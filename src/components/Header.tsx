@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import logoFull from "@/assets/inkanyezi-logo-full.png";
+import logoTransparent from "@/assets/inkanyezi-logo-transparent.png";
 
 const navLinks = [
   { label: "Services", href: "#services" },
@@ -18,16 +18,9 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16 md:h-20">
         <a href="#" className="flex items-center">
           <img
-            src={logoFull}
+            src={logoTransparent}
             alt="Inkanyezi Technologies"
-            className="h-[70px] w-auto"
-            style={{
-              mixBlendMode: "lighten",
-              background: "transparent",
-              border: "none",
-              boxShadow: "none",
-              borderRadius: 0,
-            }}
+            className="h-[65px] w-auto"
           />
         </a>
 
