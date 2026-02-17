@@ -20,8 +20,14 @@ const Header = () => {
           <img
             src={logoFull}
             alt="Inkanyezi Technologies"
-            className="h-[50px] w-auto"
-            style={{ mixBlendMode: "lighten" }}
+            className="h-[70px] w-auto"
+            style={{
+              mixBlendMode: "lighten",
+              background: "transparent",
+              border: "none",
+              boxShadow: "none",
+              borderRadius: 0,
+            }}
           />
         </a>
 
