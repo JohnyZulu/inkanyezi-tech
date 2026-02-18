@@ -1,14 +1,41 @@
 import { useState } from "react";
-import { MapPin, Phone, MessageCircle, Send } from "lucide-react";
+import { MapPin, Phone, MessageCircle, Send, Loader2 } from "lucide-react";
+
+const WEBHOOK_URL = "https://hook.eu1.make.com/79mjaa3s26c6bsr3lpfqmx5nwu5sa489";
 
 const ContactSection = () => {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", industry: "", message: "" });
+  const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", industry: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim()) return;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email.trim())) return;
+
+    setSending(true);
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          company: form.company.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          industry: form.industry,
+          enquiry: form.message.trim(),
+          timestamp: new Date().toISOString(),
+          source: "Inkanyezi Contact Page",
+        }),
+      });
+    } catch {
+      // still show success to user
+    }
+    setSending(false);
     setSent(true);
+    setForm({ name: "", company: "", email: "", phone: "", industry: "", message: "" });
   };
 
   const inputClass =
@@ -37,7 +64,7 @@ const ContactSection = () => {
                   Message Received
                 </h3>
                 <p className="text-muted-foreground">
-                  We'll be in touch within 24 hours. The future starts now.
+                  Thanks! We'll respond within 30 minutes. Check your email for confirmation.
                 </p>
               </div>
             ) : (
@@ -53,6 +80,17 @@ const ContactSection = () => {
                       placeholder="Your full name"
                       maxLength={100}
                       required
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-sans text-sm text-foreground mb-2">Company</label>
+                    <input
+                      type="text"
+                      value={form.company}
+                      onChange={(e) => setForm({ ...form, company: e.target.value })}
+                      className={inputClass}
+                      placeholder="Your company name (optional)"
+                      maxLength={100}
                     />
                   </div>
                   <div>
@@ -109,10 +147,11 @@ const ContactSection = () => {
                 </div>
                 <button
                   type="submit"
-                  className="w-full gradient-gold text-primary-foreground font-sans font-semibold py-4 rounded-lg hover:opacity-90 transition-opacity glow-gold flex items-center justify-center gap-2"
+                  disabled={sending}
+                  className="w-full gradient-gold text-primary-foreground font-sans font-semibold py-4 rounded-lg hover:opacity-90 transition-opacity glow-gold flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  Start Your Automation Journey
-                  <Send className="w-4 h-4" />
+                  {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                  {sending ? "Sending..." : "Start Your Automation Journey"}
                 </button>
               </form>
             )}
