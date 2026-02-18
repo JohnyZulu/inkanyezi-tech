@@ -10,6 +10,8 @@ const timelineSteps = [
 
 const LiveDemo = () => {
   const [name, setName] = useState("");
+  const [company, setCompany] = useState("");
+  const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [need, setNeed] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -17,7 +19,9 @@ const LiveDemo = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !phone.trim()) return;
+    if (!name.trim() || !email.trim() || !phone.trim()) return;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) return;
     setSubmitted(true);
     setActiveStep(0);
 
@@ -32,6 +36,8 @@ const LiveDemo = () => {
     setSubmitted(false);
     setActiveStep(-1);
     setName("");
+    setCompany("");
+    setEmail("");
     setPhone("");
     setNeed("");
   };
@@ -66,6 +72,31 @@ const LiveDemo = () => {
                 />
               </div>
               <div>
+                <label className="block font-sans text-sm text-foreground mb-2">Company</label>
+                <input
+                  type="text"
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  disabled={submitted}
+                  className="w-full bg-secondary border border-border rounded-lg px-4 py-3 font-sans text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all disabled:opacity-50"
+                  placeholder="Your company name (optional)"
+                  maxLength={100}
+                />
+              </div>
+              <div>
+                <label className="block font-sans text-sm text-foreground mb-2">Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={submitted}
+                  className="w-full bg-secondary border border-border rounded-lg px-4 py-3 font-sans text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all disabled:opacity-50"
+                  placeholder="your.email@company.com"
+                  maxLength={255}
+                  required
+                />
+              </div>
+              <div>
                 <label className="block font-sans text-sm text-foreground mb-2">Phone Number</label>
                 <input
                   type="tel"
@@ -91,7 +122,7 @@ const LiveDemo = () => {
               </div>
               <button
                 type="submit"
-                disabled={submitted || !name.trim() || !phone.trim()}
+                disabled={submitted || !name.trim() || !email.trim() || !phone.trim()}
                 className="w-full gradient-gold text-primary-foreground font-sans font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
