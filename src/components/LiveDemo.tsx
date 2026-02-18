@@ -8,6 +8,8 @@ const timelineSteps = [
   { label: "Notification sent", delay: 5000 },
 ];
 
+const WEBHOOK_URL = "https://hook.eu1.make.com/79mjaa3s26c6bsr3lpfqmx5nwu5sa489";
+
 const LiveDemo = () => {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
@@ -16,15 +18,11 @@ const LiveDemo = () => {
   const [need, setNeed] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [activeStep, setActiveStep] = useState(-1);
+  const [error, setError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !email.trim() || !phone.trim()) return;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) return;
-    setSubmitted(true);
+  const startTimeline = () => {
     setActiveStep(0);
-
     timelineSteps.forEach((_, i) => {
       if (i > 0) {
         setTimeout(() => setActiveStep(i), timelineSteps[i].delay);
@@ -32,9 +30,47 @@ const LiveDemo = () => {
     });
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !email.trim() || !phone.trim()) return;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) return;
+
+    setError(null);
+    setSending(true);
+
+    try {
+      const response = await fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          company: company.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          enquiry: need.trim(),
+          timestamp: new Date().toISOString(),
+          source: "Inkanyezi Website",
+        }),
+      });
+
+      if (response.ok || response.status === 410) {
+        setSubmitted(true);
+        startTimeline();
+      } else {
+        setError("Something went wrong. Please try again or call us directly.");
+      }
+    } catch {
+      setError("Something went wrong. Please try again or call us directly.");
+    } finally {
+      setSending(false);
+    }
+  };
+
   const reset = () => {
     setSubmitted(false);
     setActiveStep(-1);
+    setError(null);
     setName("");
     setCompany("");
     setEmail("");
@@ -120,13 +156,16 @@ const LiveDemo = () => {
                   maxLength={500}
                 />
               </div>
+              {error && (
+                <p className="text-sm text-destructive font-sans">{error}</p>
+              )}
               <button
                 type="submit"
-                disabled={submitted || !name.trim() || !email.trim() || !phone.trim()}
+                disabled={submitted || sending || !name.trim() || !email.trim() || !phone.trim()}
                 className="w-full gradient-gold text-primary-foreground font-sans font-semibold py-3 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                <Send className="w-4 h-4" />
-                Submit Demo
+                {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                {sending ? "Sending..." : "Submit Demo"}
               </button>
             </form>
           </div>
