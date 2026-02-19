@@ -9,10 +9,12 @@ import PhilosophySection from "@/components/PhilosophySection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import ChatbotWidget from "@/components/ChatbotWidget";
+import CustomCursor from "@/components/CustomCursor";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <CustomCursor />
       <Header />
       <main>
         <HeroSection />
