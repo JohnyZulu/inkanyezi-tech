@@ -10,57 +10,100 @@ const HeroSection = () => {
     if (!ctx) return;
 
     let animId: number;
-    const stars: { x: number; y: number; r: number; o: number; speed: number }[] = [];
+
+    interface Star {
+      x: number; y: number; r: number; baseO: number; o: number;
+      speed: number; drift: number; layer: number; phase: number;
+    }
+
+    const layers = [
+      { count: 40, minR: 0.3, maxR: 0.8, driftX: 0.08, driftY: 0.04, twinkleSpeed: 0.6 },
+      { count: 30, minR: 0.8, maxR: 1.5, driftX: 0.15, driftY: 0.08, twinkleSpeed: 0.4 },
+      { count: 15, minR: 1.5, maxR: 2.5, driftX: 0.25, driftY: 0.12, twinkleSpeed: 0.25 },
+    ];
+
+    let stars: Star[] = [];
+    let w = 0, h = 0;
 
     const resize = () => {
-      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      const dpr = window.devicePixelRatio || 1;
+      w = canvas.offsetWidth;
+      h = canvas.offsetHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
     const init = () => {
       resize();
-      stars.length = 0;
-      const w = canvas.offsetWidth;
-      const h = canvas.offsetHeight;
-      for (let i = 0; i < 80; i++) {
-        stars.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          r: Math.random() * 1.5 + 0.5,
-          o: Math.random() * 0.5 + 0.2,
-          speed: Math.random() * 0.3 + 0.1,
-        });
-      }
+      stars = [];
+      layers.forEach((layer, li) => {
+        for (let i = 0; i < layer.count; i++) {
+          const baseO = Math.random() * 0.4 + 0.15;
+          stars.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * (layer.maxR - layer.minR) + layer.minR,
+            baseO,
+            o: baseO,
+            speed: layer.twinkleSpeed,
+            drift: layer.driftX,
+            layer: li,
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
+      });
     };
 
-    const draw = () => {
-      const w = canvas.offsetWidth;
-      const h = canvas.offsetHeight;
+    const draw = (time: number) => {
       ctx.clearRect(0, 0, w, h);
+      const t = time * 0.001;
 
       stars.forEach((s) => {
-        s.o += Math.sin(Date.now() * 0.001 * s.speed) * 0.005;
-        const opacity = Math.max(0.1, Math.min(0.7, s.o));
+        // Drift diagonally and wrap
+        const layerCfg = layers[s.layer];
+        s.x += layerCfg.driftX;
+        s.y += layerCfg.driftY;
+        if (s.x > w + 5) s.x = -5;
+        if (s.y > h + 5) s.y = -5;
+
+        // Twinkle
+        s.o = s.baseO + Math.sin(t * s.speed + s.phase) * 0.2;
+        const opacity = Math.max(0.05, Math.min(0.85, s.o));
+
+        // Glow
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r + 2, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(40, 89%, 61%, ${opacity * 0.15})`;
+        ctx.fill();
+
+        // Core
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         ctx.fillStyle = `hsla(40, 89%, 61%, ${opacity})`;
         ctx.fill();
+        ctx.restore();
       });
 
-      // Draw some connecting lines
-      for (let i = 0; i < stars.length; i++) {
-        for (let j = i + 1; j < stars.length; j++) {
-          const dx = stars[i].x - stars[j].x;
-          const dy = stars[i].y - stars[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 120) {
-            ctx.beginPath();
-            ctx.moveTo(stars[i].x, stars[i].y);
-            ctx.lineTo(stars[j].x, stars[j].y);
-            ctx.strokeStyle = `hsla(40, 89%, 61%, ${0.05 * (1 - dist / 120)})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
+      // Constellation lines within same layer
+      for (let li = 0; li < layers.length; li++) {
+        const layerStars = stars.filter((s) => s.layer === li);
+        const maxDist = 100 + li * 30;
+        for (let i = 0; i < layerStars.length; i++) {
+          for (let j = i + 1; j < layerStars.length; j++) {
+            const dx = layerStars[i].x - layerStars[j].x;
+            const dy = layerStars[i].y - layerStars[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < maxDist) {
+              const alpha = 0.06 * (1 - dist / maxDist) * (0.5 + li * 0.25);
+              ctx.beginPath();
+              ctx.moveTo(layerStars[i].x, layerStars[i].y);
+              ctx.lineTo(layerStars[j].x, layerStars[j].y);
+              ctx.strokeStyle = `hsla(40, 89%, 61%, ${alpha})`;
+              ctx.lineWidth = 0.4 + li * 0.2;
+              ctx.stroke();
+            }
           }
         }
       }
@@ -69,7 +112,7 @@ const HeroSection = () => {
     };
 
     init();
-    draw();
+    animId = requestAnimationFrame(draw);
     window.addEventListener("resize", init);
     return () => {
       window.removeEventListener("resize", init);
