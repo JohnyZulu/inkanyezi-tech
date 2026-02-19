@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Check, Loader2, Send } from "lucide-react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const timelineSteps = [
   { label: "Form submitted", delay: 0 },
@@ -78,22 +79,24 @@ const LiveDemo = () => {
     setNeed("");
   };
 
+  const scrollRef = useScrollAnimation();
+
   return (
     <section id="demo" className="section-padding">
-      <div className="max-w-4xl mx-auto">
-        <p className="font-technical text-sm tracking-[0.2em] uppercase text-primary mb-4 text-center">
+      <div className="max-w-4xl mx-auto" ref={scrollRef}>
+        <p data-animate data-delay="0" className="font-technical text-sm tracking-[0.2em] uppercase text-primary mb-4 text-center">
           See It In Action
         </p>
-        <h2 className="font-serif text-3xl md:text-5xl font-bold text-foreground text-center mb-4">
+        <h2 data-animate data-delay="100" className="font-serif text-3xl md:text-5xl font-bold text-foreground text-center mb-4">
           Experience It <span className="gradient-gold-text">Yourself</span>
         </h2>
-        <p className="text-muted-foreground text-center max-w-xl mx-auto mb-12 text-lg">
+        <p data-animate data-delay="150" className="text-muted-foreground text-center max-w-xl mx-auto mb-12 text-lg">
           Try our live demo and see how fast AI automation responds.
         </p>
 
         <div className="grid md:grid-cols-2 gap-8 items-start">
           {/* Form */}
-          <div className="bg-card border border-gold rounded-xl p-8">
+          <div data-animate data-delay="200" className="bg-card border border-gold rounded-xl p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block font-sans text-sm text-foreground mb-2">Your Name</label>
@@ -171,7 +174,7 @@ const LiveDemo = () => {
           </div>
 
           {/* Timeline */}
-          <div className="bg-card border border-gold rounded-xl p-8 min-h-[300px] flex flex-col justify-center">
+          <div data-animate data-delay="350" className="bg-card border border-gold rounded-xl p-8 min-h-[300px] flex flex-col justify-center">
             {!submitted ? (
               <div className="text-center text-muted-foreground font-sans">
                 <p className="text-lg mb-2">⬅ Fill in the form</p>

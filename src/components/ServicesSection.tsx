@@ -1,4 +1,5 @@
 import { Check, Star } from "lucide-react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const packages = [
   {
@@ -39,20 +40,24 @@ const packages = [
   },
 ];
 
-const ServicesSection = () => (
-  <section id="services" className="section-padding">
-    <div className="max-w-6xl mx-auto">
-      <p className="font-technical text-sm tracking-[0.2em] uppercase text-primary mb-4 text-center">
-        Packages
-      </p>
-      <h2 className="font-serif text-3xl md:text-5xl font-bold text-foreground text-center mb-16">
-        Choose Your <span className="gradient-gold-text">Path Forward</span>
-      </h2>
-      <div className="grid md:grid-cols-3 gap-8">
-        {packages.map((pkg, i) => (
-          <div
-            key={i}
-            className={`relative rounded-xl p-8 border transition-all duration-500 hover:scale-[1.02] ${
+const ServicesSection = () => {
+  const ref = useScrollAnimation();
+  return (
+    <section id="services" className="section-padding">
+      <div className="max-w-6xl mx-auto" ref={ref}>
+        <p data-animate data-delay="0" className="font-technical text-sm tracking-[0.2em] uppercase text-primary mb-4 text-center">
+          Packages
+        </p>
+        <h2 data-animate data-delay="100" className="font-serif text-3xl md:text-5xl font-bold text-foreground text-center mb-16">
+          Choose Your <span className="gradient-gold-text">Path Forward</span>
+        </h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          {packages.map((pkg, i) => (
+            <div
+              key={i}
+              data-animate
+              data-delay={200 + i * 150}
+              className={`relative rounded-xl p-8 border transition-all duration-500 hover:scale-[1.02] ${
               pkg.highlighted
                 ? "gradient-gold text-primary-foreground glow-gold border-transparent"
                 : "bg-card border-gold border-gold-hover"
@@ -99,9 +104,10 @@ const ServicesSection = () => (
             </a>
           </div>
         ))}
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default ServicesSection;

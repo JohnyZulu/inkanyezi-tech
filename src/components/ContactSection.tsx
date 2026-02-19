@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { MapPin, Phone, MessageCircle, Send, Loader2 } from "lucide-react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const WEBHOOK_URL = "https://hook.eu1.make.com/79mjaa3s26c6bsr3lpfqmx5nwu5sa489";
 
@@ -41,20 +42,22 @@ const ContactSection = () => {
   const inputClass =
     "w-full bg-secondary border border-border rounded-lg px-4 py-3 font-sans text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all";
 
+  const ref = useScrollAnimation();
+
   return (
     <section id="contact" className="section-padding">
-      <div className="max-w-6xl mx-auto">
-        <p className="font-technical text-sm tracking-[0.2em] uppercase text-primary mb-4 text-center">
+      <div className="max-w-6xl mx-auto" ref={ref}>
+        <p data-animate data-delay="0" className="font-technical text-sm tracking-[0.2em] uppercase text-primary mb-4 text-center">
           Get Started
         </p>
-        <h2 className="font-serif text-3xl md:text-5xl font-bold text-foreground text-center mb-16">
+        <h2 data-animate data-delay="100" className="font-serif text-3xl md:text-5xl font-bold text-foreground text-center mb-16">
           Start Your Automation{" "}
           <span className="gradient-gold-text">Journey</span>
         </h2>
 
         <div className="grid md:grid-cols-5 gap-12">
           {/* Form */}
-          <div className="md:col-span-3 bg-card border border-gold rounded-xl p-8">
+          <div data-animate data-delay="200" className="md:col-span-3 bg-card border border-gold rounded-xl p-8">
             {sent ? (
               <div className="text-center py-12 animate-fade-in-slow">
                 <div className="w-16 h-16 gradient-gold rounded-full mx-auto mb-6 flex items-center justify-center">
@@ -158,7 +161,7 @@ const ContactSection = () => {
           </div>
 
           {/* Info */}
-          <div className="md:col-span-2 space-y-8">
+          <div data-animate data-delay="350" className="md:col-span-2 space-y-8">
             <div>
               <h3 className="font-serif text-xl font-semibold text-foreground mb-4">
                 Get in Touch
