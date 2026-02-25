@@ -20,7 +20,7 @@ const Header = () => {
           <img
             src={logoTransparent}
             alt="Inkanyezi Technologies"
-            className="h-[95px] w-auto"
+            className="h-[114px] w-auto"
           />
         </a>
 
