@@ -9,7 +9,7 @@ const ChatbotWidget = () => {
       {open && (
         <div className="mb-4 w-96 h-[600px] rounded-xl shadow-2xl overflow-hidden animate-fade-in-slow">
           <iframe
-            src="https://inkanyezibot-v2-zttg.vercel.app"
+            src="https://inkanyezibot-v2-zttg.vercel.app/embed"
             className="w-full h-full border-0"
             title="Inkanyezi AI Assistant"
           />
