@@ -7,7 +7,7 @@ const ChatbotWidget = () => {
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {open && (
-        <div className="mb-4 w-96 h-[600px] rounded-xl shadow-2xl overflow-hidden animate-fade-in-slow">
+        <div className="mb-4 w-96 h-[450px] rounded-xl shadow-2xl overflow-hidden animate-fade-in-slow">
           <iframe
             src="https://inkanyezibot-v2-zttg.vercel.app/embed"
             className="w-full h-full border-0"
