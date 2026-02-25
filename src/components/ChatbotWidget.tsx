@@ -7,23 +7,12 @@ const ChatbotWidget = () => {
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {open && (
-        <div className="mb-4 w-80 h-96 bg-card border border-gold rounded-xl shadow-2xl flex flex-col animate-fade-in-slow overflow-hidden">
-          <div className="gradient-gold px-4 py-3 flex items-center justify-between">
-            <span className="font-sans font-semibold text-primary-foreground text-sm">
-              Inkanyezi AI Assistant
-            </span>
-            <button onClick={() => setOpen(false)} className="text-primary-foreground/80 hover:text-primary-foreground">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="flex-1 flex items-center justify-center p-6 text-center">
-            <div>
-              <MessageCircle className="w-10 h-10 text-primary mx-auto mb-3 icon-glow" />
-              <p className="font-sans text-sm text-muted-foreground">
-                AI chatbot coming soon. Connect your webhook to enable real-time conversations.
-              </p>
-            </div>
-          </div>
+        <div className="mb-4 w-96 h-[600px] rounded-xl shadow-2xl overflow-hidden animate-fade-in-slow">
+          <iframe
+            src="https://inkanyezibot-v2-zttg.vercel.app"
+            className="w-full h-full border-0"
+            title="Inkanyezi AI Assistant"
+          />
         </div>
       )}
       <button
