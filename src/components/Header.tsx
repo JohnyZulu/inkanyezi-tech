@@ -15,28 +15,28 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16 md:h-20">
+      <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 flex items-center justify-between h-16 md:h-20 2xl:h-24">
         <a href="#" className="flex items-center">
           <img
             src={logoTransparent}
             alt="Inkanyezi Technologies"
-            className="h-[114px] w-auto"
+            className="h-[114px] 2xl:h-[160px] w-auto"
           />
         </a>
 
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-8 2xl:gap-10">
           {navLinks.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="font-technical text-sm text-muted-foreground hover:text-primary transition-colors tracking-wide uppercase"
+              className="font-technical text-sm 2xl:text-base text-muted-foreground hover:text-primary transition-colors tracking-wide uppercase"
             >
               {l.label}
             </a>
           ))}
           <a
             href="#contact"
-            className="gradient-gold text-primary-foreground font-sans font-semibold text-sm px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity"
+            className="gradient-gold text-primary-foreground font-sans font-semibold text-sm 2xl:text-base px-5 py-2.5 2xl:px-7 2xl:py-3 rounded-lg hover:opacity-90 transition-opacity"
           >
             Book a Call
           </a>
