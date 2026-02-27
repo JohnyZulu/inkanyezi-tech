@@ -16,10 +16,10 @@ const HeroSection = () => {
       speed: number; drift: number; layer: number; phase: number;
     }
 
-    const layers = [
-      { count: 40, minR: 0.3, maxR: 0.8, driftX: 0.08, driftY: 0.04, twinkleSpeed: 0.6 },
-      { count: 30, minR: 0.8, maxR: 1.5, driftX: 0.15, driftY: 0.08, twinkleSpeed: 0.4 },
-      { count: 15, minR: 1.5, maxR: 2.5, driftX: 0.25, driftY: 0.12, twinkleSpeed: 0.25 },
+    const layerConfigs = [
+      { minR: 0.3, maxR: 0.8, driftX: 0.08, driftY: 0.04, twinkleSpeed: 0.6 },
+      { minR: 0.8, maxR: 1.5, driftX: 0.15, driftY: 0.08, twinkleSpeed: 0.4 },
+      { minR: 1.5, maxR: 2.5, driftX: 0.25, driftY: 0.12, twinkleSpeed: 0.25 },
     ];
 
     let stars: Star[] = [];
@@ -36,9 +36,11 @@ const HeroSection = () => {
 
     const init = () => {
       resize();
+      const isLarge = w >= 1920;
+      const counts = isLarge ? [70, 50, 25] : [40, 30, 15];
       stars = [];
-      layers.forEach((layer, li) => {
-        for (let i = 0; i < layer.count; i++) {
+      layerConfigs.forEach((layer, li) => {
+        for (let i = 0; i < counts[li]; i++) {
           const baseO = Math.random() * 0.4 + 0.15;
           stars.push({
             x: Math.random() * w,
@@ -61,7 +63,7 @@ const HeroSection = () => {
 
       stars.forEach((s) => {
         // Drift diagonally and wrap
-        const layerCfg = layers[s.layer];
+        const layerCfg = layerConfigs[s.layer];
         s.x += layerCfg.driftX;
         s.y += layerCfg.driftY;
         if (s.x > w + 5) s.x = -5;
@@ -87,7 +89,7 @@ const HeroSection = () => {
       });
 
       // Constellation lines within same layer
-      for (let li = 0; li < layers.length; li++) {
+      for (let li = 0; li < layerConfigs.length; li++) {
         const layerStars = stars.filter((s) => s.layer === li);
         const maxDist = 100 + li * 30;
         for (let i = 0; i < layerStars.length; i++) {
@@ -127,28 +129,32 @@ const HeroSection = () => {
         className="absolute inset-0 w-full h-full"
         style={{ pointerEvents: "none" }}
       />
-      <div className="relative z-10 max-w-4xl mx-auto text-center px-6 pt-20">
-        <p className="font-technical text-sm md:text-base tracking-[0.3em] uppercase text-primary mb-6 animate-fade-in-slow">
+      {/* Radial glow effect */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: 'radial-gradient(ellipse 60% 50% at 50% 50%, hsla(40, 89%, 61%, 0.04) 0%, transparent 70%)',
+      }} />
+      <div className="relative z-10 max-w-4xl 2xl:max-w-6xl mx-auto text-center px-6 pt-12 md:pt-16 2xl:pt-20">
+        <p className="font-technical text-sm md:text-base 2xl:text-lg tracking-[0.3em] uppercase text-primary mb-4 2xl:mb-6 animate-fade-in-slow">
           Inkanyezi Technologies
         </p>
-        <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-foreground leading-tight mb-8 animate-slide-up">
+        <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl 2xl:text-8xl font-bold text-foreground leading-tight mb-6 2xl:mb-10 animate-slide-up">
           We are the{" "}
           <span className="gradient-gold-text">signal</span>{" "}
           in the noise
         </h1>
-        <p className="font-sans text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed animate-fade-in-slow" style={{ animationDelay: "0.3s" }}>
+        <p className="font-sans text-lg md:text-xl 2xl:text-2xl text-muted-foreground max-w-2xl 2xl:max-w-3xl mx-auto mb-10 2xl:mb-14 leading-relaxed animate-fade-in-slow" style={{ animationDelay: "0.3s" }}>
           In a digital universe defined by chaos and saturation, Inkanyezi Technologies stands as a fixed point of navigation — illuminating the future for South African businesses.
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-slow" style={{ animationDelay: "0.6s" }}>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 2xl:gap-6 animate-fade-in-slow" style={{ animationDelay: "0.6s" }}>
           <a
             href="#contact"
-            className="gradient-gold text-primary-foreground font-sans font-semibold text-base px-8 py-4 rounded-lg hover:opacity-90 transition-opacity glow-gold"
+            className="gradient-gold text-primary-foreground font-sans font-semibold text-base 2xl:text-lg px-8 py-4 2xl:px-12 2xl:py-5 rounded-lg hover:opacity-90 transition-opacity glow-gold"
           >
             Book Discovery Call
           </a>
           <a
             href="#demo"
-            className="border border-gold text-foreground font-sans font-medium text-base px-8 py-4 rounded-lg hover:bg-secondary transition-colors"
+            className="border border-gold text-foreground font-sans font-medium text-base 2xl:text-lg px-8 py-4 2xl:px-12 2xl:py-5 rounded-lg hover:bg-secondary transition-colors"
           >
             Try Live Demo
           </a>
