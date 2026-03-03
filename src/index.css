@@ -182,6 +182,15 @@
   to { opacity: 1; }
 }
 
+@keyframes chat-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(17, 100%, 60%, 0.5); }
+  50% { box-shadow: 0 0 0 12px hsl(17, 100%, 60%, 0); }
+}
+
+.animate-chat-pulse {
+  animation: chat-pulse 2s ease-in-out infinite;
+}
+
 html {
   scroll-behavior: smooth;
 }

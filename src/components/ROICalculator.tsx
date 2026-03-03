@@ -77,9 +77,13 @@ const ROICalculator = () => {
     const [s, h, c, m, d] = INDUSTRY_PRESETS[key].values;
     setStaff(s); setHours(h); setHourlyCost(c); setMissedLeads(m); setDealValue(d);
     setActivePreset(key);
+    window.dispatchEvent(new CustomEvent("roi-calculator-interaction"));
   }, []);
 
-  const clearPreset = () => setActivePreset(null);
+  const clearPreset = () => {
+    setActivePreset(null);
+    window.dispatchEvent(new CustomEvent("roi-calculator-interaction"));
+  };
 
   // Calculations
   const annualAdminWaste = staff * hours * hourlyCost * 22 * 12;
