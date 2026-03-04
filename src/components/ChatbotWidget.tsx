@@ -165,7 +165,7 @@ const ChatbotWidget = () => {
         href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="group block mb-3 relative"
+        className="group block mb-6 md:mb-3 relative"
         aria-label="Chat with Sanele directly on WhatsApp"
       >
         <div className="w-12 h-12 rounded-full bg-[#25D366] flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
