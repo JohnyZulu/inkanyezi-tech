@@ -78,7 +78,7 @@ const ChatbotWidget = () => {
     : "Sawubona! 👋 Wondering if AI automation is right for your business? I can show you in 2 minutes.";
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <>
       {/* Proactive popup */}
       {showPopup && !open && (
         <div className="absolute bottom-[8.5rem] right-0 w-72 animate-slide-up">
