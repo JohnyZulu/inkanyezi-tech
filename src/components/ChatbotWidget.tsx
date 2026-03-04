@@ -107,7 +107,7 @@ const ChatbotWidget = () => {
 
       {/* Chat window */}
       {open && (
-        <div className="absolute bottom-16 right-0 w-[calc(100vw-3rem)] h-[70vh] md:w-[420px] md:h-[580px] max-h-[calc(100vh-120px)] rounded-xl shadow-2xl overflow-hidden animate-fade-in-slow flex flex-col">
+        <div className="absolute bottom-24 md:bottom-16 right-0 w-[calc(100vw-3rem)] h-[60vh] md:w-[420px] md:h-[580px] max-h-[calc(100vh-120px)] rounded-xl shadow-2xl overflow-hidden animate-fade-in-slow flex flex-col">
           {/* Quick-reply chips overlay */}
           {showChips && (
             <div className="absolute bottom-0 left-0 right-0 z-20 p-3 bg-gradient-to-t from-card via-card/95 to-transparent">
