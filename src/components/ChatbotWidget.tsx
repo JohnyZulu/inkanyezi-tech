@@ -5,8 +5,8 @@ const WHATSAPP_NUMBER = "27658804122";
 const WHATSAPP_MSG = encodeURIComponent("Hi Sanele, I'd like to learn more about AI automation for my business");
 
 const QUICK_CHIPS = [
-  { emoji: "🤖", label: "Show me what you've built" },
-  { emoji: "💰", label: "What does it cost?" },
+  { emoji: "📊", label: "Calculate my ROI" },
+  { emoji: "🚀", label: "Show me what you've built" },
   { emoji: "📅", label: "Book a free demo" },
   { emoji: "💬", label: "Automate my WhatsApp" },
 ];
