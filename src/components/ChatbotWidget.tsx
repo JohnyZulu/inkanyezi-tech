@@ -86,7 +86,7 @@ const ChatbotWidget = () => {
 
       {/* Chat window */}
       {open && (
-        <div className="fixed bottom-24 right-6 w-[calc(100vw-3rem)] h-[60vh] md:w-[420px] md:h-[580px] max-h-[calc(100vh-120px)] rounded-xl shadow-2xl overflow-hidden animate-fade-in-slow flex flex-col z-50">
+        <div className="fixed bottom-24 right-6 w-[calc(100vw-3rem)] h-[60vh] md:w-[420px] md:h-[580px] max-h-[calc(100vh-120px)] rounded-xl shadow-2xl overflow-hidden flex flex-col z-50" style={{ backgroundColor: "#0B1120" }}>
           <iframe
             src="https://inkanyezibot-v2-zttg.vercel.app/embed"
             className="w-full h-full border-0"
