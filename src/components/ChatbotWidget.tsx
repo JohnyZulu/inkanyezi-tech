@@ -4,13 +4,6 @@ import { MessageCircle, X } from "lucide-react";
 const WHATSAPP_NUMBER = "27658804122";
 const WHATSAPP_MSG = encodeURIComponent("Hi Sanele, I'd like to learn more about AI automation for my business");
 
-const QUICK_CHIPS = [
-  { emoji: "📊", label: "Calculate my ROI" },
-  { emoji: "🚀", label: "Show me what you've built" },
-  { emoji: "📅", label: "Book a free demo" },
-  { emoji: "💬", label: "Automate my WhatsApp" },
-];
-
 const ChatbotWidget = () => {
   const [open, setOpen] = useState(false);
   const [showDoors, setShowDoors] = useState(false);
@@ -18,8 +11,6 @@ const ChatbotWidget = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [popupDismissed, setPopupDismissed] = useState(false);
   const [roiInteracted, setRoiInteracted] = useState(false);
-  const [showChips, setShowChips] = useState(true);
-  const [iframeRef, setIframeRef] = useState<HTMLIFrameElement | null>(null);
 
   // Proactive popup after 8 seconds
   useEffect(() => {
@@ -58,20 +49,11 @@ const ChatbotWidget = () => {
     setOpen(true);
     setShowPopup(false);
     setPopupDismissed(true);
-    setShowChips(true);
   }, []);
 
   const handleClose = useCallback(() => {
     setOpen(false);
   }, []);
-
-  const handleChipClick = useCallback((message: string) => {
-    setShowChips(false);
-    // Post message to iframe
-    if (iframeRef) {
-      iframeRef.contentWindow?.postMessage({ type: "send-message", message }, "*");
-    }
-  }, [iframeRef]);
 
   const popupMessage = roiInteracted
     ? "I see you just calculated your ROI — want me to show you exactly how we'd recover that amount for your business?"
@@ -106,29 +88,10 @@ const ChatbotWidget = () => {
       {open && (
         <div className="fixed bottom-24 right-6 w-[calc(100vw-3rem)] h-[60vh] md:w-[420px] md:h-[580px] max-h-[calc(100vh-120px)] rounded-xl shadow-2xl overflow-hidden animate-fade-in-slow flex flex-col z-50">
           <iframe
-            ref={setIframeRef}
             src="https://inkanyezibot-v2-zttg.vercel.app/embed"
-            className={`w-full h-full border-0 relative z-0 ${showChips ? "pointer-events-none" : ""}`}
+            className="w-full h-full border-0"
             title="Inkanyezi AI Assistant"
           />
-
-          {showChips && (
-            <div className="absolute bottom-0 left-0 right-0 z-20 p-3 bg-gradient-to-t from-card via-card/95 to-transparent pointer-events-auto">
-              <p className="text-xs text-muted-foreground mb-2 text-center">Quick questions:</p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {QUICK_CHIPS.map((chip) => (
-                  <button
-                    key={chip.label}
-                    onClick={() => handleChipClick(`${chip.emoji} ${chip.label}`)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border border-accent/30 bg-secondary/80 text-foreground hover:border-accent hover:bg-accent/10 transition-all duration-200 cursor-pointer"
-                  >
-                    <span>{chip.emoji}</span>
-                    {chip.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           {showDoors && (
             <>
