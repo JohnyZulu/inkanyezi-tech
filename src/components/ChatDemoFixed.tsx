@@ -30,7 +30,7 @@ const ChatDemoFixed = () => {
   }, [shown]);
 
   return (
-    <section id="demo" className="py-20 relative" style={{ background: "#07101f" }}>
+    <section id="demo" className="py-20 relative">
       {/* Section separator glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
 

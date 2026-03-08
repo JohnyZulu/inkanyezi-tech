@@ -98,7 +98,7 @@ const ROICalculator = () => {
   const insight = getInsight(staff, hours, hourlyCost, missedLeads, dealValue);
 
   return (
-    <section id="roi-calculator" className="section-padding relative overflow-hidden bg-background">
+    <section id="roi-calculator" className="section-padding relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-[0.03]" style={{ background: "radial-gradient(circle, hsl(17, 100%, 60%), transparent 70%)" }} />
