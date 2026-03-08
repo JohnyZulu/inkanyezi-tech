@@ -5,7 +5,7 @@ import SolutionSection from "@/components/SolutionSection";
 
 import HowItWorks from "@/components/HowItWorks";
 import ROICalculator from "@/components/ROICalculator";
-import LiveDemo from "@/components/LiveDemo";
+import ChatDemoFixed from "@/components/ChatDemoFixed";
 import PhilosophySection from "@/components/PhilosophySection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
