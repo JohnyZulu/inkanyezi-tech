@@ -19,6 +19,7 @@ const Index = () => {
       <CustomCursor />
       {/* Global starfield behind all content */}
       <GlobalStarfield />
+      <ShootingStars />
       <div className="relative z-10">
         <Header />
         <main>
