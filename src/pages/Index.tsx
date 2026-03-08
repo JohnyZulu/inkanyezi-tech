@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import ChatbotWidget from "@/components/ChatbotWidget";
 import CustomCursor from "@/components/CustomCursor";
 import GlobalStarfield from "@/components/GlobalStarfield";
+import ShootingStars from "@/components/ShootingStars";
 
 const Index = () => {
   return (
@@ -18,6 +19,7 @@ const Index = () => {
       <CustomCursor />
       {/* Global starfield behind all content */}
       <GlobalStarfield />
+      <ShootingStars />
       <div className="relative z-10">
         <Header />
         <main>
