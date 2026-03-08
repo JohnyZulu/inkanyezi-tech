@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import ChatbotWidget from "@/components/ChatbotWidget";
 import CustomCursor from "@/components/CustomCursor";
 import GlobalStarfield from "@/components/GlobalStarfield";
+import ShootingStars from "@/components/ShootingStars";
 
 const Index = () => {
   return (
