@@ -1,13 +1,34 @@
-import { useEffect, useRef } from "react";
+import { useState } from "react";
 
 const HeroSection = () => {
+  const [videoReady, setVideoReady] = useState(false);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "hsl(218, 58%, 10%)" }}>
-      {/* Opaque background blocks global starfield — reserved for future video */}
-      {/* Radial glow effect */}
+      {/* Radial glow effect (starfield fallback layer) */}
       <div className="absolute inset-0 pointer-events-none" style={{
         background: 'radial-gradient(ellipse 60% 50% at 50% 50%, hsla(40, 89%, 61%, 0.04) 0%, transparent 70%)',
       }} />
+
+      {/* Background video — hidden on mobile via CSS */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="none"
+        onCanPlay={() => setVideoReady(true)}
+        className="absolute inset-0 w-full h-full object-cover hidden md:block"
+        style={{
+          opacity: videoReady ? 1 : 0,
+          transition: "opacity 1.5s ease",
+        }}
+        src="/videos/hero-loop.mp4"
+      />
+
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-[hsl(218,58%,10%)]/50" />
+
       <div className="relative z-10 max-w-4xl 2xl:max-w-6xl mx-auto text-center px-6 pt-12 md:pt-16 2xl:pt-20">
         <p className="font-technical text-sm md:text-base 2xl:text-lg tracking-[0.3em] uppercase text-primary mb-4 2xl:mb-6 animate-fade-in-slow">
           Inkanyezi Technologies
