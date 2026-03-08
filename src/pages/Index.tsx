@@ -24,7 +24,7 @@ const Index = () => {
         
         <HowItWorks />
         <ROICalculator />
-        <LiveDemo />
+        <ChatDemoFixed />
         <PhilosophySection />
         <ContactSection />
       </main>
