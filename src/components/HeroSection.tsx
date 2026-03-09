@@ -1,5 +1,5 @@
 import { useState } from "react";
-import InkanyeziHeroCanvas from "./InkanyeziHeroCanvas";
+import InkanyeziHeroCanvas from "./InkanyeziHeroCanvas.tsx";
 
 const HeroSection = () => {
   return (
