@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, Phone, MessageCircle, Send, Loader2 } from "lucide-react";
+import { MapPin, Phone, MessageCircle, Send, Loader2, Mail, Clock } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const WEBHOOK_URL = "https://hook.eu1.make.com/79mjaa3s26c6bsr3lpfqmx5nwu5sa489";
