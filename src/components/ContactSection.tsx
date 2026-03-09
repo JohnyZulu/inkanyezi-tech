@@ -166,29 +166,52 @@ const ContactSection = () => {
               <h3 className="font-serif text-xl font-semibold text-foreground mb-4">
                 Get in Touch
               </h3>
+              <p className="font-sans text-sm text-muted-foreground mb-5">
+                Sanele Sishange — Founder &amp; CEO
+              </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                   <p className="font-sans text-muted-foreground">
-                    Durban, KwaZulu-Natal<br />South Africa
+                    Cato Manor, Mayville, Durban, 4091<br />KwaZulu-Natal, South Africa
                   </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="w-5 h-5 text-primary flex-shrink-0" />
-                  <a href="tel:+27000000000" className="font-sans text-muted-foreground hover:text-primary transition-colors">
-                    +27 (0) 00 000 0000
-                  </a>
                 </div>
                 <div className="flex items-center gap-3">
                   <MessageCircle className="w-5 h-5 text-primary flex-shrink-0" />
                   <a
-                    href="https://wa.me/27000000000"
+                    href="https://wa.me/27658804122"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-sans text-muted-foreground hover:text-primary transition-colors"
                   >
-                    Chat on WhatsApp
+                    +27 65 880 4122 (WhatsApp)
                   </a>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Mail className="w-5 h-5 text-primary flex-shrink-0" />
+                  <a
+                    href="mailto:inkanyeziaisolutions3@gmail.com"
+                    className="font-sans text-muted-foreground hover:text-primary transition-colors break-all"
+                  >
+                    inkanyeziaisolutions3@gmail.com
+                  </a>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Clock className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-sans text-muted-foreground">
+                      Monday – Friday, 8:00 AM – 5:00 PM (SAST)
+                    </p>
+                    <p className="font-sans text-sm mt-2 flex items-center gap-2">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+                      </span>
+                      <span className="text-accent">
+                        Outside office hours? InkanyeziBot is available 24/7 to answer your questions and book appointments instantly.
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
