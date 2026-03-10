@@ -1,6 +1,6 @@
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "hsl(218, 58%, 10%)" }}>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "transparent" }}>
       <div className="relative max-w-4xl 2xl:max-w-6xl mx-auto text-center px-6 pt-12 md:pt-16 2xl:pt-20" style={{ zIndex: 10 }}>
         <p className="font-technical text-sm md:text-base 2xl:text-lg tracking-[0.3em] uppercase text-primary mb-4 2xl:mb-6 animate-fade-in-slow">
           Inkanyezi Technologies
