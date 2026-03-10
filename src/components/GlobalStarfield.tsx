@@ -115,7 +115,7 @@ const GlobalStarfield = () => {
         }
       }
 
-      // Constellation lines — full page, both mobile and desktop
+      // Constellation lines
       constellationLines = [];
       const largeStars = stars.filter(s => s.tier >= 1);
       const anchors = largeStars.slice(0, Math.min(40, largeStars.length));
@@ -143,7 +143,7 @@ const GlobalStarfield = () => {
         }
       }
 
-      // Shooting stars — all devices
+      // Shooting stars
       shootingStars = [];
       for (let i = 0; i < SHOOTING_STAR_COUNT; i++) {
         shootingStars.push({
@@ -178,4 +178,129 @@ const GlobalStarfield = () => {
         const ny = prefersReducedMotion ? neb.baseY
           : neb.baseY + Math.cos(t / neb.cycleY + neb.phaseY) * h * 0.07;
         neb.x = nx; neb.y = ny;
-        const g = ctx.createRadialGradient(
+        const g = ctx.createRadialGradient(nx, ny, 0, nx, ny, neb.radius);
+        g.addColorStop(0, neb.color);
+        g.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(nx, ny, neb.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Stars
+      for (const star of stars) {
+        const twinkle = Math.sin(t * star.twinkleSpeed + star.phase);
+        star.o = star.baseO * (0.5 + 0.5 * twinkle);
+
+        const sx = prefersReducedMotion ? star.x
+          : star.x + Math.sin(t * star.driftX + star.phase) * 0.5;
+        const sy = prefersReducedMotion ? star.y
+          : star.y + Math.cos(t * star.driftY + star.phase) * 0.3;
+
+        // Glow for larger stars
+        if (star.glowR > 0) {
+          const gg = ctx.createRadialGradient(sx, sy, 0, sx, sy, star.r + star.glowR);
+          gg.addColorStop(0, `rgba(255,220,150,${star.o * star.glowO})`);
+          gg.addColorStop(1, "rgba(255,220,150,0)");
+          ctx.fillStyle = gg;
+          ctx.beginPath();
+          ctx.arc(sx, sy, star.r + star.glowR, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.beginPath();
+        ctx.arc(sx, sy, star.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,235,210,${star.o})`;
+        ctx.fill();
+      }
+
+      // Constellation lines
+      for (const line of constellationLines) {
+        const pulse = 0.6 + 0.4 * Math.sin(t * 0.5 + line.x1 * 0.01);
+        ctx.beginPath();
+        ctx.moveTo(line.x1, line.y1);
+        ctx.lineTo(line.x2, line.y2);
+        ctx.strokeStyle = `rgba(249,180,80,${line.opacity * pulse})`;
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+
+      // Shooting stars
+      for (const ss of shootingStars) {
+        if (!ss.active) {
+          ss.nextSpawn -= 1 / 60;
+          if (ss.nextSpawn <= 0) {
+            spawnShootingStar(ss);
+          }
+          continue;
+        }
+
+        ss.life++;
+        const frac = ss.life / ss.maxLife;
+        const opacity = frac < 0.2 ? frac / 0.2 : frac > 0.7 ? (1 - frac) / 0.3 : 1;
+
+        if (ss.life >= ss.maxLife) {
+          ss.active = false;
+          ss.nextSpawn = 5 + Math.random() * 12;
+          continue;
+        }
+
+        const hx = ss.x + Math.cos(ss.angle) * ss.life * ss.speed * 0.3;
+        const hy = ss.y + Math.sin(ss.angle) * ss.life * ss.speed * 0.3;
+        const tailLen = Math.min(ss.life * ss.speed * 0.3, ss.length);
+        const tx = hx - Math.cos(ss.angle) * tailLen;
+        const ty = hy - Math.sin(ss.angle) * tailLen;
+
+        const sg = ctx.createLinearGradient(tx, ty, hx, hy);
+        sg.addColorStop(0, "rgba(249,180,80,0)");
+        sg.addColorStop(0.55, `rgba(255,210,120,${opacity * 0.55})`);
+        sg.addColorStop(1, `rgba(255,245,200,${opacity})`);
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(hx, hy);
+        ctx.strokeStyle = sg;
+        ctx.lineWidth = 1.5;
+        ctx.lineCap = "round";
+        ctx.stroke();
+
+        const hg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 5);
+        hg.addColorStop(0, `rgba(255,245,185,${opacity * 0.9})`);
+        hg.addColorStop(1, "rgba(255,195,75,0)");
+        ctx.fillStyle = hg;
+        ctx.beginPath();
+        ctx.arc(hx, hy, 5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      animId = requestAnimationFrame(draw);
+    };
+
+    init();
+    animId = requestAnimationFrame(draw);
+
+    const handleResize = () => { init(); };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        zIndex: 0,
+        pointerEvents: "none",
+      }}
+    />
+  );
+};
+
+export default GlobalStarfield;
