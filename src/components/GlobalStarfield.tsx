@@ -84,13 +84,13 @@ const GlobalStarfield = () => {
         });
       }
 
-      // Stars
+      // Stars — 220 desktop, 100 mobile
       stars = [];
       const totalStars = isMobile ? 100 : 220;
       const tiers = [
         { min: 0.5, max: 1.0, glowR: 0,   glowO: 0,    twinkleMin: 2, twinkleMax: 3, fraction: 0.55 },
         { min: 1.2, max: 2.0, glowR: 2.5, glowO: 0.12, twinkleMin: 3, twinkleMax: 5, fraction: 0.30 },
-        { min: 2.2, max: 3.5, glowR: 5,   glowO: 0.4,  twinkleMin: 5, twinkleMax: 8, fraction: 0.15 },
+        { min: 2.2, max: 3.5, glowR: 7,   glowO: 0.5,  twinkleMin: 5, twinkleMax: 8, fraction: 0.15 },
       ];
       for (let ti = 0; ti < tiers.length; ti++) {
         const t = tiers[ti];
@@ -115,7 +115,7 @@ const GlobalStarfield = () => {
         }
       }
 
-      // Constellation lines
+      // Constellation lines — both mobile and desktop
       constellationLines = [];
       const largeStars = stars.filter(s => s.tier >= 1);
       const anchors = largeStars.slice(0, Math.min(40, largeStars.length));
@@ -143,7 +143,7 @@ const GlobalStarfield = () => {
         }
       }
 
-      // Shooting stars
+      // Shooting stars — all devices, 8 total
       shootingStars = [];
       for (let i = 0; i < SHOOTING_STAR_COUNT; i++) {
         shootingStars.push({
@@ -214,7 +214,7 @@ const GlobalStarfield = () => {
         ctx.fill();
       }
 
-      // Constellation lines
+      // Constellation lines — pulsing sine wave opacity
       for (const line of constellationLines) {
         const pulse = 0.6 + 0.4 * Math.sin(t * 0.5 + line.x1 * 0.01);
         ctx.beginPath();
@@ -225,7 +225,7 @@ const GlobalStarfield = () => {
         ctx.stroke();
       }
 
-      // Shooting stars
+      // Shooting stars — all devices, glowing head + amber-to-gold tail
       for (const ss of shootingStars) {
         if (!ss.active) {
           ss.nextSpawn -= 1 / 60;
@@ -241,7 +241,8 @@ const GlobalStarfield = () => {
 
         if (ss.life >= ss.maxLife) {
           ss.active = false;
-          ss.nextSpawn = 5 + Math.random() * 12;
+          // Spawn again in 6–16 seconds
+          ss.nextSpawn = 6 + Math.random() * 10;
           continue;
         }
 
@@ -251,6 +252,7 @@ const GlobalStarfield = () => {
         const tx = hx - Math.cos(ss.angle) * tailLen;
         const ty = hy - Math.sin(ss.angle) * tailLen;
 
+        // Tail: transparent amber → bright white-gold
         const sg = ctx.createLinearGradient(tx, ty, hx, hy);
         sg.addColorStop(0, "rgba(249,180,80,0)");
         sg.addColorStop(0.55, `rgba(255,210,120,${opacity * 0.55})`);
@@ -259,16 +261,17 @@ const GlobalStarfield = () => {
         ctx.moveTo(tx, ty);
         ctx.lineTo(hx, hy);
         ctx.strokeStyle = sg;
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.8;
         ctx.lineCap = "round";
         ctx.stroke();
 
-        const hg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 5);
-        hg.addColorStop(0, `rgba(255,245,185,${opacity * 0.9})`);
+        // Glowing radial gradient head
+        const hg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 7);
+        hg.addColorStop(0, `rgba(255,245,185,${opacity * 0.95})`);
         hg.addColorStop(1, "rgba(255,195,75,0)");
         ctx.fillStyle = hg;
         ctx.beginPath();
-        ctx.arc(hx, hy, 5, 0, Math.PI * 2);
+        ctx.arc(hx, hy, 7, 0, Math.PI * 2);
         ctx.fill();
       }
 
