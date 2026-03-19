@@ -8,7 +8,7 @@ import ChatDemoFixed from "@/components/ChatDemoFixed";
 import PhilosophySection from "@/components/PhilosophySection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
-import ChatbotWidget from "@/components/ChatbotWidget";
+
 import CustomCursor from "@/components/CustomCursor";
 import GlobalStarfield from "@/components/GlobalStarfield";
 import ShootingStars from "@/components/ShootingStars";
@@ -34,7 +34,7 @@ const Index = () => {
         </main>
         <Footer />
       </div>
-      <ChatbotWidget />
+      
     </div>
   );
 };
