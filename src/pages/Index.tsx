@@ -34,7 +34,7 @@ const Index = () => {
         </main>
         <Footer />
       </div>
-      <ChatbotWidget />
+      
     </div>
   );
 };
