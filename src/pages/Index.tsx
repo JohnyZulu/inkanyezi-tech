@@ -298,21 +298,27 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     ctx.clearRect(0, 0, W, H);
 
     // Base — void black
-    ctx.fillStyle = '#020810'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle = '#0a1628'; ctx.fillRect(0,0,W,H);
+    // Radial brightness boost — centre lit, edges dark like a real door
+    const radial=ctx.createRadialGradient(W*0.5,H*0.5,0,W*0.5,H*0.5,W*0.9);
+    radial.addColorStop(0,'rgba(30,60,110,0.55)');
+    radial.addColorStop(0.6,'rgba(15,35,70,0.3)');
+    radial.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=radial; ctx.fillRect(0,0,W,H);
 
     // Fine grid — holographic blueprint
-    ctx.strokeStyle = 'rgba(100,160,255,0.06)'; ctx.lineWidth = 0.5;
+    ctx.strokeStyle = 'rgba(120,180,255,0.14)'; ctx.lineWidth = 0.5;
     for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
     // Coarser accent grid
-    ctx.strokeStyle = 'rgba(100,160,255,0.04)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(120,180,255,0.08)'; ctx.lineWidth = 1;
     for(let x=0;x<W;x+=100){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<H;y+=100){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
     // Hexagonal microchip pattern
     const hr = 15, hw = hr*Math.sqrt(3);
-    ctx.strokeStyle = 'rgba(244,185,66,0.06)'; ctx.lineWidth = 0.6;
+    ctx.strokeStyle = 'rgba(244,185,66,0.14)'; ctx.lineWidth = 0.7;
     for(let row=-1;row<H/(hr*1.5)+1;row++){
       for(let col=-1;col<W/hw+1;col++){
         const cx=col*hw+(row%2===0?0:hw/2), cy=row*hr*1.5;
@@ -329,7 +335,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       for(let i=0;i<7;i++){
         const yPos=((tk*55*(0.7+ci*0.2)+i*(H/7))%H);
         const alpha=(0.08+0.1*Math.sin(tk+i+ci*2))*Math.max(0,1-op*2);
-        ctx.fillStyle=`rgba(100,180,255,${alpha})`;
+        ctx.fillStyle=`rgba(140,200,255,${alpha})`;
         ctx.font=`${7+i%2}px monospace`; ctx.textAlign='center';
         ctx.fillText(chars[(Math.floor(tk*2+i+ci*5))%chars.length],sx,yPos);
       }
@@ -338,7 +344,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     // Horizontal circuit traces with pulse
     [H*0.15,H*0.3,H*0.5,H*0.7,H*0.85].forEach((y,i)=>{
       const p=0.4+0.5*Math.sin(tk*2+i*1.3);
-      ctx.strokeStyle=`rgba(244,185,66,${0.08+p*0.1})`; ctx.lineWidth=0.8;
+      ctx.strokeStyle=`rgba(244,185,66,${0.18+p*0.22})`; ctx.lineWidth=1;
       ctx.beginPath();
       const mid=W/2;
       ctx.moveTo(0,y);
@@ -347,7 +353,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       // Junction nodes
       [W*0.1, mid, W*0.9].forEach(nx=>{
         ctx.beginPath(); ctx.arc(nx,y,2,0,Math.PI*2);
-        ctx.fillStyle=`rgba(244,185,66,${0.2+p*0.5})`; ctx.fill();
+        ctx.fillStyle=`rgba(244,185,66,${0.35+p*0.55})`; ctx.fill();
       });
     });
 
@@ -356,7 +362,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     const sg=ctx.createLinearGradient(0,scanY-25,0,scanY+25);
     sg.addColorStop(0,'rgba(100,160,255,0)');
     sg.addColorStop(0.4,`rgba(100,200,255,${0.05+op*0.03})`);
-    sg.addColorStop(0.5,`rgba(180,220,255,${0.1+op*0.05})`);
+    sg.addColorStop(0.5,`rgba(180,220,255,${0.18+op*0.1})`);
     sg.addColorStop(0.6,`rgba(100,200,255,${0.05+op*0.03})`);
     sg.addColorStop(1,'rgba(100,160,255,0)');
     ctx.fillStyle=sg; ctx.fillRect(0,scanY-25,W,50);
@@ -364,8 +370,8 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     // Plasma energy conduit — inner edge, glows gold→orange
     const cg=ctx.createLinearGradient(0,0,0,H);
     cg.addColorStop(0,'rgba(244,185,66,0)');
-    cg.addColorStop(0.25,`rgba(244,185,66,${0.4+op*0.5})`);
-    cg.addColorStop(0.5,`rgba(255,107,53,${0.6+op*0.4})`);
+    cg.addColorStop(0.25,`rgba(244,185,66,${0.6+op*0.4})`);
+    cg.addColorStop(0.5,`rgba(255,140,60,${0.8+op*0.2})`);
     cg.addColorStop(0.75,`rgba(244,185,66,${0.4+op*0.5})`);
     cg.addColorStop(1,'rgba(244,185,66,0)');
     ctx.fillStyle=cg; ctx.fillRect(isL?W-4:0,0,4,H);
@@ -378,7 +384,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     ctx.fillStyle=eg; ctx.fillRect(isL?W-80:0,0,80,H);
 
     // Precision frame — double line
-    ctx.strokeStyle='rgba(244,185,66,0.2)'; ctx.lineWidth=0.8;
+    ctx.strokeStyle='rgba(244,185,66,0.35)'; ctx.lineWidth=1;
     ctx.strokeRect(5,5,W-10,H-10);
     ctx.strokeStyle='rgba(100,160,255,0.08)'; ctx.lineWidth=0.5;
     ctx.strokeRect(11,11,W-22,H-22);
@@ -386,16 +392,16 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     // Corner brackets — engineering precision
     const b=18;
     [[5,5],[5,H-5],[W-5,5],[W-5,H-5]].forEach(([bx,by])=>{
-      ctx.strokeStyle='rgba(244,185,66,0.5)'; ctx.lineWidth=1.5;
+      ctx.strokeStyle='rgba(244,185,66,0.75)'; ctx.lineWidth=2;
       const mx=bx>W/2?-b:b, my=by>H/2?-b:b;
       ctx.beginPath(); ctx.moveTo(bx+mx,by); ctx.lineTo(bx,by); ctx.lineTo(bx,by+my); ctx.stroke();
     });
 
     // Panel ID — bottom
     ctx.font='7px monospace'; ctx.textAlign='center';
-    ctx.fillStyle=`rgba(100,160,255,${0.3+0.1*Math.sin(tk*4)})`;
+    ctx.fillStyle=`rgba(140,190,255,${0.5+0.15*Math.sin(tk*4)})`;
     ctx.fillText(isL?'◈ INK-L':'◈ INK-R',W/2,H-16);
-    ctx.fillStyle='rgba(244,185,66,0.2)';
+    ctx.fillStyle='rgba(244,185,66,0.45)';
     ctx.fillText(isL?'UNIT·ALPHA':'UNIT·SIGMA',W/2,H-8);
   };
 
@@ -491,14 +497,14 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       <div style={{position:'absolute',top:0,left:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(-${slide}%)`,overflow:'hidden'}}>
         <canvas ref={leftRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
         {phase==='opening'&&(
-          <div style={{position:'absolute',top:'50%',right:`${5+doorPct*14}%`,transform:`translateY(-50%) scale(${1+doorPct*0.3})`,fontFamily:'Arial',fontWeight:'bold',fontSize:56,color:`rgba(255,255,255,${Math.max(0,1-doorPct*2)})`,textShadow:'0 0 20px #F4B942,0 0 40px rgba(255,107,53,0.5)',pointerEvents:'none'}}>A</div>
+          <div style={{position:'absolute',top:'50%',right:'18%',transform:'translateY(-50%)',fontFamily:"'Syne',Arial,sans-serif",fontWeight:800,fontSize:58,color:`rgba(255,255,255,${Math.max(0,1-doorPct*1.8)})`,textShadow:'0 0 16px #F4B942, 0 0 32px rgba(255,107,53,0.4)',pointerEvents:'none',letterSpacing:-1,userSelect:'none'}}>A</div>
         )}
       </div>
       {/* RIGHT DOOR */}
       <div style={{position:'absolute',top:0,right:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(${slide}%)`,overflow:'hidden'}}>
         <canvas ref={rightRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
         {phase==='opening'&&(
-          <div style={{position:'absolute',top:'50%',left:`${5+doorPct*14}%`,transform:`translateY(-50%) scale(${1+doorPct*0.3})`,fontFamily:'Arial',fontWeight:'bold',fontSize:56,color:`rgba(255,255,255,${Math.max(0,1-doorPct*2)})`,textShadow:'0 0 20px #F4B942,0 0 40px rgba(255,107,53,0.5)',pointerEvents:'none'}}>I</div>
+          <div style={{position:'absolute',top:'50%',left:'18%',transform:'translateY(-50%)',fontFamily:"'Syne',Arial,sans-serif",fontWeight:800,fontSize:58,color:`rgba(255,255,255,${Math.max(0,1-doorPct*1.8)})`,textShadow:'0 0 16px #F4B942, 0 0 32px rgba(255,107,53,0.4)',pointerEvents:'none',letterSpacing:-1,userSelect:'none'}}>I</div>
         )}
       </div>
       {/* BRAIN */}
