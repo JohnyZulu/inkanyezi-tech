@@ -391,11 +391,12 @@ function InkanyeziBotWidget() {
         @keyframes ping { 0%{transform:scale(1);opacity:0.8;} 70%{transform:scale(2.2);opacity:0;} 100%{transform:scale(2.2);opacity:0;} }
         @keyframes floatBubble { 0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 30px rgba(249,115,22,0.55),0 0 60px rgba(249,115,22,0.2);} 50%{transform:translateY(-6px) scale(1.03);box-shadow:0 0 40px rgba(249,115,22,0.7),0 0 80px rgba(249,115,22,0.3);} }
         @keyframes orbitRing { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-        @keyframes windowSlide { 
-          0%  { opacity:0; transform:translateY(30px) scaleY(0.05) scaleX(0.8); transform-origin: bottom center; }
-          40% { opacity:1; transform:translateY(0) scaleY(0.6) scaleX(1); transform-origin: bottom center; }
-          70% { transform:translateY(0) scaleY(1.02) scaleX(1); transform-origin: bottom center; }
-          100%{ transform:translateY(0) scaleY(1) scaleX(1); transform-origin: bottom center; }
+        @keyframes windowSlide {
+          0%   { opacity:0; clip-path: inset(100% 0 0 0 round 20px); transform: translateY(20px); }
+          30%  { opacity:1; clip-path: inset(60% 0 0 0 round 20px); transform: translateY(10px); }
+          65%  { clip-path: inset(5% 0 0 0 round 20px); transform: translateY(2px); }
+          85%  { clip-path: inset(0% 0 -2% 0 round 20px); transform: translateY(-2px); }
+          100% { clip-path: inset(0% 0 0% 0 round 20px); transform: translateY(0); }
         }
         @keyframes headerShimmer { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
         @keyframes shimmerBar { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
@@ -417,7 +418,7 @@ function InkanyeziBotWidget() {
 
       {/* ── PROACTIVE GREETING ── */}
       {showGreeting && !isOpen && (
-        <div onClick={()=>setIsOpen(true)} style={{ position:'fixed', bottom:100, right:24, zIndex:10001, maxWidth:260, cursor:'pointer', opacity:greetingVisible?1:0, transform:greetingVisible?'translateY(0) scale(1)':'translateY(10px) scale(0.95)', transition:'opacity 0.35s ease, transform 0.35s ease' }}>
+        <div onClick={()=>setIsOpen(true)} style={{ position:'fixed', bottom:100, right:24, zIndex:99999, maxWidth:260, cursor:'pointer', opacity:greetingVisible?1:0, transform:greetingVisible?'translateY(0) scale(1)':'translateY(10px) scale(0.95)', transition:'opacity 0.35s ease, transform 0.35s ease' }}>
           <div style={{ background:'linear-gradient(145deg, rgba(15,27,53,0.98), rgba(10,22,40,0.98))', border:'1px solid rgba(249,115,22,0.25)', borderRadius:16, borderBottomRightRadius:4, padding:'12px 14px', boxShadow:'0 8px 32px rgba(0,0,0,0.5)', position:'relative', overflow:'hidden' }}>
             <div style={{ position:'absolute', top:0, left:0, right:0, height:1.5, background:'linear-gradient(90deg, transparent, rgba(244,185,66,0.6), transparent)' }} />
             <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
@@ -443,7 +444,7 @@ function InkanyeziBotWidget() {
 
       {/* ── FLOATING BUBBLE ── */}
       <button onClick={()=>setIsOpen(o=>!o)} aria-label={isOpen?'Close chat':'Open InkanyeziBot'}
-        style={{ position:'fixed', bottom:24, right:24, zIndex:10001, width:64, height:64, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', border:'2px solid rgba(249,115,22,0.45)', cursor:'pointer', fontSize:26, animation:'floatBubble 3s ease-in-out infinite', display:'flex', alignItems:'center', justifyContent:'center', transition:'transform 0.2s' }}>
+        style={{ position:'fixed', bottom:24, right:24, zIndex:99999, width:64, height:64, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', border:'2px solid rgba(249,115,22,0.45)', cursor:'pointer', fontSize:26, animation:'floatBubble 3s ease-in-out infinite', display:'flex', alignItems:'center', justifyContent:'center', transition:'transform 0.2s' }}>
         {!isOpen && (
           <div style={{ position:'absolute', width:64, height:64, animation:'orbitRing 4s linear infinite', pointerEvents:'none' }}>
             <div style={{ position:'absolute', top:-3, left:'50%', width:7, height:7, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 10px ${C.gold}` }} />
@@ -454,7 +455,7 @@ function InkanyeziBotWidget() {
 
       {/* ── CHAT WINDOW ── */}
       {isOpen && (
-        <div style={{ position:'fixed', bottom:100, right:24, width:370, height:580, display:'flex', flexDirection:'column', zIndex:10001, overflow:'hidden', borderRadius:20, background:'linear-gradient(160deg, #1e2d4a 0%, #131f33 50%, #0c1624 100%)', border:'1px solid rgba(249,115,22,0.2)', boxShadow:'0 0 0 1px rgba(244,185,66,0.05), 0 0 50px rgba(249,115,22,0.12), 0 25px 70px rgba(0,0,0,0.7)', animation:'windowSlide 0.5s cubic-bezier(0.16,1,0.3,1) forwards' }}>
+        <div style={{ position:'fixed', bottom:100, right:24, width:370, height:580, display:'flex', flexDirection:'column', zIndex:99998, borderRadius:20, background:'linear-gradient(160deg, #1e2d4a 0%, #131f33 50%, #0c1624 100%)', border:'1px solid rgba(249,115,22,0.2)', boxShadow:'0 0 0 1px rgba(244,185,66,0.05), 0 0 50px rgba(249,115,22,0.12), 0 25px 70px rgba(0,0,0,0.7)', animation:'windowSlide 0.5s cubic-bezier(0.16,1,0.3,1) forwards' }}>
           <CosmosCanvas width={370} height={580} />
 
           {/* Header */}
@@ -563,7 +564,7 @@ function WhatsAppWidget() {
         .wa-btn:hover { transform: scale(1.1) !important; box-shadow: 0 8px 30px rgba(37,211,102,0.6) !important; animation: none !important; }
         .wa-tip { animation: waFade 0.2s ease forwards; }
       `}</style>
-      <div style={{ position:'fixed', bottom:96, right:28, zIndex:10002, display:'flex', alignItems:'center', gap:10, opacity:visible?1:0, transform:visible?'scale(1)':'scale(0.8)', transition:'opacity 0.4s ease, transform 0.4s ease' }}>
+      <div style={{ position:'fixed', bottom:96, right:28, zIndex:99999, display:'flex', alignItems:'center', gap:10, opacity:visible?1:0, transform:visible?'scale(1)':'scale(0.8)', transition:'opacity 0.4s ease, transform 0.4s ease' }}>
         {hovered && (
           <div className="wa-tip" style={{ background:'linear-gradient(135deg, rgba(10,22,40,0.98), rgba(4,8,15,0.98))', border:'1px solid rgba(37,211,102,0.3)', borderRadius:10, padding:'8px 14px', whiteSpace:'nowrap', boxShadow:'0 4px 20px rgba(0,0,0,0.5)', position:'relative' }}>
             <div style={{ fontSize:12, fontWeight:700, color:'#fff', fontFamily:"'Syne',sans-serif", marginBottom:2 }}>Chat with Sanele</div>
