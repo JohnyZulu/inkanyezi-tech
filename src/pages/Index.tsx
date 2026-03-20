@@ -391,7 +391,7 @@ function InkanyeziBotWidget() {
         @keyframes ping { 0%{transform:scale(1);opacity:0.8;} 70%{transform:scale(2.2);opacity:0;} 100%{transform:scale(2.2);opacity:0;} }
         @keyframes floatBubble { 0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 30px rgba(249,115,22,0.55),0 0 60px rgba(249,115,22,0.2);} 50%{transform:translateY(-6px) scale(1.03);box-shadow:0 0 40px rgba(249,115,22,0.7),0 0 80px rgba(249,115,22,0.3);} }
         @keyframes orbitRing { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-        @keyframes windowSlide {
+        @keyframes inkDoorOpen {
           0%   { opacity:0; clip-path: inset(100% 0 0 0 round 20px); transform: translateY(20px); }
           30%  { opacity:1; clip-path: inset(60% 0 0 0 round 20px); transform: translateY(10px); }
           65%  { clip-path: inset(5% 0 0 0 round 20px); transform: translateY(2px); }
@@ -455,7 +455,7 @@ function InkanyeziBotWidget() {
 
       {/* ── CHAT WINDOW ── */}
       {isOpen && (
-        <div style={{ position:'fixed', bottom:100, right:24, width:370, height:580, display:'flex', flexDirection:'column', zIndex:99998, borderRadius:20, background:'linear-gradient(160deg, #1e2d4a 0%, #131f33 50%, #0c1624 100%)', border:'1px solid rgba(249,115,22,0.2)', boxShadow:'0 0 0 1px rgba(244,185,66,0.05), 0 0 50px rgba(249,115,22,0.12), 0 25px 70px rgba(0,0,0,0.7)', animation:'windowSlide 0.5s cubic-bezier(0.16,1,0.3,1) forwards' }}>
+        <div key={Date.now()} style={{ position:'fixed', bottom:100, right:24, width:370, height:580, display:'flex', flexDirection:'column', zIndex:99998, borderRadius:20, background:'linear-gradient(160deg, #1e2d4a 0%, #131f33 50%, #0c1624 100%)', border:'1px solid rgba(249,115,22,0.2)', boxShadow:'0 0 0 1px rgba(244,185,66,0.05), 0 0 50px rgba(249,115,22,0.12), 0 25px 70px rgba(0,0,0,0.7)', animation:'inkDoorOpen 0.55s cubic-bezier(0.16,1,0.3,1) forwards' }}>
           <CosmosCanvas width={370} height={580} />
 
           {/* Header */}
