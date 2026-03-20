@@ -277,6 +277,335 @@ function formatMessage(text: string) {
   return text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>');
 }
 
+
+// ════════════════════════════════════════════════════════════════════
+// INKANYEZI AFROFUTURIST DOOR ANIMATION
+// Zulu royal kraal meets quantum technology — built in 3025
+// Ndebele geometry × Constellation star maps × SA heritage colours
+// ════════════════════════════════════════════════════════════════════
+function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
+  const leftRef  = useRef<HTMLCanvasElement>(null);
+  const rightRef = useRef<HTMLCanvasElement>(null);
+  const [phase, setPhase]     = useState<'brain'|'opening'>('brain');
+  const [doorPct, setDoorPct] = useState(0);
+  const animRef = useRef<number>(0);
+
+  // ── PANEL CANVAS PAINTER ──────────────────────────────────────────
+  const paintPanel = (canvas: HTMLCanvasElement, side: 'left'|'right', tick: number, openPct: number) => {
+    const ctx = canvas.getContext('2d')!;
+    const W = canvas.width, H = canvas.height;
+    const isL = side === 'left';
+    ctx.clearRect(0, 0, W, H);
+
+    // Base — deep midnight
+    ctx.fillStyle = '#07111f';
+    ctx.fillRect(0, 0, W, H);
+
+    // ── NDEBELE GEOMETRIC BORDER ────────────────────────────────────
+    // Bold angular patterns inspired by Ndebele house-painting
+    const ndebeleColors = ['#F4B942', '#FF6B35', '#007A4D', '#DE3831', '#002395', '#FFB612'];
+    
+    // Top border strip — Ndebele zigzag
+    const stripH = 28;
+    for (let x = 0; x < W; x += 14) {
+      const colorIdx = Math.floor(x / 14) % ndebeleColors.length;
+      ctx.fillStyle = ndebeleColors[colorIdx];
+      ctx.globalAlpha = 0.75;
+      // Triangle up
+      ctx.beginPath();
+      ctx.moveTo(x, 0); ctx.lineTo(x + 7, stripH); ctx.lineTo(x + 14, 0);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Bottom border strip — mirror
+    for (let x = 0; x < W; x += 14) {
+      const colorIdx = Math.floor(x / 14) % ndebeleColors.length;
+      ctx.fillStyle = ndebeleColors[colorIdx];
+      ctx.globalAlpha = 0.75;
+      ctx.beginPath();
+      ctx.moveTo(x, H); ctx.lineTo(x + 7, H - stripH); ctx.lineTo(x + 14, H);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // Left/right border strips — vertical Ndebele diamonds
+    const sideW = 22;
+    const edgeSide = isL ? 'right' : 'left';
+    for (let y = stripH; y < H - stripH; y += 18) {
+      const colorIdx = Math.floor(y / 18) % ndebeleColors.length;
+      ctx.fillStyle = ndebeleColors[colorIdx];
+      ctx.globalAlpha = 0.65;
+      const bx = isL ? W - sideW : 0;
+      // Diamond shape
+      ctx.beginPath();
+      ctx.moveTo(bx + sideW/2, y);
+      ctx.lineTo(bx + sideW, y + 9);
+      ctx.lineTo(bx + sideW/2, y + 18);
+      ctx.lineTo(bx, y + 9);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    // ── ISISHWESHWE FABRIC PATTERN — main panel body ─────────────
+    const patternCanvas = document.createElement('canvas');
+    patternCanvas.width = 20; patternCanvas.height = 20;
+    const pctx = patternCanvas.getContext('2d')!;
+    pctx.fillStyle = '#07111f';
+    pctx.fillRect(0, 0, 20, 20);
+    // Classic isishweshwe small diamond repeat
+    pctx.strokeStyle = 'rgba(244,185,66,0.12)';
+    pctx.lineWidth = 0.8;
+    pctx.beginPath();
+    pctx.moveTo(10, 2); pctx.lineTo(18, 10); pctx.lineTo(10, 18); pctx.lineTo(2, 10); pctx.closePath();
+    pctx.stroke();
+    // Center dot
+    pctx.fillStyle = 'rgba(244,185,66,0.08)';
+    pctx.beginPath(); pctx.arc(10, 10, 1.5, 0, Math.PI*2); pctx.fill();
+    const pattern = ctx.createPattern(patternCanvas, 'repeat')!;
+    ctx.fillStyle = pattern;
+    ctx.fillRect(sideW, stripH, W - sideW*2, H - stripH*2);
+
+    // ── CONSTELLATION STAR MAP ────────────────────────────────────
+    // Southern Cross constellation — Inkanyezi brand identity
+    const stars = isL ? [
+      {x: W*0.25, y: H*0.22}, {x: W*0.55, y: H*0.18}, {x: W*0.4,  y: H*0.35},
+      {x: W*0.2,  y: H*0.45}, {x: W*0.6,  y: H*0.42}, {x: W*0.35, y: H*0.6},
+      {x: W*0.55, y: H*0.68}, {x: W*0.22, y: H*0.72}, {x: W*0.45, y: H*0.78},
+    ] : [
+      {x: W*0.45, y: H*0.22}, {x: W*0.75, y: H*0.18}, {x: W*0.6,  y: H*0.35},
+      {x: W*0.4,  y: H*0.45}, {x: W*0.8,  y: H*0.42}, {x: W*0.65, y: H*0.6},
+      {x: W*0.45, y: H*0.68}, {x: W*0.78, y: H*0.72}, {x: W*0.55, y: H*0.78},
+    ];
+    const starConns = [[0,2],[2,3],[2,1],[1,4],[3,5],[4,6],[5,7],[6,8],[5,6]];
+    
+    // Draw constellation lines
+    starConns.forEach(([a,b]) => {
+      ctx.beginPath();
+      ctx.moveTo(stars[a].x, stars[a].y);
+      ctx.lineTo(stars[b].x, stars[b].y);
+      ctx.strokeStyle = 'rgba(244,185,66,0.18)';
+      ctx.lineWidth = 0.8; ctx.stroke();
+    });
+    
+    // Draw stars — pulsing
+    stars.forEach((s, i) => {
+      const pulse = 0.5 + 0.5 * Math.sin(tick * 2.5 + i * 0.9);
+      const r = i === 2 ? 3.5 : 2;
+      const sg = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r*3.5);
+      sg.addColorStop(0, `rgba(244,185,66,${pulse*0.9})`);
+      sg.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.beginPath(); ctx.arc(s.x, s.y, r*3.5, 0, Math.PI*2);
+      ctx.fillStyle = sg; ctx.fill();
+      ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(244,185,66,${0.7+pulse*0.3})`; ctx.fill();
+    });
+
+    // ── INKANYEZI STAR — center focal point ───────────────────────
+    const cx = isL ? W * 0.42 : W * 0.58;
+    const cy = H * 0.5;
+    const starR = 18 + 3 * Math.sin(tick * 2);
+    const starGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, starR * 2.5);
+    starGlow.addColorStop(0, `rgba(244,185,66,${0.5 + 0.2*Math.sin(tick)})`);
+    starGlow.addColorStop(0.5, `rgba(255,107,53,0.15)`);
+    starGlow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath(); ctx.arc(cx, cy, starR*2.5, 0, Math.PI*2);
+    ctx.fillStyle = starGlow; ctx.fill();
+    // 6-pointed star (Star of Africa / Inkanyezi)
+    const drawStar = (x: number, y: number, r: number, alpha: number) => {
+      ctx.save(); ctx.translate(x, y);
+      ctx.rotate(tick * 0.3);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#F4B942';
+      for (let i = 0; i < 6; i++) {
+        ctx.save();
+        ctx.rotate((i * Math.PI) / 3);
+        ctx.beginPath();
+        ctx.moveTo(0, -r); ctx.lineTo(r*0.25, -r*0.4);
+        ctx.lineTo(r*0.5, -r*0.4); ctx.lineTo(r*0.3, 0);
+        ctx.lineTo(r*0.5, r*0.4); ctx.lineTo(0, r*0.25);
+        ctx.lineTo(-r*0.5, r*0.4); ctx.lineTo(-r*0.3, 0);
+        ctx.lineTo(-r*0.5, -r*0.4); ctx.lineTo(-r*0.25, -r*0.4);
+        ctx.closePath(); ctx.fill();
+        ctx.restore();
+      }
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    };
+    drawStar(cx, cy, starR, 0.85 + 0.15*Math.sin(tick*2));
+
+    // ── SA HERITAGE STRIP — inner edge ───────────────────────────
+    const saColors = ['#007A4D', '#FFB612', '#DE3831', '#002395', '#ffffff'];
+    const stripX = isL ? W - sideW - 8 : sideW + 2;
+    const segH = (H - stripH*2) / saColors.length;
+    saColors.forEach((c, i) => {
+      ctx.fillStyle = c;
+      ctx.globalAlpha = 0.55;
+      ctx.fillRect(stripX, stripH + i*segH, 5, segH);
+    });
+    ctx.globalAlpha = 1;
+
+    // ── TAGLINE TEXT — etched into door ──────────────────────────
+    ctx.save();
+    ctx.font = 'bold 8px monospace';
+    ctx.fillStyle = 'rgba(244,185,66,0.3)';
+    ctx.textAlign = 'center';
+    // Vertical text along inner edge
+    ctx.translate(isL ? W - sideW - 16 : sideW + 16, H / 2);
+    ctx.rotate(isL ? -Math.PI/2 : Math.PI/2);
+    ctx.fillText('WE ARE THE SIGNAL IN THE NOISE', 0, 0);
+    ctx.restore();
+
+    // ── INNER FRAME — circuit board look ─────────────────────────
+    ctx.strokeStyle = 'rgba(244,185,66,0.2)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(sideW + 8, stripH + 8, W - sideW*2 - 16, H - stripH*2 - 16);
+
+    // ── NEON INNER EDGE GLOW ──────────────────────────────────────
+    const edgeGrad = ctx.createLinearGradient(
+      isL ? W : 0, 0, isL ? W - sideW : sideW, 0
+    );
+    edgeGrad.addColorStop(0, `rgba(244,185,66,${0.35 + openPct * 0.4})`);
+    edgeGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = edgeGrad;
+    ctx.fillRect(isL ? W - sideW : 0, 0, sideW, H);
+
+    // ── OPENING GLOW INTENSIFIES ──────────────────────────────────
+    if (openPct > 0) {
+      const openGrad = ctx.createLinearGradient(
+        isL ? W : 0, 0, isL ? W - 60 : 60, 0
+      );
+      openGrad.addColorStop(0, `rgba(255,107,53,${openPct * 0.6})`);
+      openGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = openGrad;
+      ctx.fillRect(isL ? W - 60 : 0, 0, 60, H);
+    }
+  };
+
+  // ── ANIMATION LOOP ────────────────────────────────────────────────
+  useEffect(() => {
+    let raf: number; let tick = 0;
+    const animate = () => {
+      tick += 0.025;
+      if (leftRef.current)  paintPanel(leftRef.current,  'left',  tick, phase==='opening' ? doorPct : 0);
+      if (rightRef.current) paintPanel(rightRef.current, 'right', tick, phase==='opening' ? doorPct : 0);
+      raf = requestAnimationFrame(animate);
+    };
+    animate();
+    return () => cancelAnimationFrame(raf);
+  }, [phase, doorPct]);
+
+  // ── BRAIN LOADING CANVAS ──────────────────────────────────────────
+  const brainRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = brainRef.current; if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    const W = 220, H = 200;
+    canvas.width = W; canvas.height = H;
+    const CX = W/2, CY = H/2 - 10;
+    
+    const leftNodes  = [{x:CX-50,y:CY-60},{x:CX-80,y:CY-35},{x:CX-90,y:CY},{x:CX-75,y:CY+35},{x:CX-50,y:CY+55},{x:CX-30,y:CY-30},{x:CX-40,y:CY+8},{x:CX-20,y:CY-55}];
+    const rightNodes = [{x:CX+50,y:CY-60},{x:CX+80,y:CY-35},{x:CX+90,y:CY},{x:CX+75,y:CY+35},{x:CX+50,y:CY+55},{x:CX+30,y:CY-30},{x:CX+40,y:CY+8},{x:CX+20,y:CY-55}];
+    const all = [...leftNodes, ...rightNodes];
+    const conns = [[0,5],[5,7],[1,2],[2,3],[3,4],[4,6],[5,6],[8,13],[13,15],[9,10],[10,11],[11,12],[12,14],[13,14],[5,13],[6,14]];
+    const pulses: {from:number;to:number;t:number;speed:number}[] = [];
+    const seed = () => { const c=conns[Math.floor(Math.random()*conns.length)]; pulses.push({from:c[0],to:c[1],t:0,speed:0.02+Math.random()*0.025}); };
+    for(let i=0;i<6;i++) seed();
+
+    let tk=0; let raf2: number;
+    const draw = () => {
+      ctx.clearRect(0,0,W,H); tk+=0.025;
+      conns.forEach(([a,b]) => {
+        const n1=all[a],n2=all[b]; if(!n1||!n2) return;
+        ctx.beginPath(); ctx.moveTo(n1.x,n1.y); ctx.lineTo(n2.x,n2.y);
+        ctx.strokeStyle='rgba(244,185,66,0.2)'; ctx.lineWidth=1; ctx.stroke();
+      });
+      // Spine
+      ctx.beginPath(); ctx.moveTo(CX,CY-70); ctx.lineTo(CX,CY+65);
+      ctx.strokeStyle='rgba(244,185,66,0.12)'; ctx.lineWidth=1.5; ctx.stroke();
+      // Pulses
+      for(let i=pulses.length-1;i>=0;i--){
+        const p=pulses[i]; p.t+=p.speed;
+        if(p.t>=1){pulses.splice(i,1);seed();continue;}
+        const n1=all[p.from],n2=all[p.to]; if(!n1||!n2) continue;
+        const px=n1.x+(n2.x-n1.x)*p.t, py=n1.y+(n2.y-n1.y)*p.t;
+        const g=ctx.createRadialGradient(px,py,0,px,py,9);
+        g.addColorStop(0,'#F4B942'); g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(px,py,9,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2); ctx.fillStyle='#F4B942'; ctx.fill();
+      }
+      all.forEach((n,i) => {
+        const pulse=0.5+0.5*Math.sin(tk*2.5+i*0.9);
+        const ng=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,8);
+        ng.addColorStop(0,`rgba(244,185,66,${pulse*0.8})`); ng.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(n.x,n.y,8,0,Math.PI*2); ctx.fillStyle=ng; ctx.fill();
+        ctx.beginPath(); ctx.arc(n.x,n.y,3,0,Math.PI*2); ctx.fillStyle='#F4B942'; ctx.fill();
+      });
+      // AI text in gold — Inkanyezi brand colours
+      ctx.save();
+      ctx.shadowColor='#F4B942'; ctx.shadowBlur=20+8*Math.sin(tk);
+      ctx.font='bold 56px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle=`rgba(255,255,255,${0.8+0.2*Math.sin(tk*1.5)})`;
+      ctx.fillText('AI', CX, CY+4);
+      ctx.restore();
+      // Zulu/Inkanyezi tagline
+      ctx.font='9px monospace'; ctx.textAlign='center';
+      ctx.fillStyle='rgba(244,185,66,0.5)';
+      ctx.fillText('INKANYEZI · INITIALISING'.replace(' ', '·'.repeat(Math.floor(tk*3)%4+1)), CX, CY+75);
+      raf2 = requestAnimationFrame(draw);
+    };
+    draw();
+    const t = setTimeout(() => { cancelAnimationFrame(raf2); setPhase('opening'); }, 2600);
+    return () => { cancelAnimationFrame(raf2); clearTimeout(t); };
+  }, []);
+
+  // ── DOOR OPENING ──────────────────────────────────────────────────
+  useEffect(() => {
+    if(phase !== 'opening') return;
+    const dur=950, start=performance.now();
+    const run=(now:number) => {
+      const p=Math.min((now-start)/dur,1);
+      const eased=1-Math.pow(1-p,3);
+      setDoorPct(eased);
+      if(p<1) animRef.current=requestAnimationFrame(run);
+      else setTimeout(onComplete,80);
+    };
+    animRef.current=requestAnimationFrame(run);
+    return () => cancelAnimationFrame(animRef.current);
+  }, [phase, onComplete]);
+
+  const slide = doorPct * 52;
+  const brainFade = phase==='brain' ? 1 : Math.max(0, 1-doorPct*2.2);
+
+  return (
+    <div style={{position:'absolute',inset:0,display:'flex',overflow:'hidden',borderRadius:20}}>
+      {/* LEFT DOOR CANVAS */}
+      <div style={{position:'absolute',top:0,left:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(-${slide}%)`,overflow:'hidden'}}>
+        <canvas ref={leftRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
+        {phase==='opening' && (
+          <div style={{position:'absolute',top:'50%',right:`${6+doorPct*14}%`,transform:`translateY(-50%) scale(${1+doorPct*0.3})`,fontFamily:'Arial',fontWeight:'bold',fontSize:54,color:`rgba(255,255,255,${Math.max(0,1-doorPct*1.9)})`,textShadow:'0 0 18px #F4B942',pointerEvents:'none'}}>A</div>
+        )}
+      </div>
+
+      {/* RIGHT DOOR CANVAS */}
+      <div style={{position:'absolute',top:0,right:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(${slide}%)`,overflow:'hidden'}}>
+        <canvas ref={rightRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
+        {phase==='opening' && (
+          <div style={{position:'absolute',top:'50%',left:`${6+doorPct*14}%`,transform:`translateY(-50%) scale(${1+doorPct*0.3})`,fontFamily:'Arial',fontWeight:'bold',fontSize:54,color:`rgba(255,255,255,${Math.max(0,1-doorPct*1.9)})`,textShadow:'0 0 18px #F4B942',pointerEvents:'none'}}>I</div>
+        )}
+      </div>
+
+      {/* BRAIN OVERLAY */}
+      <div style={{position:'absolute',inset:0,zIndex:7,opacity:brainFade,pointerEvents:'none',display:'flex',alignItems:'center',justifyContent:'center'}}>
+        <canvas ref={brainRef} style={{width:220,height:200}}/>
+      </div>
+
+      {/* CENTER SEAM — gold Inkanyezi glow */}
+      <div style={{position:'absolute',top:0,bottom:0,left:'50%',width:2,transform:'translateX(-50%)',background:'linear-gradient(180deg,transparent,#F4B942,#FF6B35,#F4B942,transparent)',boxShadow:'0 0 16px #F4B942, 0 0 32px rgba(244,185,66,0.4)',zIndex:8,opacity:0.7+doorPct*0.3,pointerEvents:'none'}}/>
+    </div>
+  );
+}
+
 // ════════════════════════════════════════════════════════════════════
 // INKANYEZI BOT WIDGET — Native React, no iframe
 // ════════════════════════════════════════════════════════════════════
@@ -296,6 +625,8 @@ function InkanyeziBotWidget() {
   const [showChips, setShowChips]   = useState(true);
   const [showGreeting, setShowGreeting]       = useState(false);
   const [greetingVisible, setGreetingVisible] = useState(false);
+  const [showDoor, setShowDoor]               = useState(false);
+  const [openKey, setOpenKey]                 = useState(0);
   const hasTriggered = useRef(false);
   const messagesEnd  = useRef<HTMLDivElement>(null);
   const textareaRef  = useRef<HTMLTextAreaElement>(null);
@@ -391,12 +722,11 @@ function InkanyeziBotWidget() {
         @keyframes ping { 0%{transform:scale(1);opacity:0.8;} 70%{transform:scale(2.2);opacity:0;} 100%{transform:scale(2.2);opacity:0;} }
         @keyframes floatBubble { 0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 30px rgba(249,115,22,0.55),0 0 60px rgba(249,115,22,0.2);} 50%{transform:translateY(-6px) scale(1.03);box-shadow:0 0 40px rgba(249,115,22,0.7),0 0 80px rgba(249,115,22,0.3);} }
         @keyframes orbitRing { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-        @keyframes inkDoorOpen {
-          0%   { opacity:0; clip-path:inset(100% 0 0 0 round 16px); transform:translateY(12px); }
-          25%  { opacity:1; clip-path:inset(65% 0 0 0 round 16px); transform:translateY(8px); }
-          60%  { clip-path:inset(5% 0 0 0 round 16px); transform:translateY(1px); }
-          80%  { clip-path:inset(0% 0 -1% 0 round 16px); transform:translateY(-2px); }
-          100% { clip-path:inset(0% 0 0% 0 round 16px); transform:translateY(0); }
+        @keyframes windowSlide { 
+          0%  { opacity:0; transform:translateY(30px) scaleY(0.05) scaleX(0.8); transform-origin: bottom center; }
+          40% { opacity:1; transform:translateY(0) scaleY(0.6) scaleX(1); transform-origin: bottom center; }
+          70% { transform:translateY(0) scaleY(1.02) scaleX(1); transform-origin: bottom center; }
+          100%{ transform:translateY(0) scaleY(1) scaleX(1); transform-origin: bottom center; }
         }
         @keyframes headerShimmer { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
         @keyframes shimmerBar { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
@@ -418,7 +748,7 @@ function InkanyeziBotWidget() {
 
       {/* ── PROACTIVE GREETING ── */}
       {showGreeting && !isOpen && (
-        <div onClick={()=>setIsOpen(true)} style={{ position:'fixed', bottom:100, right:24, zIndex:99999, maxWidth:260, cursor:'pointer', opacity:greetingVisible?1:0, transform:greetingVisible?'translateY(0) scale(1)':'translateY(10px) scale(0.95)', transition:'opacity 0.35s ease, transform 0.35s ease' }}>
+        <div onClick={()=>{ setShowDoor(true); setOpenKey(k=>k+1); }} style={{ position:'fixed', bottom:100, right:24, zIndex:10001, maxWidth:260, cursor:'pointer', opacity:greetingVisible?1:0, transform:greetingVisible?'translateY(0) scale(1)':'translateY(10px) scale(0.95)', transition:'opacity 0.35s ease, transform 0.35s ease' }}>
           <div style={{ background:'linear-gradient(145deg, rgba(15,27,53,0.98), rgba(10,22,40,0.98))', border:'1px solid rgba(249,115,22,0.25)', borderRadius:16, borderBottomRightRadius:4, padding:'12px 14px', boxShadow:'0 8px 32px rgba(0,0,0,0.5)', position:'relative', overflow:'hidden' }}>
             <div style={{ position:'absolute', top:0, left:0, right:0, height:1.5, background:'linear-gradient(90deg, transparent, rgba(244,185,66,0.6), transparent)' }} />
             <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
@@ -443,8 +773,8 @@ function InkanyeziBotWidget() {
       )}
 
       {/* ── FLOATING BUBBLE ── */}
-      <button onClick={()=>setIsOpen(o=>!o)} aria-label={isOpen?'Close chat':'Open InkanyeziBot'}
-        style={{ position:'fixed', bottom:24, right:24, zIndex:99999, width:64, height:64, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', border:'2px solid rgba(249,115,22,0.45)', cursor:'pointer', fontSize:26, animation:'floatBubble 3s ease-in-out infinite', display:'flex', alignItems:'center', justifyContent:'center', transition:'transform 0.2s' }}>
+      <button onClick={()=>{ if(!isOpen){ setShowDoor(true); setOpenKey(k=>k+1); } else { setIsOpen(false); } }} aria-label={isOpen?'Close chat':'Open InkanyeziBot'}
+        style={{ position:'fixed', bottom:24, right:24, zIndex:10001, width:64, height:64, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', border:'2px solid rgba(249,115,22,0.45)', cursor:'pointer', fontSize:26, animation:'floatBubble 3s ease-in-out infinite', display:'flex', alignItems:'center', justifyContent:'center', transition:'transform 0.2s' }}>
         {!isOpen && (
           <div style={{ position:'absolute', width:64, height:64, animation:'orbitRing 4s linear infinite', pointerEvents:'none' }}>
             <div style={{ position:'absolute', top:-3, left:'50%', width:7, height:7, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 10px ${C.gold}` }} />
@@ -454,8 +784,15 @@ function InkanyeziBotWidget() {
       </button>
 
       {/* ── CHAT WINDOW ── */}
+      {/* ── DOOR ANIMATION — shows before chat opens ── */}
+      {showDoor && !isOpen && (
+        <div key={openKey} style={{ position:'fixed', bottom:100, right:24, width:370, height:580, zIndex:99999, borderRadius:20, overflow:'hidden', boxShadow:'0 0 0 1px rgba(0,220,255,0.25), 0 0 60px rgba(0,180,255,0.2), 0 25px 70px rgba(0,0,0,0.8)', background:'#07111f' }}>
+          <DoorAnimationInline onComplete={() => { setShowDoor(false); setIsOpen(true); }} />
+        </div>
+      )}
+
       {isOpen && (
-        <div key={String(isOpen)} style={{ position:'fixed', bottom:100, right:24, width:370, height:580, display:'flex', flexDirection:'column', zIndex:99998, borderRadius:20, background:'linear-gradient(160deg, #1e2d4a 0%, #131f33 50%, #0c1624 100%)', border:'1px solid rgba(249,115,22,0.2)', boxShadow:'0 0 0 1px rgba(244,185,66,0.05), 0 0 50px rgba(249,115,22,0.12), 0 25px 70px rgba(0,0,0,0.7)', animation:'inkDoorOpen 0.55s cubic-bezier(0.16,1,0.3,1) forwards' }}>
+        <div style={{ position:'fixed', bottom:100, right:24, width:370, height:580, display:'flex', flexDirection:'column', zIndex:99998, borderRadius:20, background:'linear-gradient(160deg, #1e2d4a 0%, #131f33 50%, #0c1624 100%)', border:'1px solid rgba(249,115,22,0.2)', boxShadow:'0 0 0 1px rgba(244,185,66,0.05), 0 0 50px rgba(249,115,22,0.12), 0 25px 70px rgba(0,0,0,0.7)' }}>
           <CosmosCanvas width={370} height={580} />
 
           {/* Header */}
@@ -564,7 +901,7 @@ function WhatsAppWidget() {
         .wa-btn:hover { transform: scale(1.1) !important; box-shadow: 0 8px 30px rgba(37,211,102,0.6) !important; animation: none !important; }
         .wa-tip { animation: waFade 0.2s ease forwards; }
       `}</style>
-      <div style={{ position:'fixed', bottom:96, right:28, zIndex:99999, display:'flex', alignItems:'center', gap:10, opacity:visible?1:0, transform:visible?'scale(1)':'scale(0.8)', transition:'opacity 0.4s ease, transform 0.4s ease' }}>
+      <div style={{ position:'fixed', bottom:96, right:28, zIndex:10002, display:'flex', alignItems:'center', gap:10, opacity:visible?1:0, transform:visible?'scale(1)':'scale(0.8)', transition:'opacity 0.4s ease, transform 0.4s ease' }}>
         {hovered && (
           <div className="wa-tip" style={{ background:'linear-gradient(135deg, rgba(10,22,40,0.98), rgba(4,8,15,0.98))', border:'1px solid rgba(37,211,102,0.3)', borderRadius:10, padding:'8px 14px', whiteSpace:'nowrap', boxShadow:'0 4px 20px rgba(0,0,0,0.5)', position:'relative' }}>
             <div style={{ fontSize:12, fontWeight:700, color:'#fff', fontFamily:"'Syne',sans-serif", marginBottom:2 }}>Chat with Sanele</div>
