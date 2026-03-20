@@ -279,8 +279,8 @@ function formatMessage(text: string) {
 
 
 // ════════════════════════════════════════════════════════════════════
-// INKANYEZI DOOR — Tech-first, cosmos-primary, African accent
-// 60% Futuristic AI / 30% Cosmos / 10% SA Identity
+// INKANYEZI DOOR — Pure tech, holographic, plasma energy
+// Inspired by: quantum computing, neural interfaces, deep space probes
 // ════════════════════════════════════════════════════════════════════
 function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
   const leftRef  = useRef<HTMLCanvasElement>(null);
@@ -289,325 +289,224 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
   const [phase, setPhase]     = useState<'brain'|'opening'>('brain');
   const [doorPct, setDoorPct] = useState(0);
   const animRef  = useRef<number>(0);
-  const tickRef  = useRef(0);
+  const tkRef    = useRef(0);
 
-  // ── PANEL PAINTER ─────────────────────────────────────────────────
-  const paintPanel = (canvas: HTMLCanvasElement, side: 'left'|'right', tk: number, openPct: number) => {
+  const paintPanel = (canvas: HTMLCanvasElement, side: 'left'|'right', tk: number, op: number) => {
     const ctx = canvas.getContext('2d')!;
     const W = canvas.width, H = canvas.height;
     const isL = side === 'left';
     ctx.clearRect(0, 0, W, H);
 
-    // ── BASE — deep space gradient ──────────────────────────────────
-    const base = ctx.createLinearGradient(0, 0, isL ? W : 0, H);
-    base.addColorStop(0, '#04080F');
-    base.addColorStop(0.5, '#07111f');
-    base.addColorStop(1, '#040c18');
-    ctx.fillStyle = base;
-    ctx.fillRect(0, 0, W, H);
+    // Base — void black
+    ctx.fillStyle = '#020810'; ctx.fillRect(0,0,W,H);
 
-    // ── TECH GRID — primary visual language ─────────────────────────
-    ctx.strokeStyle = 'rgba(244,185,66,0.055)';
-    ctx.lineWidth = 0.5;
-    const gridSize = 28;
-    for (let x = 0; x < W; x += gridSize) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-    }
-    for (let y = 0; y < H; y += gridSize) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-    }
+    // Fine grid — holographic blueprint
+    ctx.strokeStyle = 'rgba(100,160,255,0.06)'; ctx.lineWidth = 0.5;
+    for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
-    // ── HEXAGONAL PATTERN — AI/tech motif ───────────────────────────
-    const hexR = 18;
-    const hexW = hexR * Math.sqrt(3);
-    ctx.strokeStyle = 'rgba(244,185,66,0.07)';
-    ctx.lineWidth = 0.6;
-    for (let row = -1; row < H / (hexR * 1.5) + 1; row++) {
-      for (let col = -1; col < W / hexW + 1; col++) {
-        const cx = col * hexW + (row % 2 === 0 ? 0 : hexW / 2);
-        const cy = row * hexR * 1.5;
+    // Coarser accent grid
+    ctx.strokeStyle = 'rgba(100,160,255,0.04)'; ctx.lineWidth = 1;
+    for(let x=0;x<W;x+=100){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=100){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // Hexagonal microchip pattern
+    const hr = 15, hw = hr*Math.sqrt(3);
+    ctx.strokeStyle = 'rgba(244,185,66,0.06)'; ctx.lineWidth = 0.6;
+    for(let row=-1;row<H/(hr*1.5)+1;row++){
+      for(let col=-1;col<W/hw+1;col++){
+        const cx=col*hw+(row%2===0?0:hw/2), cy=row*hr*1.5;
         ctx.beginPath();
-        for (let i = 0; i < 6; i++) {
-          const angle = (Math.PI / 3) * i - Math.PI / 6;
-          const hx = cx + hexR * Math.cos(angle);
-          const hy = cy + hexR * Math.sin(angle);
-          i === 0 ? ctx.moveTo(hx, hy) : ctx.lineTo(hx, hy);
-        }
+        for(let i=0;i<6;i++){const a=(Math.PI/3)*i-Math.PI/6;ctx.lineTo(cx+hr*Math.cos(a),cy+hr*Math.sin(a));}
         ctx.closePath(); ctx.stroke();
       }
     }
 
-    // ── CIRCUIT TRACES — horizontal data lines ───────────────────────
-    const traceYs = [H*0.18, H*0.32, H*0.5, H*0.68, H*0.82];
-    traceYs.forEach((y, i) => {
-      const pulse = 0.5 + 0.5 * Math.sin(tk * 1.8 + i * 1.1);
-      ctx.strokeStyle = `rgba(244,185,66,${0.1 + pulse * 0.12})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      const x0 = isL ? 30 : 0, x1 = isL ? W : W - 30;
-      ctx.moveTo(x0, y);
-      // Stepped circuit path
-      const mid = (x0 + x1) / 2;
-      ctx.lineTo(mid - 20, y);
-      ctx.lineTo(mid - 12, y - 8);
-      ctx.lineTo(mid + 12, y - 8);
-      ctx.lineTo(mid + 20, y);
-      ctx.lineTo(x1, y);
-      ctx.stroke();
-      // Node dots on trace
-      [x0 + 15, mid, x1 - 15].forEach(nx => {
-        ctx.beginPath(); ctx.arc(nx, y, 2, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(244,185,66,${0.3 + pulse * 0.4})`;
-        ctx.fill();
-      });
-    });
-
-    // ── DATA STREAM PARTICLES — falling down ────────────────────────
-    const streamCols = isL ? [W*0.2, W*0.5, W*0.75] : [W*0.25, W*0.5, W*0.8];
-    streamCols.forEach((sx, si) => {
-      for (let p = 0; p < 5; p++) {
-        const yPos = ((tk * 60 * (0.8 + si * 0.3) + p * (H / 5)) % H);
-        const alpha = 0.15 + 0.2 * Math.sin(tk + p);
-        ctx.fillStyle = `rgba(244,185,66,${alpha})`;
-        ctx.font = `${8 + (p % 2)}px monospace`;
-        ctx.textAlign = 'center';
-        const chars = ['0', '1', 'AI', '∑', '⟨', '⟩', '∞'];
-        ctx.fillText(chars[(Math.floor(tk * 3 + p + si * 7)) % chars.length], sx, yPos);
+    // Vertical data streams — falling code
+    const cols = isL ? [W*0.18,W*0.38,W*0.62,W*0.82] : [W*0.18,W*0.38,W*0.62,W*0.82];
+    cols.forEach((sx,ci) => {
+      const chars=['01','10','AI','∑','λ','π','∞','⟨⟩','11','00','NN','ML'];
+      for(let i=0;i<7;i++){
+        const yPos=((tk*55*(0.7+ci*0.2)+i*(H/7))%H);
+        const alpha=(0.08+0.1*Math.sin(tk+i+ci*2))*Math.max(0,1-op*2);
+        ctx.fillStyle=`rgba(100,180,255,${alpha})`;
+        ctx.font=`${7+i%2}px monospace`; ctx.textAlign='center';
+        ctx.fillText(chars[(Math.floor(tk*2+i+ci*5))%chars.length],sx,yPos);
       }
     });
 
-    // ── SCAN LINE — sweeping top to bottom ─────────────────────────
-    const scanY = ((tk * 35) % (H + 60)) - 30;
-    const scanGrad = ctx.createLinearGradient(0, scanY - 20, 0, scanY + 20);
-    scanGrad.addColorStop(0, 'rgba(244,185,66,0)');
-    scanGrad.addColorStop(0.5, `rgba(244,185,66,${0.06 + openPct * 0.04})`);
-    scanGrad.addColorStop(1, 'rgba(244,185,66,0)');
-    ctx.fillStyle = scanGrad;
-    ctx.fillRect(0, scanY - 20, W, 40);
-
-    // ── CONSTELLATION — Southern Cross, subtle gold ─────────────────
-    const stars = isL
-      ? [{x:W*0.28,y:H*0.22},{x:W*0.52,y:H*0.17},{x:W*0.38,y:H*0.38},{x:W*0.18,y:H*0.44},{x:W*0.58,y:H*0.41}]
-      : [{x:W*0.42,y:H*0.22},{x:W*0.72,y:H*0.17},{x:W*0.62,y:H*0.38},{x:W*0.82,y:H*0.44},{x:W*0.48,y:H*0.41}];
-    const starConns = [[0,2],[2,1],[2,3],[1,4]];
-    starConns.forEach(([a,b]) => {
-      ctx.beginPath(); ctx.moveTo(stars[a].x, stars[a].y); ctx.lineTo(stars[b].x, stars[b].y);
-      ctx.strokeStyle = 'rgba(244,185,66,0.12)'; ctx.lineWidth = 0.7; ctx.stroke();
-    });
-    stars.forEach((s, i) => {
-      const pulse = 0.4 + 0.4 * Math.sin(tk * 2 + i * 1.3);
-      const r = i === 2 ? 2.8 : 1.8;
-      const sg = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r * 4);
-      sg.addColorStop(0, `rgba(244,185,66,${pulse * 0.7})`);
-      sg.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.beginPath(); ctx.arc(s.x, s.y, r * 4, 0, Math.PI * 2); ctx.fillStyle = sg; ctx.fill();
-      ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,220,130,${0.6 + pulse * 0.4})`; ctx.fill();
-    });
-
-    // ── INKANYEZI STAR — rotating focal point ──────────────────────
-    const starX = isL ? W * 0.4 : W * 0.6;
-    const starY = H * 0.6;
-    const starR2 = 14 + 2 * Math.sin(tk * 2.5);
-    const sg2 = ctx.createRadialGradient(starX, starY, 0, starX, starY, starR2 * 3);
-    sg2.addColorStop(0, `rgba(244,185,66,${0.35 + 0.15 * Math.sin(tk)})`);
-    sg2.addColorStop(0.6, `rgba(255,107,53,0.1)`);
-    sg2.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.beginPath(); ctx.arc(starX, starY, starR2 * 3, 0, Math.PI * 2);
-    ctx.fillStyle = sg2; ctx.fill();
-    // 4-pointed star (cleaner, more tech)
-    ctx.save(); ctx.translate(starX, starY); ctx.rotate(tk * 0.4);
-    ctx.fillStyle = '#F4B942'; ctx.globalAlpha = 0.75;
-    for (let i = 0; i < 4; i++) {
-      ctx.save(); ctx.rotate((i * Math.PI) / 2);
+    // Horizontal circuit traces with pulse
+    [H*0.15,H*0.3,H*0.5,H*0.7,H*0.85].forEach((y,i)=>{
+      const p=0.4+0.5*Math.sin(tk*2+i*1.3);
+      ctx.strokeStyle=`rgba(244,185,66,${0.08+p*0.1})`; ctx.lineWidth=0.8;
       ctx.beginPath();
-      ctx.moveTo(0, -starR2); ctx.lineTo(starR2 * 0.22, -starR2 * 0.3);
-      ctx.lineTo(starR2, 0);  ctx.lineTo(starR2 * 0.22, starR2 * 0.3);
-      ctx.lineTo(0, starR2);  ctx.lineTo(-starR2 * 0.22, starR2 * 0.3);
-      ctx.lineTo(-starR2, 0); ctx.lineTo(-starR2 * 0.22, -starR2 * 0.3);
-      ctx.closePath(); ctx.fill(); ctx.restore();
-    }
-    ctx.restore(); ctx.globalAlpha = 1;
-
-    // ── SA HERITAGE STRIP — thin outer edge, proud but minimal ─────
-    const saColors = ['#007A4D','#FFB612','#DE3831','#002395','#ffffff'];
-    const stripX = isL ? 0 : W - 4;
-    const segH = H / saColors.length;
-    saColors.forEach((c, i) => {
-      ctx.fillStyle = c; ctx.globalAlpha = 0.5;
-      ctx.fillRect(stripX, i * segH, 4, segH);
-    });
-    ctx.globalAlpha = 1;
-
-    // ── INNER FRAME — precision engineering ────────────────────────
-    ctx.strokeStyle = 'rgba(244,185,66,0.18)';
-    ctx.lineWidth = 0.8;
-    ctx.strokeRect(6, 6, W - 12, H - 12);
-    ctx.strokeStyle = 'rgba(244,185,66,0.08)';
-    ctx.strokeRect(12, 12, W - 24, H - 24);
-
-    // ── CORNER TECH BRACKETS ────────────────────────────────────────
-    const bSize = 16;
-    [[6,6],[6,H-6],[W-6,6],[W-6,H-6]].forEach(([bx, by], i) => {
-      ctx.strokeStyle = 'rgba(244,185,66,0.45)';
-      ctx.lineWidth = 1.5;
-      const mx = bx > W/2 ? -bSize : bSize;
-      const my = by > H/2 ? -bSize : bSize;
-      ctx.beginPath();
-      ctx.moveTo(bx + mx, by); ctx.lineTo(bx, by); ctx.lineTo(bx, by + my);
-      ctx.stroke();
+      const mid=W/2;
+      ctx.moveTo(0,y);
+      ctx.lineTo(mid-30,y); ctx.lineTo(mid-18,y-9); ctx.lineTo(mid+18,y-9); ctx.lineTo(mid+30,y);
+      ctx.lineTo(W,y); ctx.stroke();
+      // Junction nodes
+      [W*0.1, mid, W*0.9].forEach(nx=>{
+        ctx.beginPath(); ctx.arc(nx,y,2,0,Math.PI*2);
+        ctx.fillStyle=`rgba(244,185,66,${0.2+p*0.5})`; ctx.fill();
+      });
     });
 
-    // ── POWER CONDUIT — inner edge, energy flows to center seam ────
-    const conduitX = isL ? W - 1 : 0;
-    const conduit = ctx.createLinearGradient(0, 0, 0, H);
-    conduit.addColorStop(0, 'rgba(244,185,66,0)');
-    conduit.addColorStop(0.3, `rgba(244,185,66,${0.3 + openPct * 0.5})`);
-    conduit.addColorStop(0.5, `rgba(255,107,53,${0.5 + openPct * 0.4})`);
-    conduit.addColorStop(0.7, `rgba(244,185,66,${0.3 + openPct * 0.5})`);
-    conduit.addColorStop(1, 'rgba(244,185,66,0)');
-    ctx.fillStyle = conduit;
-    ctx.fillRect(isL ? W - 3 : 0, 0, 3, H);
+    // Scan line — system initialising
+    const scanY=((tk*40)%(H+80))-40;
+    const sg=ctx.createLinearGradient(0,scanY-25,0,scanY+25);
+    sg.addColorStop(0,'rgba(100,160,255,0)');
+    sg.addColorStop(0.4,`rgba(100,200,255,${0.05+op*0.03})`);
+    sg.addColorStop(0.5,`rgba(180,220,255,${0.1+op*0.05})`);
+    sg.addColorStop(0.6,`rgba(100,200,255,${0.05+op*0.03})`);
+    sg.addColorStop(1,'rgba(100,160,255,0)');
+    ctx.fillStyle=sg; ctx.fillRect(0,scanY-25,W,50);
 
-    // Edge glow
-    const edgeGlow = ctx.createLinearGradient(isL ? W : 0, 0, isL ? W - 50 : 50, 0);
-    edgeGlow.addColorStop(0, `rgba(255,107,53,${0.15 + openPct * 0.35})`);
-    edgeGlow.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = edgeGlow;
-    ctx.fillRect(isL ? W - 50 : 0, 0, 50, H);
+    // Plasma energy conduit — inner edge, glows gold→orange
+    const cg=ctx.createLinearGradient(0,0,0,H);
+    cg.addColorStop(0,'rgba(244,185,66,0)');
+    cg.addColorStop(0.25,`rgba(244,185,66,${0.4+op*0.5})`);
+    cg.addColorStop(0.5,`rgba(255,107,53,${0.6+op*0.4})`);
+    cg.addColorStop(0.75,`rgba(244,185,66,${0.4+op*0.5})`);
+    cg.addColorStop(1,'rgba(244,185,66,0)');
+    ctx.fillStyle=cg; ctx.fillRect(isL?W-4:0,0,4,H);
 
-    // ── STATUS TEXT — bottom of each panel ─────────────────────────
-    ctx.font = '7px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillStyle = `rgba(244,185,66,${0.2 + 0.1 * Math.sin(tk * 3)})`;
-    ctx.fillText(isL ? 'UNIT·A' : 'UNIT·I', W / 2, H - 18);
-    ctx.fillStyle = 'rgba(244,185,66,0.15)';
-    ctx.fillText(isL ? 'INK·L01' : 'INK·R01', W / 2, H - 10);
+    // Edge bloom as doors open
+    const eg=ctx.createLinearGradient(isL?W:0,0,isL?W-80:80,0);
+    eg.addColorStop(0,`rgba(255,107,53,${0.12+op*0.4})`);
+    eg.addColorStop(0.5,`rgba(244,185,66,${0.05+op*0.15})`);
+    eg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=eg; ctx.fillRect(isL?W-80:0,0,80,H);
+
+    // Precision frame — double line
+    ctx.strokeStyle='rgba(244,185,66,0.2)'; ctx.lineWidth=0.8;
+    ctx.strokeRect(5,5,W-10,H-10);
+    ctx.strokeStyle='rgba(100,160,255,0.08)'; ctx.lineWidth=0.5;
+    ctx.strokeRect(11,11,W-22,H-22);
+
+    // Corner brackets — engineering precision
+    const b=18;
+    [[5,5],[5,H-5],[W-5,5],[W-5,H-5]].forEach(([bx,by])=>{
+      ctx.strokeStyle='rgba(244,185,66,0.5)'; ctx.lineWidth=1.5;
+      const mx=bx>W/2?-b:b, my=by>H/2?-b:b;
+      ctx.beginPath(); ctx.moveTo(bx+mx,by); ctx.lineTo(bx,by); ctx.lineTo(bx,by+my); ctx.stroke();
+    });
+
+    // Panel ID — bottom
+    ctx.font='7px monospace'; ctx.textAlign='center';
+    ctx.fillStyle=`rgba(100,160,255,${0.3+0.1*Math.sin(tk*4)})`;
+    ctx.fillText(isL?'◈ INK-L':'◈ INK-R',W/2,H-16);
+    ctx.fillStyle='rgba(244,185,66,0.2)';
+    ctx.fillText(isL?'UNIT·ALPHA':'UNIT·SIGMA',W/2,H-8);
   };
 
-  // ── ANIMATION LOOP ────────────────────────────────────────────────
-  useEffect(() => {
-    let raf: number;
-    const loop = () => {
-      tickRef.current += 0.022;
-      const tk = tickRef.current;
-      const op = phase === 'opening' ? doorPct : 0;
-      if (leftRef.current)  paintPanel(leftRef.current,  'left',  tk, op);
-      if (rightRef.current) paintPanel(rightRef.current, 'right', tk, op);
-      raf = requestAnimationFrame(loop);
+  useEffect(()=>{
+    let raf:number;
+    const loop=()=>{
+      tkRef.current+=0.022;
+      const op=phase==='opening'?doorPct:0;
+      if(leftRef.current) paintPanel(leftRef.current,'left',tkRef.current,op);
+      if(rightRef.current) paintPanel(rightRef.current,'right',tkRef.current,op);
+      raf=requestAnimationFrame(loop);
     };
-    loop();
-    return () => cancelAnimationFrame(raf);
-  }, [phase, doorPct]);
+    loop(); return ()=>cancelAnimationFrame(raf);
+  },[phase,doorPct]);
 
-  // ── BRAIN / LOADING CANVAS ────────────────────────────────────────
-  useEffect(() => {
-    const canvas = brainRef.current; if (!canvas) return;
-    const ctx = canvas.getContext('2d')!;
-    const W = 280, H = 240;
-    canvas.width = W; canvas.height = H;
-    const CX = W/2, CY = H/2 - 8;
-    const leftN  = [{x:CX-55,y:CY-65},{x:CX-85,y:CY-35},{x:CX-92,y:CY+2},{x:CX-78,y:CY+38},{x:CX-52,y:CY+58},{x:CX-32,y:CY-30},{x:CX-42,y:CY+12},{x:CX-22,y:CY-58}];
-    const rightN = [{x:CX+55,y:CY-65},{x:CX+85,y:CY-35},{x:CX+92,y:CY+2},{x:CX+78,y:CY+38},{x:CX+52,y:CY+58},{x:CX+32,y:CY-30},{x:CX+42,y:CY+12},{x:CX+22,y:CY-58}];
-    const all = [...leftN, ...rightN];
-    const conns = [[0,5],[5,7],[7,0],[1,2],[2,3],[3,4],[4,6],[5,6],[8,13],[13,15],[15,8],[9,10],[10,11],[11,12],[12,14],[13,14],[5,13],[6,14]];
-    const pulses: {a:number;b:number;t:number;s:number}[] = [];
-    const seed = () => { const c=conns[Math.floor(Math.random()*conns.length)]; pulses.push({a:c[0],b:c[1],t:0,s:0.022+Math.random()*0.025}); };
-    for(let i=0;i<8;i++) seed();
-    let tk=0; let raf2: number;
-    const draw = () => {
+  // Brain / AI loading canvas
+  useEffect(()=>{
+    const canvas=brainRef.current; if(!canvas) return;
+    const ctx=canvas.getContext('2d')!;
+    const W=280,H=220; canvas.width=W; canvas.height=H;
+    const CX=W/2,CY=H/2-10;
+    const Ln=[{x:CX-52,y:CY-62},{x:CX-82,y:CY-32},{x:CX-88,y:CY+5},{x:CX-74,y:CY+40},{x:CX-48,y:CY+58},{x:CX-28,y:CY-28},{x:CX-38,y:CY+14},{x:CX-18,y:CY-55}];
+    const Rn=[{x:CX+52,y:CY-62},{x:CX+82,y:CY-32},{x:CX+88,y:CY+5},{x:CX+74,y:CY+40},{x:CX+48,y:CY+58},{x:CX+28,y:CY-28},{x:CX+38,y:CY+14},{x:CX+18,y:CY-55}];
+    const all=[...Ln,...Rn];
+    const cs=[[0,5],[5,7],[7,0],[1,2],[2,3],[3,4],[4,6],[5,6],[8,13],[13,15],[15,8],[9,10],[10,11],[11,12],[12,14],[13,14],[5,13],[6,14]];
+    const ps:{a:number;b:number;t:number;s:number}[]=[];
+    const seed=()=>{const c=cs[Math.floor(Math.random()*cs.length)];ps.push({a:c[0],b:c[1],t:0,s:0.022+Math.random()*0.025});};
+    for(let i=0;i<9;i++) seed();
+    let tk=0; let raf2:number;
+    const draw=()=>{
       ctx.clearRect(0,0,W,H); tk+=0.025;
-      // Ambient glow
       const ag=ctx.createRadialGradient(CX,CY,0,CX,CY,100);
-      ag.addColorStop(0,'rgba(244,185,66,0.08)'); ag.addColorStop(1,'rgba(0,0,0,0)');
+      ag.addColorStop(0,'rgba(244,185,66,0.07)'); ag.addColorStop(1,'rgba(0,0,0,0)');
       ctx.fillStyle=ag; ctx.fillRect(0,0,W,H);
-      // Connections
-      conns.forEach(([a,b]) => {
+      cs.forEach(([a,b])=>{
         ctx.beginPath(); ctx.moveTo(all[a].x,all[a].y); ctx.lineTo(all[b].x,all[b].y);
-        ctx.strokeStyle='rgba(244,185,66,0.15)'; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.strokeStyle='rgba(244,185,66,0.18)'; ctx.lineWidth=0.8; ctx.stroke();
       });
-      // Center spine — Inkanyezi brand gold
-      ctx.beginPath(); ctx.moveTo(CX,CY-80); ctx.lineTo(CX,CY+72);
-      ctx.strokeStyle='rgba(244,185,66,0.12)'; ctx.lineWidth=1.5; ctx.stroke();
-      // Pulses
-      for(let i=pulses.length-1;i>=0;i--){
-        const p=pulses[i]; p.t+=p.s;
-        if(p.t>=1){pulses.splice(i,1);seed();continue;}
+      ctx.beginPath(); ctx.moveTo(CX,CY-78); ctx.lineTo(CX,CY+68);
+      ctx.strokeStyle='rgba(244,185,66,0.1)'; ctx.lineWidth=1.5; ctx.stroke();
+      for(let i=ps.length-1;i>=0;i--){
+        const p=ps[i]; p.t+=p.s;
+        if(p.t>=1){ps.splice(i,1);seed();continue;}
         const n1=all[p.a],n2=all[p.b]; if(!n1||!n2) continue;
-        const px=n1.x+(n2.x-n1.x)*p.t, py=n1.y+(n2.y-n1.y)*p.t;
-        const pg=ctx.createRadialGradient(px,py,0,px,py,10);
+        const px=n1.x+(n2.x-n1.x)*p.t,py=n1.y+(n2.y-n1.y)*p.t;
+        const pg=ctx.createRadialGradient(px,py,0,px,py,9);
         pg.addColorStop(0,'#F4B942'); pg.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.beginPath(); ctx.arc(px,py,10,0,Math.PI*2); ctx.fillStyle=pg; ctx.fill();
+        ctx.beginPath(); ctx.arc(px,py,9,0,Math.PI*2); ctx.fillStyle=pg; ctx.fill();
         ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2); ctx.fillStyle='#F4B942'; ctx.fill();
       }
-      // Nodes
-      all.forEach((n,i) => {
-        const pulse=0.4+0.5*Math.sin(tk*2.5+i*0.85);
-        const ng=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,8);
-        ng.addColorStop(0,`rgba(244,185,66,${pulse*0.85})`); ng.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.beginPath(); ctx.arc(n.x,n.y,8,0,Math.PI*2); ctx.fillStyle=ng; ctx.fill();
-        ctx.beginPath(); ctx.arc(n.x,n.y,3,0,Math.PI*2);
-        ctx.fillStyle=`rgba(255,220,130,${0.7+pulse*0.3})`; ctx.fill();
+      all.forEach((n,i)=>{
+        const pls=0.4+0.5*Math.sin(tk*2.5+i*0.85);
+        const ng=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,7);
+        ng.addColorStop(0,`rgba(244,185,66,${pls*0.85})`); ng.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(n.x,n.y,7,0,Math.PI*2); ctx.fillStyle=ng; ctx.fill();
+        ctx.beginPath(); ctx.arc(n.x,n.y,2.8,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,220,120,${0.7+pls*0.3})`; ctx.fill();
       });
-      // AI text
       ctx.save();
-      ctx.shadowColor='#F4B942'; ctx.shadowBlur=22+8*Math.sin(tk);
-      ctx.font='bold 64px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.shadowColor='#F4B942'; ctx.shadowBlur=20+7*Math.sin(tk);
+      ctx.font='bold 60px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillStyle=`rgba(255,255,255,${0.82+0.18*Math.sin(tk*1.5)})`;
-      ctx.fillText('AI', CX, CY+4);
-      ctx.restore();
-      // Loading indicator
-      const dots = '▮▮▮'.slice(0, (Math.floor(tk*4)%4)+1);
+      ctx.fillText('AI',CX,CY+4); ctx.restore();
       ctx.font='9px monospace'; ctx.textAlign='center';
-      ctx.fillStyle='rgba(244,185,66,0.45)';
-      ctx.fillText(`INKANYEZI OS  ${dots}`, CX, CY+88);
-      raf2 = requestAnimationFrame(draw);
+      ctx.fillStyle='rgba(244,185,66,0.5)';
+      const bar='▮'.repeat((Math.floor(tk*4)%4)+1);
+      ctx.fillText(`INKANYEZI OS  ${bar}`,CX,CY+82);
+      raf2=requestAnimationFrame(draw);
     };
     draw();
-    const t = setTimeout(() => { cancelAnimationFrame(raf2); setPhase('opening'); }, 2500);
-    return () => { cancelAnimationFrame(raf2); clearTimeout(t); };
-  }, []);
+    const t=setTimeout(()=>{cancelAnimationFrame(raf2);setPhase('opening');},2500);
+    return ()=>{cancelAnimationFrame(raf2);clearTimeout(t);};
+  },[]);
 
-  // ── DOOR OPENING ──────────────────────────────────────────────────
-  useEffect(() => {
-    if (phase !== 'opening') return;
-    const dur=900, start=performance.now();
-    const run = (now:number) => {
+  useEffect(()=>{
+    if(phase!=='opening') return;
+    const dur=900,start=performance.now();
+    const run=(now:number)=>{
       const p=Math.min((now-start)/dur,1);
-      const eased=1-Math.pow(1-p,3);
-      setDoorPct(eased);
-      if (p<1) animRef.current=requestAnimationFrame(run);
-      else setTimeout(onComplete,80);
+      setDoorPct(1-Math.pow(1-p,3));
+      if(p<1) animRef.current=requestAnimationFrame(run);
+      else setTimeout(onComplete,60);
     };
-    animRef.current=requestAnimationFrame(run);
-    return () => cancelAnimationFrame(animRef.current);
-  }, [phase, onComplete]);
+    animRef.current=requestAnimationFrame(run); return ()=>cancelAnimationFrame(animRef.current);
+  },[phase,onComplete]);
 
-  const slide = doorPct * 52;
-  const brainFade = phase==='brain' ? 1 : Math.max(0, 1-doorPct*2.2);
+  const slide=doorPct*52;
+  const brainFade=phase==='brain'?1:Math.max(0,1-doorPct*2.2);
 
   return (
     <div style={{position:'absolute',inset:0,display:'flex',overflow:'hidden',borderRadius:20}}>
       {/* LEFT DOOR */}
       <div style={{position:'absolute',top:0,left:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(-${slide}%)`,overflow:'hidden'}}>
         <canvas ref={leftRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
-        {phase==='opening' && (
-          <div style={{position:'absolute',top:'50%',right:`${5+doorPct*13}%`,transform:`translateY(-50%) scale(${1+doorPct*0.25})`,fontFamily:'Arial',fontWeight:'bold',fontSize:56,color:`rgba(255,255,255,${Math.max(0,1-doorPct*2)})`,textShadow:'0 0 20px #F4B942, 0 0 40px rgba(255,107,53,0.5)',pointerEvents:'none',letterSpacing:-2}}>A</div>
+        {phase==='opening'&&(
+          <div style={{position:'absolute',top:'50%',right:`${5+doorPct*14}%`,transform:`translateY(-50%) scale(${1+doorPct*0.3})`,fontFamily:'Arial',fontWeight:'bold',fontSize:56,color:`rgba(255,255,255,${Math.max(0,1-doorPct*2)})`,textShadow:'0 0 20px #F4B942,0 0 40px rgba(255,107,53,0.5)',pointerEvents:'none'}}>A</div>
         )}
       </div>
       {/* RIGHT DOOR */}
       <div style={{position:'absolute',top:0,right:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(${slide}%)`,overflow:'hidden'}}>
         <canvas ref={rightRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
-        {phase==='opening' && (
-          <div style={{position:'absolute',top:'50%',left:`${5+doorPct*13}%`,transform:`translateY(-50%) scale(${1+doorPct*0.25})`,fontFamily:'Arial',fontWeight:'bold',fontSize:56,color:`rgba(255,255,255,${Math.max(0,1-doorPct*2)})`,textShadow:'0 0 20px #F4B942, 0 0 40px rgba(255,107,53,0.5)',pointerEvents:'none',letterSpacing:-2}}>I</div>
+        {phase==='opening'&&(
+          <div style={{position:'absolute',top:'50%',left:`${5+doorPct*14}%`,transform:`translateY(-50%) scale(${1+doorPct*0.3})`,fontFamily:'Arial',fontWeight:'bold',fontSize:56,color:`rgba(255,255,255,${Math.max(0,1-doorPct*2)})`,textShadow:'0 0 20px #F4B942,0 0 40px rgba(255,107,53,0.5)',pointerEvents:'none'}}>I</div>
         )}
       </div>
-      {/* BRAIN OVERLAY */}
+      {/* BRAIN */}
       <div style={{position:'absolute',inset:0,zIndex:7,opacity:brainFade,pointerEvents:'none',display:'flex',alignItems:'center',justifyContent:'center'}}>
-        <canvas ref={brainRef} style={{width:280,height:240}}/>
+        <canvas ref={brainRef} style={{width:280,height:220}}/>
       </div>
-      {/* CENTER SEAM — gold-orange Inkanyezi glow */}
-      <div style={{position:'absolute',top:0,bottom:0,left:'50%',width:2,transform:'translateX(-50%)',background:'linear-gradient(180deg,transparent,#F4B942,#FF6B35,#F4B942,transparent)',boxShadow:'0 0 18px #F4B942, 0 0 36px rgba(244,185,66,0.35)',zIndex:8,opacity:0.65+doorPct*0.35,pointerEvents:'none'}}/>
+      {/* CENTER SEAM — gold plasma */}
+      <div style={{position:'absolute',top:0,bottom:0,left:'50%',width:2,transform:'translateX(-50%)',background:'linear-gradient(180deg,transparent,#F4B942,#FF6B35,#F4B942,transparent)',boxShadow:'0 0 20px #F4B942,0 0 40px rgba(244,185,66,0.35)',zIndex:8,opacity:0.6+doorPct*0.4,pointerEvents:'none'}}/>
     </div>
   );
 }
@@ -743,13 +642,13 @@ function InkanyeziBotWidget() {
         @keyframes greetingPop { from{opacity:0;transform:translateY(10px) scale(0.95);} to{opacity:1;transform:translateY(0) scale(1);} }
         .ink-msg { animation: msgFadeUp 0.3s ease forwards; }
         .ink-chip { animation: chipAppear 0.3s ease forwards; transition: all 0.2s !important; }
-        .ink-chip:hover { background: rgba(244,185,66,0.15) !important; border-color: rgba(244,185,66,0.5) !important; color: #fff !important; transform: translateX(2px); }
+        .ink-chip:hover { background: rgba(244,185,66,0.12) !important; border-color: #F4B942 !important; color: #1a1a2e !important; transform: translateX(2px); }
         .ink-rocket { animation: rocketGlow 2s ease infinite; }
         .ink-rocket:hover:not(:disabled) { transform: scale(1.08) rotate(-5deg) !important; box-shadow: 0 0 30px rgba(249,115,22,0.9) !important; }
         .ink-msgs::-webkit-scrollbar { width: 3px; }
         .ink-msgs::-webkit-scrollbar-track { background: transparent; }
-        .ink-msgs::-webkit-scrollbar-thumb { background: rgba(244,185,66,0.25); border-radius: 2px; }
-        .ink-textarea::placeholder { color: rgba(255,255,255,0.28) !important; }
+        .ink-msgs::-webkit-scrollbar-thumb { background: rgba(244,185,66,0.4); border-radius: 2px; }
+        .ink-textarea::placeholder { color: rgba(100,110,130,0.5) !important; }
       `}</style>
 
       {/* ── PROACTIVE GREETING ── */}
@@ -789,20 +688,14 @@ function InkanyeziBotWidget() {
         <span style={{ position:'relative', zIndex:1, transition:'transform 0.3s', transform:isOpen?'rotate(45deg)':'none' }}>{isOpen?'✕':'⭐'}</span>
       </button>
 
-      {/* ── CHAT WINDOW ── */}
-      {/* ── DOOR ANIMATION — shows before chat opens ── */}
-      {showDoor && !isOpen && (
-        <div key={openKey} style={{ position:'fixed', bottom:100, right:24, width:370, height:580, zIndex:99999, borderRadius:20, overflow:'hidden', boxShadow:'0 0 0 1px rgba(0,220,255,0.25), 0 0 60px rgba(0,180,255,0.2), 0 25px 70px rgba(0,0,0,0.8)', background:'#07111f' }}>
-          <DoorAnimationInline onComplete={() => { setShowDoor(false); setIsOpen(true); }} />
-        </div>
-      )}
+      {/* ── DOOR + CHAT WINDOW — layered, no black gap ── */}
+      {(showDoor || isOpen) && (
+        <div style={{ position:'fixed', bottom:100, right:24, width:370, height:580, zIndex:99998, borderRadius:20, boxShadow:'0 0 0 1px rgba(244,185,66,0.12), 0 0 50px rgba(244,185,66,0.08), 0 25px 70px rgba(0,0,0,0.6)' }}>
 
-      {isOpen && (
-        <div style={{ position:'fixed', bottom:100, right:24, width:370, height:580, display:'flex', flexDirection:'column', zIndex:99998, borderRadius:20, background:'linear-gradient(160deg, #1e2d4a 0%, #131f33 50%, #0c1624 100%)', border:'1px solid rgba(249,115,22,0.2)', boxShadow:'0 0 0 1px rgba(244,185,66,0.05), 0 0 50px rgba(249,115,22,0.12), 0 25px 70px rgba(0,0,0,0.7)' }}>
-          <CosmosCanvas width={370} height={580} />
-
+          {/* Chat window — pre-rendered behind door, fades in when door completes */}
+          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', borderRadius:20, overflow:'hidden', opacity: isOpen ? 1 : 0, transition: isOpen ? 'opacity 0.25s ease' : 'none', zIndex:1 }}>
           {/* Header */}
-          <div style={{ position:'relative', zIndex:2, background:'linear-gradient(135deg, rgba(15,27,53,0.98), rgba(26,42,80,0.98))', borderBottom:'1px solid rgba(249,115,22,0.18)', padding:'12px 16px', display:'flex', alignItems:'center', gap:12, flexShrink:0 }}>
+          <div style={{ position:'relative', zIndex:2, background:'linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%)', borderBottom:'1px solid rgba(244,185,66,0.3)', boxShadow:'0 1px 8px rgba(0,0,0,0.06)', padding:'12px 16px', display:'flex', alignItems:'center', gap:12, flexShrink:0 }}>
             <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`, backgroundSize:'200% 100%', animation:'headerShimmer 3s linear infinite' }} />
             <div style={{ position:'relative', flexShrink:0 }}>
               <div style={{ width:42, height:42, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, boxShadow:'0 0 16px rgba(249,115,22,0.6)' }}>⭐</div>
@@ -811,25 +704,25 @@ function InkanyeziBotWidget() {
               </div>
             </div>
             <div style={{ flex:1, minWidth:0 }}>
-              <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:15, color:C.white, letterSpacing:'-0.01em' }}>InkanyeziBot <span style={{ fontSize:11, color:C.gold, fontFamily:"'Space Mono',monospace", fontWeight:400 }}>✦</span></div>
-              <div style={{ fontSize:11, color:'#FF6B35', display:'flex', alignItems:'center', gap:5, fontFamily:"'DM Sans',sans-serif" }}>
+              <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:15, color:'#1a1a2e', letterSpacing:'-0.01em' }}>InkanyeziBot <span style={{ fontSize:11, color:C.gold, fontFamily:"'Space Mono',monospace", fontWeight:400 }}>✦</span></div>
+              <div style={{ fontSize:11, color:'#F4B942', display:'flex', alignItems:'center', gap:5, fontFamily:"'DM Sans',sans-serif" }}>
                 <SignalDot /><span>Online · AI Automation · Durban, ZA</span>
               </div>
             </div>
             <div style={{ textAlign:'right', flexShrink:0 }}>
-              <div style={{ fontSize:10, color:'rgba(255,255,255,0.3)', fontFamily:"'Space Mono',monospace" }}>🇿🇦 SA AI</div>
+              <div style={{ fontSize:10, color:'rgba(100,80,20,0.5)', fontFamily:"'Space Mono',monospace" }}>🇿🇦 SA AI</div>
               <HeritageStrip style={{ justifyContent:'flex-end', marginTop:3 }} />
             </div>
           </div>
 
           {/* Messages */}
-          <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, position:'relative', zIndex:2 }}>
+          <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, position:'relative', zIndex:2, background:'#F5F7FA' }}>
             {messages.map((msg,i) => (
               <div key={i} className="ink-msg" style={{ display:'flex', justifyContent:msg.role==='user'?'flex-end':'flex-start', alignItems:'flex-end', gap:6, animationDelay:`${i*0.03}s` }}>
                 {msg.role==='assistant' && (
                   <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, boxShadow:'0 0 8px rgba(249,115,22,0.4)' }}>⭐</div>
                 )}
-                <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #FF6B35, #c2410c)':'rgba(255,255,255,0.11)', color:C.white, border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.22)', boxShadow:msg.role==='user'?'0 0 14px rgba(249,115,22,0.3)':'none', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
+                <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'#FFFFFF', color:msg.role==='user'?'#1a1a2e':'#1a1a2e', border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.3)', boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.25)':'0 1px 4px rgba(0,0,0,0.06)', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
                   dangerouslySetInnerHTML={{ __html:formatMessage(msg.content) }} />
               </div>
             ))}
@@ -837,10 +730,10 @@ function InkanyeziBotWidget() {
             {/* Quick chips */}
             {showChips && messages.length===1 && (
               <div style={{ display:'flex', flexDirection:'column', gap:6, marginTop:4 }}>
-                <div style={{ fontSize:'0.6rem', color:'rgba(255,255,255,0.28)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.1em', textAlign:'center', marginBottom:2 }}>Quick questions:</div>
+                <div style={{ fontSize:'0.6rem', color:'rgba(100,110,130,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.1em', textAlign:'center', marginBottom:2 }}>Quick questions:</div>
                 {CHIPS.map((chip,i) => (
                   <button key={i} className="ink-chip" onClick={()=>sendMessage(chip.msg)}
-                    style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(249,115,22,0.2)', borderRadius:8, padding:'8px 12px', color:'rgba(255,255,255,0.7)', fontSize:12, cursor:'pointer', textAlign:'left', fontFamily:"'DM Sans',sans-serif", animationDelay:`${i*0.08}s`, opacity:0 }}>
+                    style={{ background:'#FFFFFF', border:'1px solid rgba(244,185,66,0.35)', borderRadius:8, padding:'8px 12px', color:'#1a1a2e', fontSize:12, cursor:'pointer', textAlign:'left', fontFamily:"'DM Sans',sans-serif", animationDelay:`${i*0.08}s`, opacity:0 }}>
                     {chip.label}
                   </button>
                 ))}
@@ -856,8 +749,8 @@ function InkanyeziBotWidget() {
             {isLoading && (
               <div style={{ display:'flex', alignItems:'flex-end', gap:6 }}>
                 <div style={{ width:24, height:24, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, flexShrink:0 }}>⭐</div>
-                <div style={{ background:'rgba(255,255,255,0.11)', padding:'12px 16px', borderRadius:14, borderBottomLeftRadius:3, border:'1px solid rgba(244,185,66,0.22)', display:'flex', alignItems:'center', gap:5 }}>
-                  {[0,1,2].map(i => <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'#FF6B35', opacity:0.15, animation:`thinkPulse 1.2s ease-in-out infinite`, animationDelay:`${i*0.2}s` }} />)}
+                <div style={{ background:'#FFFFFF', padding:'12px 16px', borderRadius:14, borderBottomLeftRadius:3, border:'1px solid rgba(244,185,66,0.25)', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', display:'flex', alignItems:'center', gap:5 }}>
+                  {[0,1,2].map(i => <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'#F4B942', opacity:0.4, animation:`thinkPulse 1.2s ease-in-out infinite`, animationDelay:`${i*0.2}s` }} />)}
                 </div>
               </div>
             )}
@@ -865,25 +758,33 @@ function InkanyeziBotWidget() {
           </div>
 
           {/* Input */}
-          <div style={{ position:'relative', zIndex:2, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.22)', background:'rgba(18,30,50,0.98)', flexShrink:0 }}>
+          <div style={{ position:'relative', zIndex:2, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#FFFFFF', flexShrink:0 }}>
             <div style={{ display:'flex', gap:8, alignItems:'flex-end' }}>
               <textarea ref={textareaRef} value={input} className="ink-textarea"
                 onChange={e => { setInput(e.target.value); e.target.style.height='auto'; e.target.style.height=Math.min(e.target.scrollHeight,96)+'px'; }}
                 onKeyDown={e => { if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                placeholder="Send a message into the cosmos..." rows={1}
-                style={{ flex:1, padding:'9px 13px', borderRadius:14, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(249,115,22,0.18)', color:C.white, outline:'none', fontSize:13, resize:'none', lineHeight:1.5, wordBreak:'break-word', overflowY:'auto', maxHeight:96, fontFamily:"'DM Sans',sans-serif", transition:'border-color 0.2s' }}
-                onFocus={e=>e.target.style.borderColor='rgba(249,115,22,0.4)'}
-                onBlur={e=>e.target.style.borderColor='rgba(249,115,22,0.18)'}
+                placeholder="Type your message..." rows={1}
+                style={{ flex:1, padding:'9px 13px', borderRadius:14, background:'#F5F7FA', border:'1px solid rgba(244,185,66,0.3)', color:'#1a1a2e', outline:'none', fontSize:13, resize:'none', lineHeight:1.5, wordBreak:'break-word', overflowY:'auto', maxHeight:96, fontFamily:"'DM Sans',sans-serif", transition:'border-color 0.2s' }}
+                onFocus={e=>e.target.style.borderColor='#F4B942'}
+                onBlur={e=>e.target.style.borderColor='rgba(244,185,66,0.3)'}
               />
               <button className="ink-rocket" onClick={()=>sendMessage()} disabled={isLoading||!input.trim()}
                 style={{ width:42, height:42, borderRadius:'50%', flexShrink:0, background:isLoading||!input.trim()?'rgba(249,115,22,0.3)':'linear-gradient(135deg, #FF6B35, #c2410c)', border:'none', cursor:isLoading||!input.trim()?'not-allowed':'pointer', color:C.white, fontSize:18, display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', opacity:isLoading||!input.trim()?0.5:1 }}>
                 🚀
               </button>
             </div>
-            <div style={{ marginTop:6, textAlign:'center', fontSize:10, color:'rgba(255,255,255,0.2)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.05em' }}>
+            <div style={{ marginTop:6, textAlign:'center', fontSize:10, color:'rgba(150,120,60,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.05em' }}>
               ✦ INKANYEZI TECHNOLOGIES · WE ARE THE SIGNAL IN THE NOISE ✦
             </div>
           </div>
+          </div>
+
+          {/* Door overlay — sits above chat, removed when done */}
+          {showDoor && !isOpen && (
+            <div key={openKey} style={{ position:'absolute', inset:0, zIndex:2, borderRadius:20, overflow:'hidden' }}>
+              <DoorAnimationInline onComplete={() => { setShowDoor(false); setIsOpen(true); }} />
+            </div>
+          )}
         </div>
       )}
     </>
