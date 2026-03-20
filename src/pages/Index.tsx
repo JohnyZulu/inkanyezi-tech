@@ -279,295 +279,304 @@ function formatMessage(text: string) {
 
 
 // ════════════════════════════════════════════════════════════════════
-// INKANYEZI AFROFUTURIST DOOR ANIMATION
-// Zulu royal kraal meets quantum technology — built in 3025
-// Ndebele geometry × Constellation star maps × SA heritage colours
+// INKANYEZI DOOR — Tech-first, cosmos-primary, African accent
+// 60% Futuristic AI / 30% Cosmos / 10% SA Identity
 // ════════════════════════════════════════════════════════════════════
 function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
   const leftRef  = useRef<HTMLCanvasElement>(null);
   const rightRef = useRef<HTMLCanvasElement>(null);
+  const brainRef = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase]     = useState<'brain'|'opening'>('brain');
   const [doorPct, setDoorPct] = useState(0);
-  const animRef = useRef<number>(0);
+  const animRef  = useRef<number>(0);
+  const tickRef  = useRef(0);
 
-  // ── PANEL CANVAS PAINTER ──────────────────────────────────────────
-  const paintPanel = (canvas: HTMLCanvasElement, side: 'left'|'right', tick: number, openPct: number) => {
+  // ── PANEL PAINTER ─────────────────────────────────────────────────
+  const paintPanel = (canvas: HTMLCanvasElement, side: 'left'|'right', tk: number, openPct: number) => {
     const ctx = canvas.getContext('2d')!;
     const W = canvas.width, H = canvas.height;
     const isL = side === 'left';
     ctx.clearRect(0, 0, W, H);
 
-    // Base — deep midnight
-    ctx.fillStyle = '#07111f';
+    // ── BASE — deep space gradient ──────────────────────────────────
+    const base = ctx.createLinearGradient(0, 0, isL ? W : 0, H);
+    base.addColorStop(0, '#04080F');
+    base.addColorStop(0.5, '#07111f');
+    base.addColorStop(1, '#040c18');
+    ctx.fillStyle = base;
     ctx.fillRect(0, 0, W, H);
 
-    // ── NDEBELE GEOMETRIC BORDER ────────────────────────────────────
-    // Bold angular patterns inspired by Ndebele house-painting
-    const ndebeleColors = ['#F4B942', '#FF6B35', '#007A4D', '#DE3831', '#002395', '#FFB612'];
-    
-    // Top border strip — Ndebele zigzag
-    const stripH = 28;
-    for (let x = 0; x < W; x += 14) {
-      const colorIdx = Math.floor(x / 14) % ndebeleColors.length;
-      ctx.fillStyle = ndebeleColors[colorIdx];
-      ctx.globalAlpha = 0.75;
-      // Triangle up
-      ctx.beginPath();
-      ctx.moveTo(x, 0); ctx.lineTo(x + 7, stripH); ctx.lineTo(x + 14, 0);
-      ctx.fill();
+    // ── TECH GRID — primary visual language ─────────────────────────
+    ctx.strokeStyle = 'rgba(244,185,66,0.055)';
+    ctx.lineWidth = 0.5;
+    const gridSize = 28;
+    for (let x = 0; x < W; x += gridSize) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
     }
-    ctx.globalAlpha = 1;
-
-    // Bottom border strip — mirror
-    for (let x = 0; x < W; x += 14) {
-      const colorIdx = Math.floor(x / 14) % ndebeleColors.length;
-      ctx.fillStyle = ndebeleColors[colorIdx];
-      ctx.globalAlpha = 0.75;
-      ctx.beginPath();
-      ctx.moveTo(x, H); ctx.lineTo(x + 7, H - stripH); ctx.lineTo(x + 14, H);
-      ctx.fill();
+    for (let y = 0; y < H; y += gridSize) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
     }
-    ctx.globalAlpha = 1;
 
-    // Left/right border strips — vertical Ndebele diamonds
-    const sideW = 22;
-    const edgeSide = isL ? 'right' : 'left';
-    for (let y = stripH; y < H - stripH; y += 18) {
-      const colorIdx = Math.floor(y / 18) % ndebeleColors.length;
-      ctx.fillStyle = ndebeleColors[colorIdx];
-      ctx.globalAlpha = 0.65;
-      const bx = isL ? W - sideW : 0;
-      // Diamond shape
-      ctx.beginPath();
-      ctx.moveTo(bx + sideW/2, y);
-      ctx.lineTo(bx + sideW, y + 9);
-      ctx.lineTo(bx + sideW/2, y + 18);
-      ctx.lineTo(bx, y + 9);
-      ctx.closePath(); ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-
-    // ── ISISHWESHWE FABRIC PATTERN — main panel body ─────────────
-    const patternCanvas = document.createElement('canvas');
-    patternCanvas.width = 20; patternCanvas.height = 20;
-    const pctx = patternCanvas.getContext('2d')!;
-    pctx.fillStyle = '#07111f';
-    pctx.fillRect(0, 0, 20, 20);
-    // Classic isishweshwe small diamond repeat
-    pctx.strokeStyle = 'rgba(244,185,66,0.12)';
-    pctx.lineWidth = 0.8;
-    pctx.beginPath();
-    pctx.moveTo(10, 2); pctx.lineTo(18, 10); pctx.lineTo(10, 18); pctx.lineTo(2, 10); pctx.closePath();
-    pctx.stroke();
-    // Center dot
-    pctx.fillStyle = 'rgba(244,185,66,0.08)';
-    pctx.beginPath(); pctx.arc(10, 10, 1.5, 0, Math.PI*2); pctx.fill();
-    const pattern = ctx.createPattern(patternCanvas, 'repeat')!;
-    ctx.fillStyle = pattern;
-    ctx.fillRect(sideW, stripH, W - sideW*2, H - stripH*2);
-
-    // ── CONSTELLATION STAR MAP ────────────────────────────────────
-    // Southern Cross constellation — Inkanyezi brand identity
-    const stars = isL ? [
-      {x: W*0.25, y: H*0.22}, {x: W*0.55, y: H*0.18}, {x: W*0.4,  y: H*0.35},
-      {x: W*0.2,  y: H*0.45}, {x: W*0.6,  y: H*0.42}, {x: W*0.35, y: H*0.6},
-      {x: W*0.55, y: H*0.68}, {x: W*0.22, y: H*0.72}, {x: W*0.45, y: H*0.78},
-    ] : [
-      {x: W*0.45, y: H*0.22}, {x: W*0.75, y: H*0.18}, {x: W*0.6,  y: H*0.35},
-      {x: W*0.4,  y: H*0.45}, {x: W*0.8,  y: H*0.42}, {x: W*0.65, y: H*0.6},
-      {x: W*0.45, y: H*0.68}, {x: W*0.78, y: H*0.72}, {x: W*0.55, y: H*0.78},
-    ];
-    const starConns = [[0,2],[2,3],[2,1],[1,4],[3,5],[4,6],[5,7],[6,8],[5,6]];
-    
-    // Draw constellation lines
-    starConns.forEach(([a,b]) => {
-      ctx.beginPath();
-      ctx.moveTo(stars[a].x, stars[a].y);
-      ctx.lineTo(stars[b].x, stars[b].y);
-      ctx.strokeStyle = 'rgba(244,185,66,0.18)';
-      ctx.lineWidth = 0.8; ctx.stroke();
-    });
-    
-    // Draw stars — pulsing
-    stars.forEach((s, i) => {
-      const pulse = 0.5 + 0.5 * Math.sin(tick * 2.5 + i * 0.9);
-      const r = i === 2 ? 3.5 : 2;
-      const sg = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r*3.5);
-      sg.addColorStop(0, `rgba(244,185,66,${pulse*0.9})`);
-      sg.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.beginPath(); ctx.arc(s.x, s.y, r*3.5, 0, Math.PI*2);
-      ctx.fillStyle = sg; ctx.fill();
-      ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(244,185,66,${0.7+pulse*0.3})`; ctx.fill();
-    });
-
-    // ── INKANYEZI STAR — center focal point ───────────────────────
-    const cx = isL ? W * 0.42 : W * 0.58;
-    const cy = H * 0.5;
-    const starR = 18 + 3 * Math.sin(tick * 2);
-    const starGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, starR * 2.5);
-    starGlow.addColorStop(0, `rgba(244,185,66,${0.5 + 0.2*Math.sin(tick)})`);
-    starGlow.addColorStop(0.5, `rgba(255,107,53,0.15)`);
-    starGlow.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.beginPath(); ctx.arc(cx, cy, starR*2.5, 0, Math.PI*2);
-    ctx.fillStyle = starGlow; ctx.fill();
-    // 6-pointed star (Star of Africa / Inkanyezi)
-    const drawStar = (x: number, y: number, r: number, alpha: number) => {
-      ctx.save(); ctx.translate(x, y);
-      ctx.rotate(tick * 0.3);
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = '#F4B942';
-      for (let i = 0; i < 6; i++) {
-        ctx.save();
-        ctx.rotate((i * Math.PI) / 3);
+    // ── HEXAGONAL PATTERN — AI/tech motif ───────────────────────────
+    const hexR = 18;
+    const hexW = hexR * Math.sqrt(3);
+    ctx.strokeStyle = 'rgba(244,185,66,0.07)';
+    ctx.lineWidth = 0.6;
+    for (let row = -1; row < H / (hexR * 1.5) + 1; row++) {
+      for (let col = -1; col < W / hexW + 1; col++) {
+        const cx = col * hexW + (row % 2 === 0 ? 0 : hexW / 2);
+        const cy = row * hexR * 1.5;
         ctx.beginPath();
-        ctx.moveTo(0, -r); ctx.lineTo(r*0.25, -r*0.4);
-        ctx.lineTo(r*0.5, -r*0.4); ctx.lineTo(r*0.3, 0);
-        ctx.lineTo(r*0.5, r*0.4); ctx.lineTo(0, r*0.25);
-        ctx.lineTo(-r*0.5, r*0.4); ctx.lineTo(-r*0.3, 0);
-        ctx.lineTo(-r*0.5, -r*0.4); ctx.lineTo(-r*0.25, -r*0.4);
-        ctx.closePath(); ctx.fill();
-        ctx.restore();
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 3) * i - Math.PI / 6;
+          const hx = cx + hexR * Math.cos(angle);
+          const hy = cy + hexR * Math.sin(angle);
+          i === 0 ? ctx.moveTo(hx, hy) : ctx.lineTo(hx, hy);
+        }
+        ctx.closePath(); ctx.stroke();
       }
-      ctx.restore();
-      ctx.globalAlpha = 1;
-    };
-    drawStar(cx, cy, starR, 0.85 + 0.15*Math.sin(tick*2));
+    }
 
-    // ── SA HERITAGE STRIP — inner edge ───────────────────────────
-    const saColors = ['#007A4D', '#FFB612', '#DE3831', '#002395', '#ffffff'];
-    const stripX = isL ? W - sideW - 8 : sideW + 2;
-    const segH = (H - stripH*2) / saColors.length;
+    // ── CIRCUIT TRACES — horizontal data lines ───────────────────────
+    const traceYs = [H*0.18, H*0.32, H*0.5, H*0.68, H*0.82];
+    traceYs.forEach((y, i) => {
+      const pulse = 0.5 + 0.5 * Math.sin(tk * 1.8 + i * 1.1);
+      ctx.strokeStyle = `rgba(244,185,66,${0.1 + pulse * 0.12})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      const x0 = isL ? 30 : 0, x1 = isL ? W : W - 30;
+      ctx.moveTo(x0, y);
+      // Stepped circuit path
+      const mid = (x0 + x1) / 2;
+      ctx.lineTo(mid - 20, y);
+      ctx.lineTo(mid - 12, y - 8);
+      ctx.lineTo(mid + 12, y - 8);
+      ctx.lineTo(mid + 20, y);
+      ctx.lineTo(x1, y);
+      ctx.stroke();
+      // Node dots on trace
+      [x0 + 15, mid, x1 - 15].forEach(nx => {
+        ctx.beginPath(); ctx.arc(nx, y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(244,185,66,${0.3 + pulse * 0.4})`;
+        ctx.fill();
+      });
+    });
+
+    // ── DATA STREAM PARTICLES — falling down ────────────────────────
+    const streamCols = isL ? [W*0.2, W*0.5, W*0.75] : [W*0.25, W*0.5, W*0.8];
+    streamCols.forEach((sx, si) => {
+      for (let p = 0; p < 5; p++) {
+        const yPos = ((tk * 60 * (0.8 + si * 0.3) + p * (H / 5)) % H);
+        const alpha = 0.15 + 0.2 * Math.sin(tk + p);
+        ctx.fillStyle = `rgba(244,185,66,${alpha})`;
+        ctx.font = `${8 + (p % 2)}px monospace`;
+        ctx.textAlign = 'center';
+        const chars = ['0', '1', 'AI', '∑', '⟨', '⟩', '∞'];
+        ctx.fillText(chars[(Math.floor(tk * 3 + p + si * 7)) % chars.length], sx, yPos);
+      }
+    });
+
+    // ── SCAN LINE — sweeping top to bottom ─────────────────────────
+    const scanY = ((tk * 35) % (H + 60)) - 30;
+    const scanGrad = ctx.createLinearGradient(0, scanY - 20, 0, scanY + 20);
+    scanGrad.addColorStop(0, 'rgba(244,185,66,0)');
+    scanGrad.addColorStop(0.5, `rgba(244,185,66,${0.06 + openPct * 0.04})`);
+    scanGrad.addColorStop(1, 'rgba(244,185,66,0)');
+    ctx.fillStyle = scanGrad;
+    ctx.fillRect(0, scanY - 20, W, 40);
+
+    // ── CONSTELLATION — Southern Cross, subtle gold ─────────────────
+    const stars = isL
+      ? [{x:W*0.28,y:H*0.22},{x:W*0.52,y:H*0.17},{x:W*0.38,y:H*0.38},{x:W*0.18,y:H*0.44},{x:W*0.58,y:H*0.41}]
+      : [{x:W*0.42,y:H*0.22},{x:W*0.72,y:H*0.17},{x:W*0.62,y:H*0.38},{x:W*0.82,y:H*0.44},{x:W*0.48,y:H*0.41}];
+    const starConns = [[0,2],[2,1],[2,3],[1,4]];
+    starConns.forEach(([a,b]) => {
+      ctx.beginPath(); ctx.moveTo(stars[a].x, stars[a].y); ctx.lineTo(stars[b].x, stars[b].y);
+      ctx.strokeStyle = 'rgba(244,185,66,0.12)'; ctx.lineWidth = 0.7; ctx.stroke();
+    });
+    stars.forEach((s, i) => {
+      const pulse = 0.4 + 0.4 * Math.sin(tk * 2 + i * 1.3);
+      const r = i === 2 ? 2.8 : 1.8;
+      const sg = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r * 4);
+      sg.addColorStop(0, `rgba(244,185,66,${pulse * 0.7})`);
+      sg.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.beginPath(); ctx.arc(s.x, s.y, r * 4, 0, Math.PI * 2); ctx.fillStyle = sg; ctx.fill();
+      ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,220,130,${0.6 + pulse * 0.4})`; ctx.fill();
+    });
+
+    // ── INKANYEZI STAR — rotating focal point ──────────────────────
+    const starX = isL ? W * 0.4 : W * 0.6;
+    const starY = H * 0.6;
+    const starR2 = 14 + 2 * Math.sin(tk * 2.5);
+    const sg2 = ctx.createRadialGradient(starX, starY, 0, starX, starY, starR2 * 3);
+    sg2.addColorStop(0, `rgba(244,185,66,${0.35 + 0.15 * Math.sin(tk)})`);
+    sg2.addColorStop(0.6, `rgba(255,107,53,0.1)`);
+    sg2.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath(); ctx.arc(starX, starY, starR2 * 3, 0, Math.PI * 2);
+    ctx.fillStyle = sg2; ctx.fill();
+    // 4-pointed star (cleaner, more tech)
+    ctx.save(); ctx.translate(starX, starY); ctx.rotate(tk * 0.4);
+    ctx.fillStyle = '#F4B942'; ctx.globalAlpha = 0.75;
+    for (let i = 0; i < 4; i++) {
+      ctx.save(); ctx.rotate((i * Math.PI) / 2);
+      ctx.beginPath();
+      ctx.moveTo(0, -starR2); ctx.lineTo(starR2 * 0.22, -starR2 * 0.3);
+      ctx.lineTo(starR2, 0);  ctx.lineTo(starR2 * 0.22, starR2 * 0.3);
+      ctx.lineTo(0, starR2);  ctx.lineTo(-starR2 * 0.22, starR2 * 0.3);
+      ctx.lineTo(-starR2, 0); ctx.lineTo(-starR2 * 0.22, -starR2 * 0.3);
+      ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+    ctx.restore(); ctx.globalAlpha = 1;
+
+    // ── SA HERITAGE STRIP — thin outer edge, proud but minimal ─────
+    const saColors = ['#007A4D','#FFB612','#DE3831','#002395','#ffffff'];
+    const stripX = isL ? 0 : W - 4;
+    const segH = H / saColors.length;
     saColors.forEach((c, i) => {
-      ctx.fillStyle = c;
-      ctx.globalAlpha = 0.55;
-      ctx.fillRect(stripX, stripH + i*segH, 5, segH);
+      ctx.fillStyle = c; ctx.globalAlpha = 0.5;
+      ctx.fillRect(stripX, i * segH, 4, segH);
     });
     ctx.globalAlpha = 1;
 
-    // ── TAGLINE TEXT — etched into door ──────────────────────────
-    ctx.save();
-    ctx.font = 'bold 8px monospace';
-    ctx.fillStyle = 'rgba(244,185,66,0.3)';
+    // ── INNER FRAME — precision engineering ────────────────────────
+    ctx.strokeStyle = 'rgba(244,185,66,0.18)';
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(6, 6, W - 12, H - 12);
+    ctx.strokeStyle = 'rgba(244,185,66,0.08)';
+    ctx.strokeRect(12, 12, W - 24, H - 24);
+
+    // ── CORNER TECH BRACKETS ────────────────────────────────────────
+    const bSize = 16;
+    [[6,6],[6,H-6],[W-6,6],[W-6,H-6]].forEach(([bx, by], i) => {
+      ctx.strokeStyle = 'rgba(244,185,66,0.45)';
+      ctx.lineWidth = 1.5;
+      const mx = bx > W/2 ? -bSize : bSize;
+      const my = by > H/2 ? -bSize : bSize;
+      ctx.beginPath();
+      ctx.moveTo(bx + mx, by); ctx.lineTo(bx, by); ctx.lineTo(bx, by + my);
+      ctx.stroke();
+    });
+
+    // ── POWER CONDUIT — inner edge, energy flows to center seam ────
+    const conduitX = isL ? W - 1 : 0;
+    const conduit = ctx.createLinearGradient(0, 0, 0, H);
+    conduit.addColorStop(0, 'rgba(244,185,66,0)');
+    conduit.addColorStop(0.3, `rgba(244,185,66,${0.3 + openPct * 0.5})`);
+    conduit.addColorStop(0.5, `rgba(255,107,53,${0.5 + openPct * 0.4})`);
+    conduit.addColorStop(0.7, `rgba(244,185,66,${0.3 + openPct * 0.5})`);
+    conduit.addColorStop(1, 'rgba(244,185,66,0)');
+    ctx.fillStyle = conduit;
+    ctx.fillRect(isL ? W - 3 : 0, 0, 3, H);
+
+    // Edge glow
+    const edgeGlow = ctx.createLinearGradient(isL ? W : 0, 0, isL ? W - 50 : 50, 0);
+    edgeGlow.addColorStop(0, `rgba(255,107,53,${0.15 + openPct * 0.35})`);
+    edgeGlow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = edgeGlow;
+    ctx.fillRect(isL ? W - 50 : 0, 0, 50, H);
+
+    // ── STATUS TEXT — bottom of each panel ─────────────────────────
+    ctx.font = '7px monospace';
     ctx.textAlign = 'center';
-    // Vertical text along inner edge
-    ctx.translate(isL ? W - sideW - 16 : sideW + 16, H / 2);
-    ctx.rotate(isL ? -Math.PI/2 : Math.PI/2);
-    ctx.fillText('WE ARE THE SIGNAL IN THE NOISE', 0, 0);
-    ctx.restore();
-
-    // ── INNER FRAME — circuit board look ─────────────────────────
-    ctx.strokeStyle = 'rgba(244,185,66,0.2)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(sideW + 8, stripH + 8, W - sideW*2 - 16, H - stripH*2 - 16);
-
-    // ── NEON INNER EDGE GLOW ──────────────────────────────────────
-    const edgeGrad = ctx.createLinearGradient(
-      isL ? W : 0, 0, isL ? W - sideW : sideW, 0
-    );
-    edgeGrad.addColorStop(0, `rgba(244,185,66,${0.35 + openPct * 0.4})`);
-    edgeGrad.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = edgeGrad;
-    ctx.fillRect(isL ? W - sideW : 0, 0, sideW, H);
-
-    // ── OPENING GLOW INTENSIFIES ──────────────────────────────────
-    if (openPct > 0) {
-      const openGrad = ctx.createLinearGradient(
-        isL ? W : 0, 0, isL ? W - 60 : 60, 0
-      );
-      openGrad.addColorStop(0, `rgba(255,107,53,${openPct * 0.6})`);
-      openGrad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = openGrad;
-      ctx.fillRect(isL ? W - 60 : 0, 0, 60, H);
-    }
+    ctx.fillStyle = `rgba(244,185,66,${0.2 + 0.1 * Math.sin(tk * 3)})`;
+    ctx.fillText(isL ? 'UNIT·A' : 'UNIT·I', W / 2, H - 18);
+    ctx.fillStyle = 'rgba(244,185,66,0.15)';
+    ctx.fillText(isL ? 'INK·L01' : 'INK·R01', W / 2, H - 10);
   };
 
   // ── ANIMATION LOOP ────────────────────────────────────────────────
   useEffect(() => {
-    let raf: number; let tick = 0;
-    const animate = () => {
-      tick += 0.025;
-      if (leftRef.current)  paintPanel(leftRef.current,  'left',  tick, phase==='opening' ? doorPct : 0);
-      if (rightRef.current) paintPanel(rightRef.current, 'right', tick, phase==='opening' ? doorPct : 0);
-      raf = requestAnimationFrame(animate);
+    let raf: number;
+    const loop = () => {
+      tickRef.current += 0.022;
+      const tk = tickRef.current;
+      const op = phase === 'opening' ? doorPct : 0;
+      if (leftRef.current)  paintPanel(leftRef.current,  'left',  tk, op);
+      if (rightRef.current) paintPanel(rightRef.current, 'right', tk, op);
+      raf = requestAnimationFrame(loop);
     };
-    animate();
+    loop();
     return () => cancelAnimationFrame(raf);
   }, [phase, doorPct]);
 
-  // ── BRAIN LOADING CANVAS ──────────────────────────────────────────
-  const brainRef = useRef<HTMLCanvasElement>(null);
+  // ── BRAIN / LOADING CANVAS ────────────────────────────────────────
   useEffect(() => {
     const canvas = brainRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d')!;
-    const W = 220, H = 200;
+    const W = 280, H = 240;
     canvas.width = W; canvas.height = H;
-    const CX = W/2, CY = H/2 - 10;
-    
-    const leftNodes  = [{x:CX-50,y:CY-60},{x:CX-80,y:CY-35},{x:CX-90,y:CY},{x:CX-75,y:CY+35},{x:CX-50,y:CY+55},{x:CX-30,y:CY-30},{x:CX-40,y:CY+8},{x:CX-20,y:CY-55}];
-    const rightNodes = [{x:CX+50,y:CY-60},{x:CX+80,y:CY-35},{x:CX+90,y:CY},{x:CX+75,y:CY+35},{x:CX+50,y:CY+55},{x:CX+30,y:CY-30},{x:CX+40,y:CY+8},{x:CX+20,y:CY-55}];
-    const all = [...leftNodes, ...rightNodes];
-    const conns = [[0,5],[5,7],[1,2],[2,3],[3,4],[4,6],[5,6],[8,13],[13,15],[9,10],[10,11],[11,12],[12,14],[13,14],[5,13],[6,14]];
-    const pulses: {from:number;to:number;t:number;speed:number}[] = [];
-    const seed = () => { const c=conns[Math.floor(Math.random()*conns.length)]; pulses.push({from:c[0],to:c[1],t:0,speed:0.02+Math.random()*0.025}); };
-    for(let i=0;i<6;i++) seed();
-
+    const CX = W/2, CY = H/2 - 8;
+    const leftN  = [{x:CX-55,y:CY-65},{x:CX-85,y:CY-35},{x:CX-92,y:CY+2},{x:CX-78,y:CY+38},{x:CX-52,y:CY+58},{x:CX-32,y:CY-30},{x:CX-42,y:CY+12},{x:CX-22,y:CY-58}];
+    const rightN = [{x:CX+55,y:CY-65},{x:CX+85,y:CY-35},{x:CX+92,y:CY+2},{x:CX+78,y:CY+38},{x:CX+52,y:CY+58},{x:CX+32,y:CY-30},{x:CX+42,y:CY+12},{x:CX+22,y:CY-58}];
+    const all = [...leftN, ...rightN];
+    const conns = [[0,5],[5,7],[7,0],[1,2],[2,3],[3,4],[4,6],[5,6],[8,13],[13,15],[15,8],[9,10],[10,11],[11,12],[12,14],[13,14],[5,13],[6,14]];
+    const pulses: {a:number;b:number;t:number;s:number}[] = [];
+    const seed = () => { const c=conns[Math.floor(Math.random()*conns.length)]; pulses.push({a:c[0],b:c[1],t:0,s:0.022+Math.random()*0.025}); };
+    for(let i=0;i<8;i++) seed();
     let tk=0; let raf2: number;
     const draw = () => {
       ctx.clearRect(0,0,W,H); tk+=0.025;
+      // Ambient glow
+      const ag=ctx.createRadialGradient(CX,CY,0,CX,CY,100);
+      ag.addColorStop(0,'rgba(244,185,66,0.08)'); ag.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=ag; ctx.fillRect(0,0,W,H);
+      // Connections
       conns.forEach(([a,b]) => {
-        const n1=all[a],n2=all[b]; if(!n1||!n2) return;
-        ctx.beginPath(); ctx.moveTo(n1.x,n1.y); ctx.lineTo(n2.x,n2.y);
-        ctx.strokeStyle='rgba(244,185,66,0.2)'; ctx.lineWidth=1; ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(all[a].x,all[a].y); ctx.lineTo(all[b].x,all[b].y);
+        ctx.strokeStyle='rgba(244,185,66,0.15)'; ctx.lineWidth=0.8; ctx.stroke();
       });
-      // Spine
-      ctx.beginPath(); ctx.moveTo(CX,CY-70); ctx.lineTo(CX,CY+65);
+      // Center spine — Inkanyezi brand gold
+      ctx.beginPath(); ctx.moveTo(CX,CY-80); ctx.lineTo(CX,CY+72);
       ctx.strokeStyle='rgba(244,185,66,0.12)'; ctx.lineWidth=1.5; ctx.stroke();
       // Pulses
       for(let i=pulses.length-1;i>=0;i--){
-        const p=pulses[i]; p.t+=p.speed;
+        const p=pulses[i]; p.t+=p.s;
         if(p.t>=1){pulses.splice(i,1);seed();continue;}
-        const n1=all[p.from],n2=all[p.to]; if(!n1||!n2) continue;
+        const n1=all[p.a],n2=all[p.b]; if(!n1||!n2) continue;
         const px=n1.x+(n2.x-n1.x)*p.t, py=n1.y+(n2.y-n1.y)*p.t;
-        const g=ctx.createRadialGradient(px,py,0,px,py,9);
-        g.addColorStop(0,'#F4B942'); g.addColorStop(1,'rgba(0,0,0,0)');
-        ctx.beginPath(); ctx.arc(px,py,9,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+        const pg=ctx.createRadialGradient(px,py,0,px,py,10);
+        pg.addColorStop(0,'#F4B942'); pg.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(px,py,10,0,Math.PI*2); ctx.fillStyle=pg; ctx.fill();
         ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2); ctx.fillStyle='#F4B942'; ctx.fill();
       }
+      // Nodes
       all.forEach((n,i) => {
-        const pulse=0.5+0.5*Math.sin(tk*2.5+i*0.9);
+        const pulse=0.4+0.5*Math.sin(tk*2.5+i*0.85);
         const ng=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,8);
-        ng.addColorStop(0,`rgba(244,185,66,${pulse*0.8})`); ng.addColorStop(1,'rgba(0,0,0,0)');
+        ng.addColorStop(0,`rgba(244,185,66,${pulse*0.85})`); ng.addColorStop(1,'rgba(0,0,0,0)');
         ctx.beginPath(); ctx.arc(n.x,n.y,8,0,Math.PI*2); ctx.fillStyle=ng; ctx.fill();
-        ctx.beginPath(); ctx.arc(n.x,n.y,3,0,Math.PI*2); ctx.fillStyle='#F4B942'; ctx.fill();
+        ctx.beginPath(); ctx.arc(n.x,n.y,3,0,Math.PI*2);
+        ctx.fillStyle=`rgba(255,220,130,${0.7+pulse*0.3})`; ctx.fill();
       });
-      // AI text in gold — Inkanyezi brand colours
+      // AI text
       ctx.save();
-      ctx.shadowColor='#F4B942'; ctx.shadowBlur=20+8*Math.sin(tk);
-      ctx.font='bold 56px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillStyle=`rgba(255,255,255,${0.8+0.2*Math.sin(tk*1.5)})`;
+      ctx.shadowColor='#F4B942'; ctx.shadowBlur=22+8*Math.sin(tk);
+      ctx.font='bold 64px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle=`rgba(255,255,255,${0.82+0.18*Math.sin(tk*1.5)})`;
       ctx.fillText('AI', CX, CY+4);
       ctx.restore();
-      // Zulu/Inkanyezi tagline
+      // Loading indicator
+      const dots = '▮▮▮'.slice(0, (Math.floor(tk*4)%4)+1);
       ctx.font='9px monospace'; ctx.textAlign='center';
-      ctx.fillStyle='rgba(244,185,66,0.5)';
-      ctx.fillText('INKANYEZI · INITIALISING'.replace(' ', '·'.repeat(Math.floor(tk*3)%4+1)), CX, CY+75);
+      ctx.fillStyle='rgba(244,185,66,0.45)';
+      ctx.fillText(`INKANYEZI OS  ${dots}`, CX, CY+88);
       raf2 = requestAnimationFrame(draw);
     };
     draw();
-    const t = setTimeout(() => { cancelAnimationFrame(raf2); setPhase('opening'); }, 2600);
+    const t = setTimeout(() => { cancelAnimationFrame(raf2); setPhase('opening'); }, 2500);
     return () => { cancelAnimationFrame(raf2); clearTimeout(t); };
   }, []);
 
   // ── DOOR OPENING ──────────────────────────────────────────────────
   useEffect(() => {
-    if(phase !== 'opening') return;
-    const dur=950, start=performance.now();
-    const run=(now:number) => {
+    if (phase !== 'opening') return;
+    const dur=900, start=performance.now();
+    const run = (now:number) => {
       const p=Math.min((now-start)/dur,1);
       const eased=1-Math.pow(1-p,3);
       setDoorPct(eased);
-      if(p<1) animRef.current=requestAnimationFrame(run);
+      if (p<1) animRef.current=requestAnimationFrame(run);
       else setTimeout(onComplete,80);
     };
     animRef.current=requestAnimationFrame(run);
@@ -579,29 +588,26 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div style={{position:'absolute',inset:0,display:'flex',overflow:'hidden',borderRadius:20}}>
-      {/* LEFT DOOR CANVAS */}
+      {/* LEFT DOOR */}
       <div style={{position:'absolute',top:0,left:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(-${slide}%)`,overflow:'hidden'}}>
         <canvas ref={leftRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
         {phase==='opening' && (
-          <div style={{position:'absolute',top:'50%',right:`${6+doorPct*14}%`,transform:`translateY(-50%) scale(${1+doorPct*0.3})`,fontFamily:'Arial',fontWeight:'bold',fontSize:54,color:`rgba(255,255,255,${Math.max(0,1-doorPct*1.9)})`,textShadow:'0 0 18px #F4B942',pointerEvents:'none'}}>A</div>
+          <div style={{position:'absolute',top:'50%',right:`${5+doorPct*13}%`,transform:`translateY(-50%) scale(${1+doorPct*0.25})`,fontFamily:'Arial',fontWeight:'bold',fontSize:56,color:`rgba(255,255,255,${Math.max(0,1-doorPct*2)})`,textShadow:'0 0 20px #F4B942, 0 0 40px rgba(255,107,53,0.5)',pointerEvents:'none',letterSpacing:-2}}>A</div>
         )}
       </div>
-
-      {/* RIGHT DOOR CANVAS */}
+      {/* RIGHT DOOR */}
       <div style={{position:'absolute',top:0,right:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(${slide}%)`,overflow:'hidden'}}>
         <canvas ref={rightRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
         {phase==='opening' && (
-          <div style={{position:'absolute',top:'50%',left:`${6+doorPct*14}%`,transform:`translateY(-50%) scale(${1+doorPct*0.3})`,fontFamily:'Arial',fontWeight:'bold',fontSize:54,color:`rgba(255,255,255,${Math.max(0,1-doorPct*1.9)})`,textShadow:'0 0 18px #F4B942',pointerEvents:'none'}}>I</div>
+          <div style={{position:'absolute',top:'50%',left:`${5+doorPct*13}%`,transform:`translateY(-50%) scale(${1+doorPct*0.25})`,fontFamily:'Arial',fontWeight:'bold',fontSize:56,color:`rgba(255,255,255,${Math.max(0,1-doorPct*2)})`,textShadow:'0 0 20px #F4B942, 0 0 40px rgba(255,107,53,0.5)',pointerEvents:'none',letterSpacing:-2}}>I</div>
         )}
       </div>
-
       {/* BRAIN OVERLAY */}
       <div style={{position:'absolute',inset:0,zIndex:7,opacity:brainFade,pointerEvents:'none',display:'flex',alignItems:'center',justifyContent:'center'}}>
-        <canvas ref={brainRef} style={{width:220,height:200}}/>
+        <canvas ref={brainRef} style={{width:280,height:240}}/>
       </div>
-
-      {/* CENTER SEAM — gold Inkanyezi glow */}
-      <div style={{position:'absolute',top:0,bottom:0,left:'50%',width:2,transform:'translateX(-50%)',background:'linear-gradient(180deg,transparent,#F4B942,#FF6B35,#F4B942,transparent)',boxShadow:'0 0 16px #F4B942, 0 0 32px rgba(244,185,66,0.4)',zIndex:8,opacity:0.7+doorPct*0.3,pointerEvents:'none'}}/>
+      {/* CENTER SEAM — gold-orange Inkanyezi glow */}
+      <div style={{position:'absolute',top:0,bottom:0,left:'50%',width:2,transform:'translateX(-50%)',background:'linear-gradient(180deg,transparent,#F4B942,#FF6B35,#F4B942,transparent)',boxShadow:'0 0 18px #F4B942, 0 0 36px rgba(244,185,66,0.35)',zIndex:8,opacity:0.65+doorPct*0.35,pointerEvents:'none'}}/>
     </div>
   );
 }
