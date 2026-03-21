@@ -936,13 +936,10 @@ function InkanyeziBotWidget() {
           transition: 'box-shadow 0.4s ease',
         }}>
 
-          {/* Chat window — pre-rendered behind door */}
-          {/* Zoom-in effect: scales from 0.92 → 1.0 while fading in */}
-          {/* Feels like stepping INTO the dashboard, not just seeing it appear */}
+          {/* Chat window — pre-rendered behind door, simple fade in */}
           <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', borderRadius:20, overflow:'hidden', zIndex:1,
             opacity: isOpen ? 1 : 0,
-            transform: isOpen ? 'scale(1)' : 'scale(0.92)',
-            transition: isOpen ? 'opacity 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1)' : 'none',
+            transition: isOpen ? 'opacity 0.3s ease' : 'none',
           }}>
           {/* ── DASHBOARD BOOT OVERLAY — appears when door opens ── */}
           {showBoot && (
