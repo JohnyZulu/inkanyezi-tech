@@ -403,6 +403,44 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     ctx.fillText(isL?'◈ INK-L':'◈ INK-R',W/2,H-16);
     ctx.fillStyle='rgba(244,185,66,0.45)';
     ctx.fillText(isL?'UNIT·ALPHA':'UNIT·SIGMA',W/2,H-8);
+
+    // ── LETTER — A on left panel (right side near seam), I on right panel (left side near seam)
+    // Only appears during opening phase, fades out as doors slide away
+    if(op > 0) {
+      const letter = isL ? 'A' : 'I';
+      // Position: near the inner seam edge of each panel
+      // Left panel: letter on right side (near center seam) — x = rightmost quarter
+      // Right panel: letter on left side (near center seam) — x = leftmost quarter
+      const lx = isL ? W * 0.78 : W * 0.22;
+      const ly = H * 0.5;
+      const letterAlpha = Math.min(op * 3, 1) * Math.max(0, 1 - op * 1.2);
+      if(letterAlpha > 0) {
+        // Glow halo behind letter
+        const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, 55);
+        lg.addColorStop(0, `rgba(244,185,66,${letterAlpha * 0.25})`);
+        lg.addColorStop(0.5, `rgba(255,107,53,${letterAlpha * 0.1})`);
+        lg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(lx, ly, 55, 0, Math.PI*2);
+        ctx.fillStyle = lg; ctx.fill();
+        // Letter itself
+        ctx.save();
+        ctx.font = 'bold 72px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = '#F4B942';
+        ctx.shadowBlur = 20 * letterAlpha;
+        ctx.fillStyle = `rgba(255,255,255,${letterAlpha})`;
+        ctx.fillText(letter, lx, ly);
+        ctx.restore();
+        // Underline accent — tech style
+        const uw = letter === 'I' ? 28 : 44;
+        const ug = ctx.createLinearGradient(lx-uw/2, ly+44, lx+uw/2, ly+44);
+        ug.addColorStop(0, 'rgba(244,185,66,0)');
+        ug.addColorStop(0.5, `rgba(244,185,66,${letterAlpha * 0.8})`);
+        ug.addColorStop(1, 'rgba(244,185,66,0)');
+        ctx.fillStyle = ug; ctx.fillRect(lx-uw/2, ly+38, uw, 2);
+      }
+    }
   };
 
   useEffect(()=>{
@@ -496,16 +534,12 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       {/* LEFT DOOR */}
       <div style={{position:'absolute',top:0,left:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(-${slide}%)`,overflow:'hidden'}}>
         <canvas ref={leftRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
-        {phase==='opening'&&(
-          <div style={{position:'absolute',top:'50%',right:'18%',transform:'translateY(-50%)',fontFamily:"'Syne',Arial,sans-serif",fontWeight:800,fontSize:58,color:`rgba(255,255,255,${Math.max(0,1-doorPct*1.8)})`,textShadow:'0 0 16px #F4B942, 0 0 32px rgba(255,107,53,0.4)',pointerEvents:'none',letterSpacing:-1,userSelect:'none'}}>A</div>
-        )}
+
       </div>
       {/* RIGHT DOOR */}
       <div style={{position:'absolute',top:0,right:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(${slide}%)`,overflow:'hidden'}}>
         <canvas ref={rightRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
-        {phase==='opening'&&(
-          <div style={{position:'absolute',top:'50%',left:'18%',transform:'translateY(-50%)',fontFamily:"'Syne',Arial,sans-serif",fontWeight:800,fontSize:58,color:`rgba(255,255,255,${Math.max(0,1-doorPct*1.8)})`,textShadow:'0 0 16px #F4B942, 0 0 32px rgba(255,107,53,0.4)',pointerEvents:'none',letterSpacing:-1,userSelect:'none'}}>I</div>
-        )}
+
       </div>
       {/* BRAIN */}
       <div style={{position:'absolute',inset:0,zIndex:7,opacity:brainFade,pointerEvents:'none',display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -655,6 +689,11 @@ function InkanyeziBotWidget() {
         .ink-msgs::-webkit-scrollbar-track { background: transparent; }
         .ink-msgs::-webkit-scrollbar-thumb { background: rgba(244,185,66,0.4); border-radius: 2px; }
         .ink-textarea::placeholder { color: rgba(100,110,130,0.5) !important; }
+        @keyframes closePulse {
+          0%   { box-shadow: 0 0 0 0 rgba(229,62,62,0.6), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1); }
+          50%  { box-shadow: 0 0 0 10px rgba(229,62,62,0), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1.06); }
+          100% { box-shadow: 0 0 0 0 rgba(229,62,62,0), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1); }
+        }
       `}</style>
 
       {/* ── PROACTIVE GREETING ── */}
@@ -684,14 +723,63 @@ function InkanyeziBotWidget() {
       )}
 
       {/* ── FLOATING BUBBLE ── */}
-      <button onClick={()=>{ if(!isOpen){ setShowDoor(true); setOpenKey(k=>k+1); } else { setIsOpen(false); } }} aria-label={isOpen?'Close chat':'Open InkanyeziBot'}
-        style={{ position:'fixed', bottom:24, right:24, zIndex:10001, width:64, height:64, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', border:'2px solid rgba(249,115,22,0.45)', cursor:'pointer', fontSize:26, animation:'floatBubble 3s ease-in-out infinite', display:'flex', alignItems:'center', justifyContent:'center', transition:'transform 0.2s' }}>
-        {!isOpen && (
+      <button
+        onClick={()=>{ if(!isOpen){ setShowDoor(true); setOpenKey(k=>k+1); } else { setIsOpen(false); } }}
+        aria-label={isOpen?'Close InkanyeziBot':'Open InkanyeziBot'}
+        style={{
+          position:'fixed', bottom:24, right:24, zIndex:99999,
+          width:64, height:64, borderRadius:'50%',
+          background: isOpen
+            ? 'linear-gradient(135deg, #e53e3e, #c53030)'
+            : 'linear-gradient(135deg, #FF6B35, #c2410c)',
+          border: isOpen
+            ? '2.5px solid rgba(229,62,62,0.6)'
+            : '2px solid rgba(249,115,22,0.45)',
+          cursor:'pointer', fontSize: isOpen ? 22 : 26,
+          animation: isOpen ? 'closePulse 1.8s ease-in-out infinite' : 'floatBubble 3s ease-in-out infinite',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          transition:'background 0.3s, border 0.3s',
+          boxShadow: isOpen
+            ? '0 0 0 0 rgba(229,62,62,0.4), 0 4px 20px rgba(229,62,62,0.4)'
+            : '0 0 30px rgba(249,115,22,0.55)',
+        }}>
+        {/* Orbit ring — only when closed */}
+        {!isOpen && !showDoor && (
           <div style={{ position:'absolute', width:64, height:64, animation:'orbitRing 4s linear infinite', pointerEvents:'none' }}>
             <div style={{ position:'absolute', top:-3, left:'50%', width:7, height:7, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 10px ${C.gold}` }} />
           </div>
         )}
-        <span style={{ position:'relative', zIndex:1, transition:'transform 0.3s', transform:isOpen?'rotate(45deg)':'none' }}>{isOpen?'✕':'⭐'}</span>
+        {/* Close X — animated spinning lines */}
+        {isOpen ? (
+          <div style={{ position:'relative', width:24, height:24 }}>
+            <div style={{
+              position:'absolute', top:'50%', left:0, right:0, height:2.5,
+              background:'#fff', borderRadius:2,
+              transform:'translateY(-50%) rotate(45deg)',
+              boxShadow:'0 0 6px rgba(255,255,255,0.8)',
+            }}/>
+            <div style={{
+              position:'absolute', top:'50%', left:0, right:0, height:2.5,
+              background:'#fff', borderRadius:2,
+              transform:'translateY(-50%) rotate(-45deg)',
+              boxShadow:'0 0 6px rgba(255,255,255,0.8)',
+            }}/>
+          </div>
+        ) : (
+          <span style={{ position:'relative', zIndex:1 }}>⭐</span>
+        )}
+        {/* Close label — appears above button */}
+        {isOpen && (
+          <div style={{
+            position:'absolute', bottom:'calc(100% + 8px)', left:'50%',
+            transform:'translateX(-50%)',
+            background:'rgba(229,62,62,0.9)',
+            color:'#fff', fontSize:'0.55rem', fontFamily:"'Space Mono',monospace",
+            letterSpacing:'0.1em', padding:'3px 8px', borderRadius:4,
+            whiteSpace:'nowrap', pointerEvents:'none',
+            boxShadow:'0 2px 8px rgba(229,62,62,0.4)',
+          }}>CLOSE</div>
+        )}
       </button>
 
       {/* ── DOOR + CHAT WINDOW — layered, no black gap ── */}
