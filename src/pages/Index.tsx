@@ -100,7 +100,7 @@ const SIGNALS = {
   BUDGET: { high:25, medium:15, low:5 } as Record<string,number>,
   DEPTH:5, DEMO:100, EXPLICIT:80,
 };
-const THRESHOLD = 45; const MIN_MSGS = 3;
+const THRESHOLD = 55; const MIN_MSGS = 4;
 const TRIGGERS = ['get in touch','contact','speak to someone','call me','reach out','book a demo','schedule','sign up','get started','how much','pricing','cost','quote','proposal','sounds good',"let's do it",'ready to','can you help','interested'];
 
 function scoreConversation(ctx: any, userCount: number, lastMsg: string) {
@@ -738,7 +738,14 @@ function InkanyeziBotWidget() {
     const userMsgs = messages.filter(m => m.role==='user');
     const lastMsg  = userMsgs[userMsgs.length-1]?.content||'';
     const { shouldShow } = scoreConversation(sessionContext, userMsgs.length, lastMsg);
-    if (shouldShow) { hasTriggered.current = true; setTimeout(() => setShowLeadForm(true), 1200); }
+    // Primary trigger — score threshold met
+    if (shouldShow) { hasTriggered.current = true; setTimeout(() => setShowLeadForm(true), 1200); return; }
+    // Backup trigger — after 5 user messages always show form regardless of score
+    // Never let a long engaged conversation end without capturing the lead
+    if (userMsgs.length >= 5 && !hasTriggered.current) {
+      hasTriggered.current = true;
+      setTimeout(() => setShowLeadForm(true), 1200);
+    }
   }, [messages, sessionContext, leadFormSubmitted]);
 
   const sendMessage = async (text?: string) => {
