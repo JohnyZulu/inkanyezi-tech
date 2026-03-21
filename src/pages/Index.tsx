@@ -933,19 +933,17 @@ function InkanyeziBotWidget() {
         )}
       </button>
 
-      {/* ── DOOR ANIMATION — appears over chat while loading ── */}
-      {showDoor && !isOpen && (
-        <div key={openKey} style={{
+      {/* ── UNIFIED CONTAINER — door + chat always together, no gap ── */}
+      {(showDoor || isOpen) && (
+        <div style={{
           position:'fixed', bottom:100, right:24, width:370, height:580,
-          zIndex:99999, borderRadius:20, overflow:'hidden',
-          boxShadow:'0 0 0 1px rgba(244,185,66,0.1), 0 25px 70px rgba(0,0,0,0.7)',
+          zIndex:99998, borderRadius:20, overflow:'hidden',
+          boxShadow:'0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)',
         }}>
-          <DoorAnimationInline onComplete={() => { setShowDoor(false); setIsOpen(true); }} />
-        </div>
-      )}
 
-      {/* ── CHAT WINDOW — only mounts when isOpen ── */}
-      {isOpen && (
+          {/* CHAT — always rendered inside container */}
+          {/* Visible immediately when isOpen, hidden during door phase */}
+          {(showDoor || isOpen) && (
         <div style={{
           position:'fixed', bottom:100, right:24, width:370, height:580,
           display:'flex', flexDirection:'column',
@@ -1043,6 +1041,20 @@ function InkanyeziBotWidget() {
               ✦ INKANYEZI TECHNOLOGIES · WE ARE THE SIGNAL IN THE NOISE ✦
             </div>
           </div>
+          </div>
+
+          {/* DOOR — sits on top of chat, removed when complete */}
+          {showDoor && (
+            <div key={openKey} style={{
+              position:'absolute', inset:0, zIndex:10,
+              borderRadius:20, overflow:'hidden',
+            }}>
+              <DoorAnimationInline onComplete={() => {
+                setShowDoor(false);
+                setIsOpen(true);
+              }} />
+            </div>
+          )}
         </div>
       )}
     </>
