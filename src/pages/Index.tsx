@@ -941,16 +941,13 @@ function InkanyeziBotWidget() {
           boxShadow:'0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)',
         }}>
 
-          {/* CHAT — always rendered inside container */}
-          {/* Visible immediately when isOpen, hidden during door phase */}
-          {(showDoor || isOpen) && (
-        <div style={{
-          position:'fixed', bottom:100, right:24, width:370, height:580,
-          display:'flex', flexDirection:'column',
-          zIndex:99998, borderRadius:20, overflow:'hidden',
-          background:'#FAFBFC',
-          boxShadow:'0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)',
-        }}>
+          {/* CHAT — fills container, always present, door sits on top */}
+          <div style={{
+            position:'absolute', inset:0,
+            display:'flex', flexDirection:'column',
+            borderRadius:20, overflow:'hidden',
+            background:'#FAFBFC',
+          }}>
 
           {/* Header */}
           <div style={{
@@ -1043,7 +1040,7 @@ function InkanyeziBotWidget() {
           </div>
           </div>
 
-          {/* DOOR — sits on top of chat, removed when complete */}
+          {/* DOOR — sits on top of chat as absolute overlay */}
           {showDoor && (
             <div key={openKey} style={{
               position:'absolute', inset:0, zIndex:10,
