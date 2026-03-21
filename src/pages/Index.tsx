@@ -367,19 +367,24 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     sg.addColorStop(1,'rgba(100,160,255,0)');
     ctx.fillStyle=sg; ctx.fillRect(0,scanY-25,W,50);
 
-    // Plasma energy conduit — inner edge, glows gold→orange
-    const cg=ctx.createLinearGradient(0,0,0,H);
-    cg.addColorStop(0,'rgba(244,185,66,0)');
-    cg.addColorStop(0.25,`rgba(244,185,66,${0.6+op*0.4})`);
-    cg.addColorStop(0.5,`rgba(255,140,60,${0.8+op*0.2})`);
-    cg.addColorStop(0.75,`rgba(244,185,66,${0.4+op*0.5})`);
-    cg.addColorStop(1,'rgba(244,185,66,0)');
-    ctx.fillStyle=cg; ctx.fillRect(isL?W-4:0,0,4,H);
+    // Plasma energy conduit — fades to zero as door opens (eliminates trace line)
+    const conduitAlpha = Math.max(0, 1 - op * 3);
+    if (conduitAlpha > 0) {
+      const cg=ctx.createLinearGradient(0,0,0,H);
+      cg.addColorStop(0,'rgba(244,185,66,0)');
+      cg.addColorStop(0.25,`rgba(244,185,66,${0.6*conduitAlpha})`);
+      cg.addColorStop(0.5,`rgba(255,140,60,${0.8*conduitAlpha})`);
+      cg.addColorStop(0.75,`rgba(244,185,66,${0.5*conduitAlpha})`);
+      cg.addColorStop(1,'rgba(244,185,66,0)');
+      ctx.fillStyle=cg; ctx.fillRect(isL?W-4:0,0,4,H);
+    }
 
     // Edge bloom as doors open
+    // Edge bloom — fades away completely as door opens to leave clean reveal
+    const bloomAlpha = Math.max(0, 1 - op * 2.5);
     const eg=ctx.createLinearGradient(isL?W:0,0,isL?W-80:80,0);
-    eg.addColorStop(0,`rgba(255,107,53,${0.12+op*0.4})`);
-    eg.addColorStop(0.5,`rgba(244,185,66,${0.05+op*0.15})`);
+    eg.addColorStop(0,`rgba(255,107,53,${(0.12+op*0.3)*bloomAlpha})`);
+    eg.addColorStop(0.5,`rgba(244,185,66,${(0.05+op*0.1)*bloomAlpha})`);
     eg.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=eg; ctx.fillRect(isL?W-80:0,0,80,H);
 
@@ -545,8 +550,147 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       <div style={{position:'absolute',inset:0,zIndex:7,opacity:brainFade,pointerEvents:'none',display:'flex',alignItems:'center',justifyContent:'center'}}>
         <canvas ref={brainRef} style={{width:280,height:220}}/>
       </div>
-      {/* CENTER SEAM — gold plasma */}
-      <div style={{position:'absolute',top:0,bottom:0,left:'50%',width:2,transform:'translateX(-50%)',background:'linear-gradient(180deg,transparent,#F4B942,#FF6B35,#F4B942,transparent)',boxShadow:'0 0 20px #F4B942,0 0 40px rgba(244,185,66,0.35)',zIndex:8,opacity:0.6+doorPct*0.4,pointerEvents:'none'}}/>
+      {/* No center seam — panel plasma conduits provide the visual separation */}
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════
+// DASHBOARD BOOT SEQUENCE
+// Appears when doors open — system initialising animation
+// Scanline sweep + boot lines + elements loading in
+// ════════════════════════════════════════════════════════════════════
+function DashboardBoot({ onComplete }: { onComplete: () => void }) {
+  const [visible, setVisible] = useState(true);
+  const [scanY, setScanY]     = useState(-60);
+  const [lines, setLines]     = useState<string[]>([]);
+  const [done, setDone]       = useState(false);
+
+  const bootLines = [
+    'INKANYEZI OS v2.1 · BOOTING...',
+    'NEURAL INTERFACE · OK',
+    'GEMINI AI ENGINE · ONLINE',
+    'MAKE.COM PIPELINE · CONNECTED',
+    'LEAD CAPTURE · ARMED',
+    'ENCRYPTION · AES-256 ACTIVE',
+    'SYSTEM READY ✓',
+  ];
+
+  // Scanline sweep across full window
+  useEffect(() => {
+    let y = -60;
+    const sweep = setInterval(() => {
+      y += 14;
+      setScanY(y);
+      if (y > 620) clearInterval(sweep);
+    }, 12);
+    return () => clearInterval(sweep);
+  }, []);
+
+  // Boot lines appear one by one
+  useEffect(() => {
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < bootLines.length) {
+        setLines(prev => [...prev, bootLines[i]]);
+        i++;
+      } else {
+        clearInterval(interval);
+        // Flash complete then fade out
+        setTimeout(() => {
+          setDone(true);
+          setTimeout(onComplete, 400);
+        }, 180);
+      }
+    }, 130);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0, zIndex: 20,
+      background: 'linear-gradient(160deg, #0a1628 0%, #04080F 100%)',
+      borderRadius: 20,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      opacity: done ? 0 : 1,
+      transition: done ? 'opacity 0.35s ease' : 'none',
+      overflow: 'hidden',
+      pointerEvents: done ? 'none' : 'all',
+    }}>
+      {/* Scanline sweep */}
+      <div style={{
+        position: 'absolute', left: 0, right: 0,
+        top: scanY, height: 60,
+        background: 'linear-gradient(180deg, rgba(244,185,66,0) 0%, rgba(244,185,66,0.06) 40%, rgba(244,185,66,0.12) 50%, rgba(244,185,66,0.06) 60%, rgba(244,185,66,0) 100%)',
+        pointerEvents: 'none',
+        transition: 'top 0.01s linear',
+      }}/>
+
+      {/* Grid overlay */}
+      <div style={{
+        position: 'absolute', inset: 0, opacity: 0.08,
+        backgroundImage: 'linear-gradient(rgba(244,185,66,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(244,185,66,0.5) 1px, transparent 1px)',
+        backgroundSize: '24px 24px',
+      }}/>
+
+      {/* Inkanyezi wordmark */}
+      <div style={{
+        fontFamily: "'Syne', sans-serif", fontWeight: 800,
+        fontSize: '1.1rem', color: '#F4B942',
+        letterSpacing: '0.2em', marginBottom: '1.5rem',
+        textShadow: '0 0 20px rgba(244,185,66,0.5)',
+        textTransform: 'uppercase',
+      }}>✦ INKANYEZI</div>
+
+      {/* Boot lines */}
+      <div style={{
+        fontFamily: "'Space Mono', monospace", fontSize: '0.62rem',
+        color: 'rgba(100,200,255,0.85)', lineHeight: 1.9,
+        textAlign: 'left', width: 220, letterSpacing: '0.04em',
+      }}>
+        {lines.map((line, i) => (
+          <div key={i} style={{
+            opacity: 1,
+            color: i === lines.length - 1 && line.includes('READY')
+              ? '#4ADE80'
+              : i === lines.length - 1
+              ? '#F4B942'
+              : 'rgba(100,200,255,0.7)',
+            animation: 'bootLine 0.15s ease forwards',
+          }}>
+            <span style={{ color: '#F4B942', marginRight: 6 }}>›</span>
+            {line}
+          </div>
+        ))}
+        {/* Blinking cursor */}
+        {!done && (
+          <span style={{
+            display: 'inline-block', width: 7, height: 13,
+            background: '#F4B942', marginLeft: 2, verticalAlign: 'middle',
+            animation: 'cursorBlink 0.7s step-end infinite',
+          }}/>
+        )}
+      </div>
+
+      {/* Progress bar */}
+      <div style={{
+        width: 220, height: 2, background: 'rgba(244,185,66,0.1)',
+        borderRadius: 1, marginTop: '1.2rem', overflow: 'hidden',
+      }}>
+        <div style={{
+          height: '100%', borderRadius: 1,
+          background: 'linear-gradient(90deg, #F4B942, #FF6B35)',
+          width: `${Math.round((lines.length / bootLines.length) * 100)}%`,
+          transition: 'width 0.12s ease',
+          boxShadow: '0 0 8px rgba(244,185,66,0.6)',
+        }}/>
+      </div>
+
+      <style>{`
+        @keyframes bootLine { from{opacity:0;transform:translateX(-4px);} to{opacity:1;transform:translateX(0);} }
+        @keyframes cursorBlink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+      `}</style>
     </div>
   );
 }
@@ -572,6 +716,7 @@ function InkanyeziBotWidget() {
   const [greetingVisible, setGreetingVisible] = useState(false);
   const [showDoor, setShowDoor]               = useState(false);
   const [openKey, setOpenKey]                 = useState(0);
+  const [showBoot, setShowBoot]               = useState(false);
   const hasTriggered = useRef(false);
   const messagesEnd  = useRef<HTMLDivElement>(null);
   const textareaRef  = useRef<HTMLTextAreaElement>(null);
@@ -784,10 +929,26 @@ function InkanyeziBotWidget() {
 
       {/* ── DOOR + CHAT WINDOW — layered, no black gap ── */}
       {(showDoor || isOpen) && (
-        <div style={{ position:'fixed', bottom:100, right:24, width:370, height:580, zIndex:99998, borderRadius:20, boxShadow:'0 0 0 1px rgba(244,185,66,0.12), 0 0 50px rgba(244,185,66,0.08), 0 25px 70px rgba(0,0,0,0.6)' }}>
+        <div style={{ position:'fixed', bottom:100, right:24, width:370, height:580, zIndex:99998, borderRadius:20,
+          boxShadow: isOpen
+            ? '0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25), 0 0 0 4px rgba(244,185,66,0.04)'
+            : '0 0 0 1px rgba(244,185,66,0.08), 0 0 60px rgba(244,185,66,0.06), 0 25px 70px rgba(0,0,0,0.7)',
+          transition: 'box-shadow 0.4s ease',
+        }}>
 
-          {/* Chat window — pre-rendered behind door, fades in when door completes */}
-          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', borderRadius:20, overflow:'hidden', opacity: isOpen ? 1 : 0, transition: isOpen ? 'opacity 0.25s ease' : 'none', zIndex:1 }}>
+          {/* Chat window — pre-rendered behind door */}
+          {/* Zoom-in effect: scales from 0.92 → 1.0 while fading in */}
+          {/* Feels like stepping INTO the dashboard, not just seeing it appear */}
+          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', borderRadius:20, overflow:'hidden', zIndex:1,
+            opacity: isOpen ? 1 : 0,
+            transform: isOpen ? 'scale(1)' : 'scale(0.92)',
+            transition: isOpen ? 'opacity 0.35s cubic-bezier(0.16,1,0.3,1), transform 0.35s cubic-bezier(0.16,1,0.3,1)' : 'none',
+          }}>
+          {/* ── DASHBOARD BOOT OVERLAY — appears when door opens ── */}
+          {showBoot && (
+            <DashboardBoot onComplete={() => setShowBoot(false)} />
+          )}
+
           {/* Header */}
           <div style={{ position:'relative', zIndex:2, background:'linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%)', borderBottom:'1px solid rgba(244,185,66,0.3)', boxShadow:'0 1px 8px rgba(0,0,0,0.06)', padding:'12px 16px', display:'flex', alignItems:'center', gap:12, flexShrink:0 }}>
             <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`, backgroundSize:'200% 100%', animation:'headerShimmer 3s linear infinite' }} />
@@ -876,7 +1037,7 @@ function InkanyeziBotWidget() {
           {/* Door overlay — sits above chat, removed when done */}
           {showDoor && !isOpen && (
             <div key={openKey} style={{ position:'absolute', inset:0, zIndex:2, borderRadius:20, overflow:'hidden' }}>
-              <DoorAnimationInline onComplete={() => { setShowDoor(false); setIsOpen(true); }} />
+              <DoorAnimationInline onComplete={() => { setShowDoor(false); setIsOpen(true); setShowBoot(true); }} />
             </div>
           )}
         </div>
