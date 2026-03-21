@@ -1000,6 +1000,148 @@ function InkanyeziBotWidget() {
 
   useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior:'smooth' }); }, [messages, showLeadForm, isLoading]);
 
+  // ════════════════════════════════════════════════════════════════════
+  // MODERN SESSION MANAGEMENT
+  // Best practices: sessionStorage, Visibility API, scroll depth,
+  // returning visitor detection, active-time-only inactivity timer
+  // ════════════════════════════════════════════════════════════════════
+
+  useEffect(() => {
+    const STORAGE_KEY = 'inkanyezi_chat_session';
+    const VISITOR_KEY = 'inkanyezi_visitor';
+    const INACTIVITY_MS = 20 * 60 * 1000;  // 20min of ACTIVE time
+    const GREETING_SCROLL = 0.35;           // trigger greeting at 35% scroll depth
+
+    // ── 1. RETURNING VISITOR DETECTION ─────────────────────────────
+    // localStorage persists across sessions — detects returning visitors
+    const visitCount = parseInt(localStorage.getItem(VISITOR_KEY) || '0') + 1;
+    localStorage.setItem(VISITOR_KEY, String(visitCount));
+
+    // Returning visitor gets a more personalised proactive greeting
+    if (visitCount > 1) {
+      const savedName = localStorage.getItem('inkanyezi_name');
+      // Will be used by the greeting popup to personalise the message
+      (window as any).__inkanyezi_returning = { count: visitCount, name: savedName };
+    }
+
+    // ── 2. SESSION STATE PERSISTENCE (sessionStorage) ──────────────
+    // sessionStorage clears when the tab is closed — ideal for chat
+    // Restore any in-progress conversation if user refreshed the page
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.messages?.length > 1) {
+          setMessages(parsed.messages);
+          setShowChips(false);
+          if (parsed.sessionContext) setSessionContext(parsed.sessionContext);
+          // Don't auto-reopen — user can click the bubble to continue
+        }
+      }
+    } catch {}
+
+    // ── 3. ACTIVE-TIME-ONLY INACTIVITY TIMER ───────────────────────
+    // Only count time when the page is VISIBLE and FOCUSED
+    // Prevents resetting just because user left the tab open overnight
+    let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
+    let isPageVisible = !document.hidden;
+    let isPageFocused = document.hasFocus();
+
+    const doReset = () => {
+      setIsOpen(false);
+      setShowDoor(false);
+      setShowGreeting(false);
+      setGreetingVisible(false);
+      setMessages([{
+        role: 'assistant',
+        content: "Sawubona! 👋 I'm InkanyeziBot — your AI guide to automation for South African businesses.\n\nBy chatting, you agree to our POPIA-compliant data policy.\n\nWhat does your business do, and what's the biggest challenge slowing you down right now?",
+      }]);
+      setInput('');
+      setShowLeadForm(false);
+      setLeadFormSubmitted(false);
+      setShowChips(true);
+      setSessionContext(null);
+      hasTriggered.current = false;
+      sessionStorage.removeItem(STORAGE_KEY);
+    };
+
+    const startTimer = () => {
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      if (isPageVisible && isPageFocused) {
+        inactivityTimer = setTimeout(doReset, INACTIVITY_MS);
+      }
+    };
+
+    const stopTimer = () => {
+      if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; }
+    };
+
+    // Activity events — restart the timer on any interaction
+    const onActivity = () => { if (isPageVisible && isPageFocused) startTimer(); };
+    const activityEvents = ['mousedown','keydown','touchstart','scroll','click'];
+    activityEvents.forEach(e => window.addEventListener(e, onActivity, { passive: true }));
+
+    // ── 4. VISIBILITY API — pause timer when tab is hidden ─────────
+    const onVisibilityChange = () => {
+      isPageVisible = !document.hidden;
+      if (isPageVisible && isPageFocused) startTimer();
+      else stopTimer();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    // ── 5. WINDOW FOCUS/BLUR — pause when window loses focus ───────
+    const onFocus = () => { isPageFocused = true; startTimer(); };
+    const onBlur  = () => { isPageFocused = false; stopTimer(); };
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('blur', onBlur);
+
+    // ── 6. SCROLL DEPTH TRIGGER — smarter than time-only ───────────
+    // Trigger proactive greeting when user scrolls 35% of page
+    // Shows genuine interest — more relevant than just time on page
+    let greetingFired = false;
+    const onScroll = () => {
+      if (greetingFired) return;
+      const scrolled = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+      if (scrolled >= GREETING_SCROLL) {
+        greetingFired = true;
+        // Only show if chat isn't already open
+        // (The existing 8s timer will handle this via setShowGreeting)
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // ── 7. SAVE SESSION ON MESSAGE CHANGE ──────────────────────────
+    // Will be called from a separate effect below
+
+    startTimer(); // Begin tracking
+
+    return () => {
+      stopTimer();
+      activityEvents.forEach(e => window.removeEventListener(e, onActivity));
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  // ── SAVE CONVERSATION TO sessionStorage on every message ─────────
+  // Allows page refresh to restore the conversation seamlessly
+  useEffect(() => {
+    if (messages.length <= 1) return; // Don't save just the greeting
+    try {
+      sessionStorage.setItem('inkanyezi_chat_session', JSON.stringify({
+        messages: messages.slice(-20), // Keep last 20 messages only
+        sessionContext,
+        savedAt: Date.now(),
+      }));
+      // Save customer name to localStorage for returning visitor greeting
+      if (sessionContext?.name) {
+        localStorage.setItem('inkanyezi_name', sessionContext.name);
+      }
+    } catch {}
+  }, [messages, sessionContext]);
+
   // Proactive greeting after 8s
   useEffect(() => {
     const show = setTimeout(() => { if (!isOpen) { setShowGreeting(true); setTimeout(() => setGreetingVisible(true), 50); } }, 8000);
@@ -1133,8 +1275,16 @@ function InkanyeziBotWidget() {
               </div>
             </div>
             <p style={{ margin:0, fontSize:'0.78rem', color:'rgba(255,255,255,0.85)', lineHeight:1.55, fontFamily:"'DM Sans',sans-serif" }}>
-              Sawubona! 👋 Automating a South African business?{' '}
-              <span style={{ color:'#F4B942', fontWeight:600 }}>I can show you how in 3 minutes.</span>
+              {(() => {
+                const r = (window as any).__inkanyezi_returning;
+                if (r?.count > 1 && r?.name) {
+                  return <>Welcome back, <span style={{color:'#F4B942',fontWeight:600}}>{r.name}</span>! 👋 Ready to continue where we left off?</>;
+                } else if (r?.count > 1) {
+                  return <>Welcome back! 👋 <span style={{color:'#F4B942',fontWeight:600}}>Shall we continue exploring AI for your business?</span></>;
+                } else {
+                  return <>Sawubona! 👋 Automating a South African business?{' '}<span style={{color:'#F4B942',fontWeight:600}}>I can show you how in 3 minutes.</span></>;
+                }
+              })()}
             </p>
             <div style={{ marginTop:8, display:'flex', alignItems:'center', gap:4, fontSize:'0.65rem', color:'rgba(255,255,255,0.4)', fontFamily:"'Space Mono',monospace" }}>
               <span>Tap to chat</span><span style={{color:'#F4B942'}}>→</span>
@@ -1204,26 +1354,35 @@ function InkanyeziBotWidget() {
         )}
       </button>
 
-      {/* ── DOOR + CHAT WINDOW — layered, no black gap ── */}
-      {(showDoor || isOpen) && (
-        <div style={{ position:'fixed', bottom:100, right:24, width:370, height:580, zIndex:99998, borderRadius:20,
-          boxShadow: isOpen
-            ? '0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25), 0 0 0 4px rgba(244,185,66,0.04)'
-            : '0 0 0 1px rgba(244,185,66,0.08), 0 0 60px rgba(244,185,66,0.06), 0 25px 70px rgba(0,0,0,0.7)',
-          transition: 'box-shadow 0.4s ease',
+      {/* ── DOOR ANIMATION — appears over chat while loading ── */}
+      {showDoor && !isOpen && (
+        <div key={openKey} style={{
+          position:'fixed', bottom:100, right:24, width:370, height:580,
+          zIndex:99999, borderRadius:20, overflow:'hidden',
+          boxShadow:'0 0 0 1px rgba(244,185,66,0.1), 0 25px 70px rgba(0,0,0,0.7)',
+        }}>
+          <DoorAnimationInline onComplete={() => { setShowDoor(false); setIsOpen(true); }} />
+        </div>
+      )}
+
+      {/* ── CHAT WINDOW — only mounts when isOpen ── */}
+      {isOpen && (
+        <div style={{
+          position:'fixed', bottom:100, right:24, width:370, height:580,
+          display:'flex', flexDirection:'column',
+          zIndex:99998, borderRadius:20, overflow:'hidden',
+          background:'#FAFBFC',
+          boxShadow:'0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)',
         }}>
 
-          {/* Chat window — visible only when isOpen, pre-rendered behind door */}
+          {/* Header */}
           <div style={{
-            position:'absolute', inset:0,
-            display: isOpen ? 'flex' : 'none',
-            flexDirection:'column',
-            borderRadius:20, overflow:'hidden', zIndex:1,
-            background:'#FAFBFC',
+            position:'relative', zIndex:2, flexShrink:0,
+            background:'linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%)',
+            borderBottom:'1px solid rgba(244,185,66,0.3)',
+            boxShadow:'0 1px 8px rgba(0,0,0,0.06)',
+            padding:'12px 16px', display:'flex', alignItems:'center', gap:12,
           }}>
-
-            {/* Header */}
-            <div style={{ position:'relative', zIndex:2, background:'linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%)', borderBottom:'1px solid rgba(244,185,66,0.3)', boxShadow:'0 1px 8px rgba(0,0,0,0.06)', padding:'12px 16px', display:'flex', alignItems:'center', gap:12, flexShrink:0 }}>
             <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`, backgroundSize:'200% 100%', animation:'headerShimmer 3s linear infinite' }} />
             <div style={{ position:'relative', flexShrink:0 }}>
               <div style={{ width:42, height:42, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, boxShadow:'0 0 16px rgba(249,115,22,0.6)' }}>⭐</div>
@@ -1244,13 +1403,13 @@ function InkanyeziBotWidget() {
           </div>
 
           {/* Messages */}
-          <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, position:'relative', zIndex:2, background:'#F5F7FA' }}>
+          <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'#F5F7FA' }}>
             {messages.map((msg,i) => (
               <div key={i} className="ink-msg" style={{ display:'flex', justifyContent:msg.role==='user'?'flex-end':'flex-start', alignItems:'flex-end', gap:6, animationDelay:`${i*0.03}s` }}>
                 {msg.role==='assistant' && (
                   <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, boxShadow:'0 0 8px rgba(249,115,22,0.4)' }}>⭐</div>
                 )}
-                <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'#FFFFFF', color:msg.role==='user'?'#1a1a2e':'#1a1a2e', border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.3)', boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.25)':'0 1px 4px rgba(0,0,0,0.06)', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
+                <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'#FFFFFF', color:'#1a1a2e', border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.3)', boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.25)':'0 1px 4px rgba(0,0,0,0.06)', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
                   dangerouslySetInnerHTML={{ __html:formatMessage(msg.content) }} />
               </div>
             ))}
@@ -1278,7 +1437,7 @@ function InkanyeziBotWidget() {
               <div style={{ display:'flex', alignItems:'flex-end', gap:6 }}>
                 <div style={{ width:24, height:24, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, flexShrink:0 }}>⭐</div>
                 <div style={{ background:'#FFFFFF', padding:'12px 16px', borderRadius:14, borderBottomLeftRadius:3, border:'1px solid rgba(244,185,66,0.25)', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', display:'flex', alignItems:'center', gap:5 }}>
-                  {[0,1,2].map(i => <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'#F4B942', opacity:0.4, animation:`thinkPulse 1.2s ease-in-out infinite`, animationDelay:`${i*0.2}s` }} />)}
+                  {[0,1,2].map(i => <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'#F4B942', opacity:0.4, animation:'thinkPulse 1.2s ease-in-out infinite', animationDelay:`${i*0.2}s` }} />)}
                 </div>
               </div>
             )}
@@ -1286,7 +1445,7 @@ function InkanyeziBotWidget() {
           </div>
 
           {/* Input */}
-          <div style={{ position:'relative', zIndex:2, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#FFFFFF', flexShrink:0 }}>
+          <div style={{ flexShrink:0, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#FFFFFF' }}>
             <div style={{ display:'flex', gap:8, alignItems:'flex-end' }}>
               <textarea ref={textareaRef} value={input} className="ink-textarea"
                 onChange={e => { setInput(e.target.value); e.target.style.height='auto'; e.target.style.height=Math.min(e.target.scrollHeight,96)+'px'; }}
@@ -1305,14 +1464,6 @@ function InkanyeziBotWidget() {
               ✦ INKANYEZI TECHNOLOGIES · WE ARE THE SIGNAL IN THE NOISE ✦
             </div>
           </div>
-          </div>
-
-          {/* Door overlay — sits above chat, removed when done */}
-          {showDoor && !isOpen && (
-            <div key={openKey} style={{ position:'absolute', inset:0, zIndex:2, borderRadius:20, overflow:'hidden' }}>
-              <DoorAnimationInline onComplete={() => { setShowDoor(false); setIsOpen(true); }} />
-            </div>
-          )}
         </div>
       )}
     </>
