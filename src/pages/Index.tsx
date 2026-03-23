@@ -603,18 +603,22 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     const isL = side === 'left';
     ctx.clearRect(0, 0, W, H);
 
-    ctx.fillStyle = '#0a1628'; ctx.fillRect(0,0,W,H);
+    // Base — warm void, NOT cold navy
+    ctx.fillStyle = '#0E0A04'; ctx.fillRect(0,0,W,H);
+    // Amber radial warmth — fire from the centre seam
     const radial=ctx.createRadialGradient(W*0.5,H*0.5,0,W*0.5,H*0.5,W*0.9);
-    radial.addColorStop(0,'rgba(30,60,110,0.55)');
-    radial.addColorStop(0.6,'rgba(15,35,70,0.3)');
+    radial.addColorStop(0,'rgba(80,50,10,0.65)');
+    radial.addColorStop(0.5,'rgba(40,25,5,0.35)');
     radial.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=radial; ctx.fillRect(0,0,W,H);
 
-    ctx.strokeStyle = 'rgba(120,180,255,0.14)'; ctx.lineWidth = 0.5;
+    // Fine grid — warm gold constellation weave
+    ctx.strokeStyle = 'rgba(244,185,66,0.10)'; ctx.lineWidth = 0.5;
     for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
-    ctx.strokeStyle = 'rgba(120,180,255,0.08)'; ctx.lineWidth = 1;
+    // Coarser accent grid — orange counter feel
+    ctx.strokeStyle = 'rgba(255,107,53,0.07)'; ctx.lineWidth = 1;
     for(let x=0;x<W;x+=100){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<H;y+=100){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
@@ -635,7 +639,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       for(let i=0;i<7;i++){
         const yPos=((tk*55*(0.7+ci*0.2)+i*(H/7))%H);
         const alpha=(0.08+0.1*Math.sin(tk+i+ci*2))*Math.max(0,1-op*2);
-        ctx.fillStyle=`rgba(140,200,255,${alpha})`;
+        ctx.fillStyle=`rgba(255,185,80,${alpha})`;
         ctx.font=`${7+i%2}px monospace`; ctx.textAlign='center';
         ctx.fillText(chars[(Math.floor(tk*2+i+ci*5))%chars.length],sx,yPos);
       }
@@ -655,13 +659,14 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       });
     });
 
+    // Amber scan sweep — warm system initialising
     const scanY=((tk*40)%(H+80))-40;
     const sg=ctx.createLinearGradient(0,scanY-25,0,scanY+25);
-    sg.addColorStop(0,'rgba(100,160,255,0)');
-    sg.addColorStop(0.4,`rgba(100,200,255,${0.05+op*0.03})`);
-    sg.addColorStop(0.5,`rgba(180,220,255,${0.18+op*0.1})`);
-    sg.addColorStop(0.6,`rgba(100,200,255,${0.05+op*0.03})`);
-    sg.addColorStop(1,'rgba(100,160,255,0)');
+    sg.addColorStop(0,'rgba(244,185,66,0)');
+    sg.addColorStop(0.4,`rgba(255,160,40,${0.06+op*0.03})`);
+    sg.addColorStop(0.5,`rgba(255,200,80,${0.22+op*0.1})`);
+    sg.addColorStop(0.6,`rgba(255,160,40,${0.06+op*0.03})`);
+    sg.addColorStop(1,'rgba(244,185,66,0)');
     ctx.fillStyle=sg; ctx.fillRect(0,scanY-25,W,50);
 
     const conduitAlpha = Math.max(0, 1 - op * 3);
@@ -684,7 +689,8 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
 
     ctx.strokeStyle='rgba(244,185,66,0.35)'; ctx.lineWidth=1;
     ctx.strokeRect(5,5,W-10,H-10);
-    ctx.strokeStyle='rgba(100,160,255,0.08)'; ctx.lineWidth=0.5;
+    // Inner precision line — warm amber ghost
+    ctx.strokeStyle='rgba(255,140,40,0.10)'; ctx.lineWidth=0.5;
     ctx.strokeRect(11,11,W-22,H-22);
 
     const b=18;
@@ -695,7 +701,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     });
 
     ctx.font='7px monospace'; ctx.textAlign='center';
-    ctx.fillStyle=`rgba(140,190,255,${0.5+0.15*Math.sin(tk*4)})`;
+    ctx.fillStyle=`rgba(255,185,80,${0.5+0.15*Math.sin(tk*4)})`;
     ctx.fillText(isL?'◈ INK-L':'◈ INK-R',W/2,H-16);
     ctx.fillStyle='rgba(244,185,66,0.45)';
     ctx.fillText(isL?'UNIT·ALPHA':'UNIT·SIGMA',W/2,H-8);
@@ -1137,7 +1143,7 @@ function InkanyeziBotWidget() {
 
       {/* ── UNIFIED CONTAINER ── */}
       {(showDoor || isOpen) && (
-        <div style={{ position:'fixed', bottom:100, right:24, width:370, height:580, zIndex:99998, borderRadius:20, overflow:'hidden', boxShadow:'0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)' }}>
+        <div style={{ position:'fixed', bottom:100, right:24, width: 'min(370px, calc(100vw - 32px))', height:'min(580px, calc(100vh - 120px))', zIndex:99998, borderRadius:20, overflow:'hidden', boxShadow:'0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)' }}>
 
           <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', borderRadius:20, overflow:'hidden', background:'#FAFBFC' }}>
 
