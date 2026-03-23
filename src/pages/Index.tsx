@@ -1066,19 +1066,88 @@ function InkanyeziBotWidget() {
         @keyframes greetingPop { from{opacity:0;transform:translateY(10px) scale(0.95);} to{opacity:1;transform:translateY(0) scale(1);} }
         @keyframes stepSlide { from{opacity:0;transform:translateX(10px);} to{opacity:1;transform:translateX(0);} }
         .ink-msg { animation: msgFadeUp 0.3s ease forwards; }
+
+        /* ── CHIPS ── */
         .ink-chip { animation: chipAppear 0.3s ease forwards; transition: all 0.2s !important; }
         .ink-chip:hover { background: rgba(244,185,66,0.12) !important; border-color: #F4B942 !important; color: #1a1a2e !important; transform: translateX(2px); }
+
+        /* ── SEND BUTTON ── */
         .ink-rocket { animation: rocketGlow 2s ease infinite; }
         .ink-rocket:hover:not(:disabled) { transform: scale(1.08) rotate(-5deg) !important; box-shadow: 0 0 30px rgba(249,115,22,0.9) !important; }
+
+        /* ── SCROLLBAR — webkit ── */
         .ink-msgs::-webkit-scrollbar { width: 3px; }
         .ink-msgs::-webkit-scrollbar-track { background: transparent; }
         .ink-msgs::-webkit-scrollbar-thumb { background: rgba(244,185,66,0.4); border-radius: 2px; }
+
+        /* ── TEXTAREA — cross-device ── */
+        .ink-textarea {
+          -webkit-appearance: none;
+          appearance: none;
+          /* Prevent iOS Safari zoom on focus (font-size must be >= 16px on iOS) */
+          font-size: 16px !important;
+          /* Smooth native scrolling on iOS */
+          -webkit-overflow-scrolling: touch;
+          /* Kill tap highlight on Android Chrome / Samsung */
+          -webkit-tap-highlight-color: transparent;
+          tap-highlight-color: transparent;
+          /* Prevent callout menu on long-press (iOS) */
+          -webkit-touch-callout: none;
+          /* Disable text selection flash on mobile */
+          -webkit-user-select: text;
+          user-select: text;
+        }
         .ink-textarea::placeholder { color: rgba(100,110,130,0.5) !important; }
+        /* Remove inner padding on Firefox */
+        .ink-textarea::-moz-focus-inner { padding: 0; border: 0; }
+        /* Samsung Internet / older Android input fix */
+        .ink-textarea:focus { outline: none !important; -webkit-tap-highlight-color: transparent; }
+
+        /* ── CLOSE PULSE ── */
         @keyframes closePulse {
           0%   { box-shadow: 0 0 0 0 rgba(229,62,62,0.6), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1); }
           50%  { box-shadow: 0 0 0 10px rgba(229,62,62,0), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1.06); }
           100% { box-shadow: 0 0 0 0 rgba(229,62,62,0), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1); }
         }
+
+        /* ── MOBILE KEYBOARD — prevent layout shift when keyboard opens ── */
+        /* Use dvh (dynamic viewport height) which shrinks with the keyboard on mobile */
+        @supports (height: 100dvh) {
+          .ink-widget-container {
+            height: min(580px, calc(100dvh - 120px)) !important;
+          }
+          .ink-widget-container.ink-fullscreen {
+            height: 100dvh !important;
+          }
+        }
+
+        /* ── TOUCH TARGETS — minimum 44×44pt per Apple HIG / Android guidelines ── */
+        .ink-rocket { min-width: 44px; min-height: 44px; }
+        .ink-chip { min-height: 44px; display: flex !important; align-items: center; padding: 10px 14px !important; }
+
+        /* ── FLOATING BUBBLE — safe area inset for notched phones ── */
+        .ink-bubble {
+          bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+          right:  calc(24px + env(safe-area-inset-right, 0px)) !important;
+        }
+
+        /* ── INPUT BAR — account for home bar on iPhone X+ ── */
+        .ink-input-bar {
+          padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+        }
+
+        /* ── FULLSCREEN on mobile — no bottom safe area bleed ── */
+        .ink-widget-container.ink-fullscreen .ink-input-bar {
+          padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+        }
+
+        /* ── PREVENT double-tap zoom on buttons (iOS Safari) ── */
+        button, .ink-chip, .ink-rocket {
+          touch-action: manipulation;
+        }
+
+        /* ── WIDGET — hide floating bubble when fullscreen ── */
+        .ink-bubble-hidden { opacity: 0 !important; pointer-events: none !important; }
       `}</style>
 
       {/* ── PROACTIVE GREETING ── */}
@@ -1113,7 +1182,8 @@ function InkanyeziBotWidget() {
 
       {/* ── FLOATING BUBBLE ── */}
       <button
-        onClick={()=>{ if(!isOpen){ setShowDoor(true); setOpenKey(k=>k+1); } else { setIsOpen(false); } }}
+        className={`ink-bubble${isFullscreen ? ' ink-bubble-hidden' : ''}`}
+        onClick={()=>{ if(!isOpen){ setShowDoor(true); setOpenKey(k=>k+1); } else { setIsOpen(false); setIsFullscreen(false); } }}
         aria-label={isOpen?'Close InkanyeziBot':'Open InkanyeziBot'}
         style={{
           position:'fixed', bottom:24, right:24, zIndex:99999,
@@ -1146,7 +1216,7 @@ function InkanyeziBotWidget() {
 
       {/* ── UNIFIED CONTAINER — supports fullscreen toggle ── */}
       {(showDoor || isOpen) && (
-        <div style={{
+        <div className={`ink-widget-container${isFullscreen ? ' ink-fullscreen' : ''}`} style={{
           position: 'fixed',
           bottom:   isFullscreen ? 0 : 100,
           right:    isFullscreen ? 0 : 24,
@@ -1246,19 +1316,75 @@ function InkanyeziBotWidget() {
               <div ref={messagesEnd} />
             </div>
 
-            {/* Input */}
-            <div style={{ flexShrink:0, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#FFFFFF' }}>
+            {/* Input — cross-device compatible */}
+            <div className="ink-input-bar" style={{ flexShrink:0, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#FFFFFF' }}>
               <div style={{ display:'flex', gap:8, alignItems:'flex-end' }}>
-                <textarea ref={textareaRef} value={input} className="ink-textarea"
-                  onChange={e => { setInput(e.target.value); e.target.style.height='auto'; e.target.style.height=Math.min(e.target.scrollHeight,96)+'px'; }}
-                  onKeyDown={e => { if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); sendMessage(); } }}
-                  placeholder="Type your message..." rows={1}
-                  style={{ flex:1, padding:'9px 13px', borderRadius:14, background:'#F5F7FA', border:'1px solid rgba(244,185,66,0.3)', color:'#1a1a2e', outline:'none', fontSize:13, resize:'none', lineHeight:1.5, wordBreak:'break-word', overflowY:'auto', maxHeight:96, fontFamily:"'DM Sans',sans-serif", transition:'border-color 0.2s' }}
-                  onFocus={e=>e.target.style.borderColor='#F4B942'}
-                  onBlur={e=>e.target.style.borderColor='rgba(244,185,66,0.3)'}
+                <textarea
+                  ref={textareaRef}
+                  value={input}
+                  className="ink-textarea"
+                  onChange={e => {
+                    setInput(e.target.value);
+                    e.target.style.height = 'auto';
+                    e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+                  }}
+                  onKeyDown={e => {
+                    // Desktop: Enter sends. Mobile: Enter = new line (no send on mobile keyboards)
+                    if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) {
+                      e.preventDefault();
+                      sendMessage();
+                    }
+                  }}
+                  placeholder="Type your message..."
+                  rows={1}
+                  autoComplete="off"
+                  autoCorrect="on"
+                  autoCapitalize="sentences"
+                  spellCheck={true}
+                  inputMode="text"
+                  style={{
+                    flex:1,
+                    padding:'11px 14px',
+                    borderRadius:14,
+                    background:'#F5F7FA',
+                    border:'1px solid rgba(244,185,66,0.3)',
+                    color:'#1a1a2e',
+                    outline:'none',
+                    fontSize:16, /* 16px prevents iOS Safari zoom */
+                    resize:'none',
+                    lineHeight:1.5,
+                    wordBreak:'break-word',
+                    overflowY:'auto',
+                    maxHeight:120,
+                    fontFamily:"'DM Sans',sans-serif",
+                    transition:'border-color 0.2s',
+                    WebkitAppearance:'none',
+                    touchAction:'manipulation',
+                  }}
+                  onFocus={e => e.target.style.borderColor = '#F4B942'}
+                  onBlur={e => e.target.style.borderColor = 'rgba(244,185,66,0.3)'}
                 />
-                <button className="ink-rocket" onClick={()=>sendMessage()} disabled={isLoading||!input.trim()}
-                  style={{ width:42, height:42, borderRadius:'50%', flexShrink:0, background:isLoading||!input.trim()?'rgba(249,115,22,0.3)':'linear-gradient(135deg, #FF6B35, #c2410c)', border:'none', cursor:isLoading||!input.trim()?'not-allowed':'pointer', color:C.white, fontSize:18, display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', opacity:isLoading||!input.trim()?0.5:1 }}>
+                {/* Send button — tap-friendly 44×44 touch target */}
+                <button
+                  className="ink-rocket"
+                  onPointerUp={() => sendMessage()} /* pointerUp works on all devices */
+                  disabled={isLoading || !input.trim()}
+                  aria-label="Send message"
+                  style={{
+                    width:44, height:44,
+                    borderRadius:'50%', flexShrink:0,
+                    background: isLoading || !input.trim()
+                      ? 'rgba(249,115,22,0.3)'
+                      : 'linear-gradient(135deg, #FF6B35, #c2410c)',
+                    border:'none',
+                    cursor: isLoading || !input.trim() ? 'not-allowed' : 'pointer',
+                    color: C.white, fontSize:18,
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    transition:'all 0.2s',
+                    opacity: isLoading || !input.trim() ? 0.5 : 1,
+                    touchAction:'manipulation',
+                    WebkitTapHighlightColor:'transparent',
+                  }}>
                   🚀
                 </button>
               </div>
