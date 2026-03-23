@@ -844,7 +844,7 @@ function InkanyeziBotWidget() {
   const [isOpen, setIsOpen]   = useState(false);
   const [messages, setMessages] = useState([{
     role:'assistant',
-    content:"Sawubona! 👋 I'm InkanyeziBot — your AI guide to automation for South African businesses.\n\nBy chatting, you agree to our POPIA-compliant data policy.\n\nWhat does your business do, and what's the biggest challenge slowing you down right now?",
+    content:"Sawubona! 👋 I'm InkanyeziBot — your guide to AI automation for South African businesses. Tell me what your business does and I'll show you exactly where automation can make a difference.",
   }]);
   const [input, setInput]             = useState('');
   const [isLoading, setIsLoading]     = useState(false);
@@ -898,7 +898,7 @@ function InkanyeziBotWidget() {
     const doReset = () => {
       setIsOpen(false); setShowDoor(false); setShowGreeting(false); setGreetingVisible(false);
       setIsFullscreen(false);
-      setMessages([{ role:'assistant', content:"Sawubona! 👋 I'm InkanyeziBot — your AI guide to automation for South African businesses.\n\nBy chatting, you agree to our POPIA-compliant data policy.\n\nWhat does your business do, and what's the biggest challenge slowing you down right now?" }]);
+      setMessages([{ role:'assistant', content:"Sawubona! 👋 I'm InkanyeziBot — your guide to AI automation for South African businesses. Tell me what your business does and I'll show you exactly where automation can make a difference." }]);
       setInput(''); setShowLeadForm(false); setLeadFormSubmitted(false);
       setShowChips(true); setSessionContext(null);
       hasTriggered.current = false;
@@ -991,13 +991,25 @@ function InkanyeziBotWidget() {
         body:JSON.stringify({ messages:newMessages, sessionId, context:sessionContext }),
       });
       const data = await res.json();
-      // FIX: Strip any leaked <context> / <response> tags before displaying
+      // Strip any leaked context/response tags
       const cleanMessage = (data.message || '')
         .replace(/<context>[\s\S]*?<\/context>/gi, '')
         .replace(/<response>|<\/response>/gi, '')
         .trim();
       setMessages([...newMessages, { role:'assistant', content: cleanMessage }]);
-      if (data.context) setSessionContext(data.context);
+      if (data.context) {
+        setSessionContext(data.context);
+        // If conversation is now marked complete, start a 5-minute quiet close timer
+        // After 5 minutes of no user input post-completion, gently close the session
+        if (data.context.conversation_complete && !sessionContext?.conversation_complete) {
+          setTimeout(() => {
+            setMessages(prev => [
+              ...prev,
+              { role:'assistant', content:`Your reference is ${data.context.referenceNumber}. Sanele will be in touch within 24 hours — feel free to reach out on WhatsApp (+27 65 880 4122) anytime. Sharp! 🇿🇦` }
+            ]);
+          }, 1500);
+        }
+      }
     } catch {
       setMessages([...newMessages, { role:'assistant', content:'Something went wrong — please try again.' }]);
     } finally { setIsLoading(false); }
