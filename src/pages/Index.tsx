@@ -280,6 +280,8 @@ function formatMessage(text: string) {
 
 // ════════════════════════════════════════════════════════════════════
 // INKANYEZI DOOR — Pure tech, holographic, plasma energy
+// FIX 1: Lighter door colour — was #0a1628, now #112240 + brighter radial
+// FIX 2: Faster animation — brain phase 1200ms (was 2500ms), slide 500ms (was 900ms)
 // ════════════════════════════════════════════════════════════════════
 function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
   const leftRef  = useRef<HTMLCanvasElement>(null);
@@ -296,28 +298,30 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     const isL = side === 'left';
     ctx.clearRect(0, 0, W, H);
 
-    // Base — void black
-    ctx.fillStyle = '#0a1628'; ctx.fillRect(0,0,W,H);
-    // Radial brightness boost — centre lit, edges dark like a real door
+    // FIX: Lighter base colour — was #0a1628 (blended into background)
+    // Now #112240 — clearly visible as a distinct lighter navy panel
+    ctx.fillStyle = '#112240'; ctx.fillRect(0,0,W,H);
+
+    // FIX: Stronger radial brightness — was rgba(30,60,110,0.55), now rgba(50,100,180,0.75)
     const radial=ctx.createRadialGradient(W*0.5,H*0.5,0,W*0.5,H*0.5,W*0.9);
-    radial.addColorStop(0,'rgba(30,60,110,0.55)');
-    radial.addColorStop(0.6,'rgba(15,35,70,0.3)');
+    radial.addColorStop(0,'rgba(50,100,180,0.75)');
+    radial.addColorStop(0.6,'rgba(25,55,110,0.45)');
     radial.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=radial; ctx.fillRect(0,0,W,H);
 
     // Fine grid — holographic blueprint
-    ctx.strokeStyle = 'rgba(120,180,255,0.14)'; ctx.lineWidth = 0.5;
+    ctx.strokeStyle = 'rgba(120,180,255,0.18)'; ctx.lineWidth = 0.5;
     for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
     // Coarser accent grid
-    ctx.strokeStyle = 'rgba(120,180,255,0.08)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(120,180,255,0.1)'; ctx.lineWidth = 1;
     for(let x=0;x<W;x+=100){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<H;y+=100){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
     // Hexagonal microchip pattern
     const hr = 15, hw = hr*Math.sqrt(3);
-    ctx.strokeStyle = 'rgba(244,185,66,0.14)'; ctx.lineWidth = 0.7;
+    ctx.strokeStyle = 'rgba(244,185,66,0.18)'; ctx.lineWidth = 0.7;
     for(let row=-1;row<H/(hr*1.5)+1;row++){
       for(let col=-1;col<W/hw+1;col++){
         const cx=col*hw+(row%2===0?0:hw/2), cy=row*hr*1.5;
@@ -343,7 +347,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     // Horizontal circuit traces with pulse
     [H*0.15,H*0.3,H*0.5,H*0.7,H*0.85].forEach((y,i)=>{
       const p=0.4+0.5*Math.sin(tk*2+i*1.3);
-      ctx.strokeStyle=`rgba(244,185,66,${0.18+p*0.22})`; ctx.lineWidth=1;
+      ctx.strokeStyle=`rgba(244,185,66,${0.22+p*0.28})`; ctx.lineWidth=1;
       ctx.beginPath();
       const mid=W/2;
       ctx.moveTo(0,y);
@@ -352,7 +356,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       // Junction nodes
       [W*0.1, mid, W*0.9].forEach(nx=>{
         ctx.beginPath(); ctx.arc(nx,y,2,0,Math.PI*2);
-        ctx.fillStyle=`rgba(244,185,66,${0.35+p*0.55})`; ctx.fill();
+        ctx.fillStyle=`rgba(244,185,66,${0.4+p*0.55})`; ctx.fill();
       });
     });
 
@@ -361,25 +365,24 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     const sg=ctx.createLinearGradient(0,scanY-25,0,scanY+25);
     sg.addColorStop(0,'rgba(100,160,255,0)');
     sg.addColorStop(0.4,`rgba(100,200,255,${0.05+op*0.03})`);
-    sg.addColorStop(0.5,`rgba(180,220,255,${0.18+op*0.1})`);
+    sg.addColorStop(0.5,`rgba(180,220,255,${0.22+op*0.1})`);
     sg.addColorStop(0.6,`rgba(100,200,255,${0.05+op*0.03})`);
     sg.addColorStop(1,'rgba(100,160,255,0)');
     ctx.fillStyle=sg; ctx.fillRect(0,scanY-25,W,50);
 
-    // Plasma energy conduit — fades to zero as door opens (eliminates trace line)
+    // Plasma energy conduit — fades to zero as door opens
     const conduitAlpha = Math.max(0, 1 - op * 3);
     if (conduitAlpha > 0) {
       const cg=ctx.createLinearGradient(0,0,0,H);
       cg.addColorStop(0,'rgba(244,185,66,0)');
       cg.addColorStop(0.25,`rgba(244,185,66,${0.6*conduitAlpha})`);
-      cg.addColorStop(0.5,`rgba(255,140,60,${0.8*conduitAlpha})`);
+      cg.addColorStop(0.5,`rgba(255,140,60,${0.9*conduitAlpha})`);
       cg.addColorStop(0.75,`rgba(244,185,66,${0.5*conduitAlpha})`);
       cg.addColorStop(1,'rgba(244,185,66,0)');
       ctx.fillStyle=cg; ctx.fillRect(isL?W-4:0,0,4,H);
     }
 
-    // Edge bloom as doors open
-    // Edge bloom — fades away completely as door opens to leave clean reveal
+    // Edge bloom — fades away completely as door opens
     const bloomAlpha = Math.max(0, 1 - op * 2.5);
     const eg=ctx.createLinearGradient(isL?W:0,0,isL?W-80:80,0);
     eg.addColorStop(0,`rgba(255,107,53,${(0.12+op*0.3)*bloomAlpha})`);
@@ -388,15 +391,15 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     ctx.fillStyle=eg; ctx.fillRect(isL?W-80:0,0,80,H);
 
     // Precision frame — double line
-    ctx.strokeStyle='rgba(244,185,66,0.35)'; ctx.lineWidth=1;
+    ctx.strokeStyle='rgba(244,185,66,0.45)'; ctx.lineWidth=1;
     ctx.strokeRect(5,5,W-10,H-10);
-    ctx.strokeStyle='rgba(100,160,255,0.08)'; ctx.lineWidth=0.5;
+    ctx.strokeStyle='rgba(100,160,255,0.12)'; ctx.lineWidth=0.5;
     ctx.strokeRect(11,11,W-22,H-22);
 
     // Corner brackets — engineering precision
     const b=18;
     [[5,5],[5,H-5],[W-5,5],[W-5,H-5]].forEach(([bx,by])=>{
-      ctx.strokeStyle='rgba(244,185,66,0.75)'; ctx.lineWidth=2;
+      ctx.strokeStyle='rgba(244,185,66,0.85)'; ctx.lineWidth=2;
       const mx=bx>W/2?-b:b, my=by>H/2?-b:b;
       ctx.beginPath(); ctx.moveTo(bx+mx,by); ctx.lineTo(bx,by); ctx.lineTo(bx,by+my); ctx.stroke();
     });
@@ -405,28 +408,22 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     ctx.font='7px monospace'; ctx.textAlign='center';
     ctx.fillStyle=`rgba(140,190,255,${0.5+0.15*Math.sin(tk*4)})`;
     ctx.fillText(isL?'◈ INK-L':'◈ INK-R',W/2,H-16);
-    ctx.fillStyle='rgba(244,185,66,0.45)';
+    ctx.fillStyle='rgba(244,185,66,0.55)';
     ctx.fillText(isL?'UNIT·ALPHA':'UNIT·SIGMA',W/2,H-8);
 
-    // ── LETTER — A on left panel (right side near seam), I on right panel (left side near seam)
-    // Only appears during opening phase, fades out as doors slide away
+    // Letters A / I appear during opening phase
     if(op > 0) {
       const letter = isL ? 'A' : 'I';
-      // Position: near the inner seam edge of each panel
-      // Left panel: letter on right side (near center seam) — x = rightmost quarter
-      // Right panel: letter on left side (near center seam) — x = leftmost quarter
       const lx = isL ? W * 0.78 : W * 0.22;
       const ly = H * 0.5;
       const letterAlpha = Math.min(op * 3, 1) * Math.max(0, 1 - op * 1.2);
       if(letterAlpha > 0) {
-        // Glow halo behind letter
         const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, 55);
         lg.addColorStop(0, `rgba(244,185,66,${letterAlpha * 0.25})`);
         lg.addColorStop(0.5, `rgba(255,107,53,${letterAlpha * 0.1})`);
         lg.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.beginPath(); ctx.arc(lx, ly, 55, 0, Math.PI*2);
         ctx.fillStyle = lg; ctx.fill();
-        // Letter itself
         ctx.save();
         ctx.font = 'bold 72px Arial';
         ctx.textAlign = 'center';
@@ -436,7 +433,6 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
         ctx.fillStyle = `rgba(255,255,255,${letterAlpha})`;
         ctx.fillText(letter, lx, ly);
         ctx.restore();
-        // Underline accent — tech style
         const uw = letter === 'I' ? 28 : 44;
         const ug = ctx.createLinearGradient(lx-uw/2, ly+44, lx+uw/2, ly+44);
         ug.addColorStop(0, 'rgba(244,185,66,0)');
@@ -514,13 +510,15 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       raf2=requestAnimationFrame(draw);
     };
     draw();
-    const t=setTimeout(()=>{cancelAnimationFrame(raf2);setPhase('opening');},2500);
+    // FIX: Brain phase reduced from 2500ms → 1200ms for faster total open time
+    const t=setTimeout(()=>{cancelAnimationFrame(raf2);setPhase('opening');},1200);
     return ()=>{cancelAnimationFrame(raf2);clearTimeout(t);};
   },[]);
 
   useEffect(()=>{
     if(phase!=='opening') return;
-    const dur=900,start=performance.now();
+    // FIX: Door slide duration reduced from 900ms → 500ms
+    const dur=500,start=performance.now();
     const run=(now:number)=>{
       const p=Math.min((now-start)/dur,1);
       setDoorPct(1-Math.pow(1-p,3));
@@ -538,21 +536,22 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       {/* LEFT DOOR */}
       <div style={{position:'absolute',top:0,left:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(-${slide}%)`,overflow:'hidden'}}>
         <canvas ref={leftRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
-
       </div>
       {/* RIGHT DOOR */}
       <div style={{position:'absolute',top:0,right:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(${slide}%)`,overflow:'hidden'}}>
         <canvas ref={rightRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
-
       </div>
       {/* BRAIN */}
       <div style={{position:'absolute',inset:0,zIndex:7,opacity:brainFade,pointerEvents:'none',display:'flex',alignItems:'center',justifyContent:'center'}}>
         <canvas ref={brainRef} style={{width:280,height:220}}/>
       </div>
-      {/* No center seam — panel plasma conduits provide the visual separation */}
     </div>
   );
 }
+
+// ════════════════════════════════════════════════════════════════════
+// INKANYEZI BOT WIDGET
+// FIX 3: Responsive height — clamps so top never gets cut off on laptops
 // ════════════════════════════════════════════════════════════════════
 function InkanyeziBotWidget() {
   const [isOpen, setIsOpen]   = useState(false);
@@ -573,39 +572,52 @@ function InkanyeziBotWidget() {
   const [showDoor, setShowDoor]               = useState(false);
   const [openKey, setOpenKey]                 = useState(0);
 
+  // FIX 3: Compute responsive chat window dimensions based on viewport
+  const [chatDims, setChatDims] = useState({ width: 370, height: 580, bottom: 100 });
+
+  useEffect(() => {
+    const updateDims = () => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      // Mobile portrait — full screen
+      if (vw <= 480) {
+        setChatDims({ width: vw, height: vh, bottom: 0 });
+      }
+      // Laptop / short screens — clamp height so top is never cut off
+      else if (vh <= 768) {
+        const maxH = vh - 100; // 100px = button height + gap
+        setChatDims({ width: Math.min(370, vw - 48), height: maxH, bottom: 86 });
+      }
+      // Standard desktop
+      else {
+        setChatDims({ width: Math.min(370, vw - 48), height: Math.min(580, vh - 120), bottom: 100 });
+      }
+    };
+    updateDims();
+    window.addEventListener('resize', updateDims);
+    return () => window.removeEventListener('resize', updateDims);
+  }, []);
+
   const hasTriggered = useRef(false);
   const messagesEnd  = useRef<HTMLDivElement>(null);
   const textareaRef  = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior:'smooth' }); }, [messages, showLeadForm, isLoading]);
 
-  // ════════════════════════════════════════════════════════════════════
-  // MODERN SESSION MANAGEMENT
-  // Best practices: sessionStorage, Visibility API, scroll depth,
-  // returning visitor detection, active-time-only inactivity timer
-  // ════════════════════════════════════════════════════════════════════
-
   useEffect(() => {
     const STORAGE_KEY = 'inkanyezi_chat_session';
     const VISITOR_KEY = 'inkanyezi_visitor';
-    const INACTIVITY_MS = 20 * 60 * 1000;  // 20min of ACTIVE time
-    const GREETING_SCROLL = 0.35;           // trigger greeting at 35% scroll depth
+    const INACTIVITY_MS = 20 * 60 * 1000;
+    const GREETING_SCROLL = 0.35;
 
-    // ── 1. RETURNING VISITOR DETECTION ─────────────────────────────
-    // localStorage persists across sessions — detects returning visitors
     const visitCount = parseInt(localStorage.getItem(VISITOR_KEY) || '0') + 1;
     localStorage.setItem(VISITOR_KEY, String(visitCount));
 
-    // Returning visitor gets a more personalised proactive greeting
     if (visitCount > 1) {
       const savedName = localStorage.getItem('inkanyezi_name');
-      // Will be used by the greeting popup to personalise the message
       (window as any).__inkanyezi_returning = { count: visitCount, name: savedName };
     }
 
-    // ── 2. SESSION STATE PERSISTENCE (sessionStorage) ──────────────
-    // sessionStorage clears when the tab is closed — ideal for chat
-    // Restore any in-progress conversation if user refreshed the page
     try {
       const saved = sessionStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -614,14 +626,10 @@ function InkanyeziBotWidget() {
           setMessages(parsed.messages);
           setShowChips(false);
           if (parsed.sessionContext) setSessionContext(parsed.sessionContext);
-          // Don't auto-reopen — user can click the bubble to continue
         }
       }
     } catch {}
 
-    // ── 3. ACTIVE-TIME-ONLY INACTIVITY TIMER ───────────────────────
-    // Only count time when the page is VISIBLE and FOCUSED
-    // Prevents resetting just because user left the tab open overnight
     let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
     let isPageVisible = !document.hidden;
     let isPageFocused = document.hasFocus();
@@ -655,12 +663,10 @@ function InkanyeziBotWidget() {
       if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; }
     };
 
-    // Activity events — restart the timer on any interaction
     const onActivity = () => { if (isPageVisible && isPageFocused) startTimer(); };
     const activityEvents = ['mousedown','keydown','touchstart','scroll','click'];
     activityEvents.forEach(e => window.addEventListener(e, onActivity, { passive: true }));
 
-    // ── 4. VISIBILITY API — pause timer when tab is hidden ─────────
     const onVisibilityChange = () => {
       isPageVisible = !document.hidden;
       if (isPageVisible && isPageFocused) startTimer();
@@ -668,31 +674,22 @@ function InkanyeziBotWidget() {
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
 
-    // ── 5. WINDOW FOCUS/BLUR — pause when window loses focus ───────
     const onFocus = () => { isPageFocused = true; startTimer(); };
     const onBlur  = () => { isPageFocused = false; stopTimer(); };
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
 
-    // ── 6. SCROLL DEPTH TRIGGER — smarter than time-only ───────────
-    // Trigger proactive greeting when user scrolls 35% of page
-    // Shows genuine interest — more relevant than just time on page
     let greetingFired = false;
     const onScroll = () => {
       if (greetingFired) return;
       const scrolled = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
       if (scrolled >= GREETING_SCROLL) {
         greetingFired = true;
-        // Only show if chat isn't already open
-        // (The existing 8s timer will handle this via setShowGreeting)
       }
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    // ── 7. SAVE SESSION ON MESSAGE CHANGE ──────────────────────────
-    // Will be called from a separate effect below
-
-    startTimer(); // Begin tracking
+    startTimer();
 
     return () => {
       stopTimer();
@@ -704,24 +701,20 @@ function InkanyeziBotWidget() {
     };
   }, []);
 
-  // ── SAVE CONVERSATION TO sessionStorage on every message ─────────
-  // Allows page refresh to restore the conversation seamlessly
   useEffect(() => {
-    if (messages.length <= 1) return; // Don't save just the greeting
+    if (messages.length <= 1) return;
     try {
       sessionStorage.setItem('inkanyezi_chat_session', JSON.stringify({
-        messages: messages.slice(-20), // Keep last 20 messages only
+        messages: messages.slice(-20),
         sessionContext,
         savedAt: Date.now(),
       }));
-      // Save customer name to localStorage for returning visitor greeting
       if (sessionContext?.name) {
         localStorage.setItem('inkanyezi_name', sessionContext.name);
       }
     } catch {}
   }, [messages, sessionContext]);
 
-  // Proactive greeting after 8s
   useEffect(() => {
     const show = setTimeout(() => { if (!isOpen) { setShowGreeting(true); setTimeout(() => setGreetingVisible(true), 50); } }, 8000);
     const hide = setTimeout(() => { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }, 20000);
@@ -732,16 +725,12 @@ function InkanyeziBotWidget() {
     if (isOpen) { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }
   }, [isOpen]);
 
-  // Lead form trigger
   useEffect(() => {
     if (hasTriggered.current || leadFormSubmitted || !sessionContext) return;
     const userMsgs = messages.filter(m => m.role==='user');
     const lastMsg  = userMsgs[userMsgs.length-1]?.content||'';
     const { shouldShow } = scoreConversation(sessionContext, userMsgs.length, lastMsg);
-    // Primary trigger — score threshold met
     if (shouldShow) { hasTriggered.current = true; setTimeout(() => setShowLeadForm(true), 1200); return; }
-    // Backup trigger — after 5 user messages always show form regardless of score
-    // Never let a long engaged conversation end without capturing the lead
     if (userMsgs.length >= 5 && !hasTriggered.current) {
       hasTriggered.current = true;
       setTimeout(() => setShowLeadForm(true), 1200);
@@ -817,7 +806,7 @@ function InkanyeziBotWidget() {
         @keyframes ping { 0%{transform:scale(1);opacity:0.8;} 70%{transform:scale(2.2);opacity:0;} 100%{transform:scale(2.2);opacity:0;} }
         @keyframes floatBubble { 0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 30px rgba(249,115,22,0.55),0 0 60px rgba(249,115,22,0.2);} 50%{transform:translateY(-6px) scale(1.03);box-shadow:0 0 40px rgba(249,115,22,0.7),0 0 80px rgba(249,115,22,0.3);} }
         @keyframes orbitRing { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-        @keyframes windowSlide { 
+        @keyframes windowSlide {
           0%  { opacity:0; transform:translateY(30px) scaleY(0.05) scaleX(0.8); transform-origin: bottom center; }
           40% { opacity:1; transform:translateY(0) scaleY(0.6) scaleX(1); transform-origin: bottom center; }
           70% { transform:translateY(0) scaleY(1.02) scaleX(1); transform-origin: bottom center; }
@@ -901,58 +890,44 @@ function InkanyeziBotWidget() {
             ? '0 0 0 0 rgba(229,62,62,0.4), 0 4px 20px rgba(229,62,62,0.4)'
             : '0 0 30px rgba(249,115,22,0.55)',
         }}>
-        {/* Orbit ring — only when closed */}
         {!isOpen && !showDoor && (
           <div style={{ position:'absolute', width:64, height:64, animation:'orbitRing 4s linear infinite', pointerEvents:'none' }}>
             <div style={{ position:'absolute', top:-3, left:'50%', width:7, height:7, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 10px ${C.gold}` }} />
           </div>
         )}
-        {/* Close X — animated spinning lines */}
         {isOpen ? (
           <div style={{ position:'relative', width:24, height:24 }}>
-            <div style={{
-              position:'absolute', top:'50%', left:0, right:0, height:2.5,
-              background:'#fff', borderRadius:2,
-              transform:'translateY(-50%) rotate(45deg)',
-              boxShadow:'0 0 6px rgba(255,255,255,0.8)',
-            }}/>
-            <div style={{
-              position:'absolute', top:'50%', left:0, right:0, height:2.5,
-              background:'#fff', borderRadius:2,
-              transform:'translateY(-50%) rotate(-45deg)',
-              boxShadow:'0 0 6px rgba(255,255,255,0.8)',
-            }}/>
+            <div style={{ position:'absolute', top:'50%', left:0, right:0, height:2.5, background:'#fff', borderRadius:2, transform:'translateY(-50%) rotate(45deg)', boxShadow:'0 0 6px rgba(255,255,255,0.8)' }}/>
+            <div style={{ position:'absolute', top:'50%', left:0, right:0, height:2.5, background:'#fff', borderRadius:2, transform:'translateY(-50%) rotate(-45deg)', boxShadow:'0 0 6px rgba(255,255,255,0.8)' }}/>
           </div>
         ) : (
           <span style={{ position:'relative', zIndex:1 }}>⭐</span>
         )}
-        {/* Close label — appears above button */}
         {isOpen && (
-          <div style={{
-            position:'absolute', bottom:'calc(100% + 8px)', left:'50%',
-            transform:'translateX(-50%)',
-            background:'rgba(229,62,62,0.9)',
-            color:'#fff', fontSize:'0.55rem', fontFamily:"'Space Mono',monospace",
-            letterSpacing:'0.1em', padding:'3px 8px', borderRadius:4,
-            whiteSpace:'nowrap', pointerEvents:'none',
-            boxShadow:'0 2px 8px rgba(229,62,62,0.4)',
-          }}>CLOSE</div>
+          <div style={{ position:'absolute', bottom:'calc(100% + 8px)', left:'50%', transform:'translateX(-50%)', background:'rgba(229,62,62,0.9)', color:'#fff', fontSize:'0.55rem', fontFamily:"'Space Mono',monospace", letterSpacing:'0.1em', padding:'3px 8px', borderRadius:4, whiteSpace:'nowrap', pointerEvents:'none', boxShadow:'0 2px 8px rgba(229,62,62,0.4)' }}>CLOSE</div>
         )}
       </button>
 
-      {/* ── UNIFIED CONTAINER — door + chat always together, no gap ── */}
+      {/* ── UNIFIED CONTAINER — responsive dimensions from chatDims state ── */}
       {(showDoor || isOpen) && (
         <div style={{
-          position:'fixed', bottom:100, right:24, width:370, height:580,
-          zIndex:99998, borderRadius:20, overflow:'hidden',
+          position:'fixed',
+          bottom: chatDims.bottom,
+          right: window.innerWidth <= 480 ? 0 : 24,
+          width: chatDims.width,
+          height: chatDims.height,
+          zIndex:99998,
+          borderRadius: window.innerWidth <= 480 ? 0 : 20,
+          overflow:'hidden',
           boxShadow:'0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)',
         }}>
 
-          {/* CHAT — fills container, always present, door sits on top */}
+          {/* CHAT — fills container, door sits on top */}
           <div style={{
             position:'absolute', inset:0,
             display:'flex', flexDirection:'column',
-            borderRadius:20, overflow:'hidden',
+            borderRadius: window.innerWidth <= 480 ? 0 : 20,
+            overflow:'hidden',
             background:'#FAFBFC',
           }}>
 
@@ -984,7 +959,7 @@ function InkanyeziBotWidget() {
           </div>
 
           {/* Messages */}
-          <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'#F5F7FA' }}>
+          <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'#F5F7FA', minHeight:0 }}>
             {messages.map((msg,i) => (
               <div key={i} className="ink-msg" style={{ display:'flex', justifyContent:msg.role==='user'?'flex-end':'flex-start', alignItems:'flex-end', gap:6, animationDelay:`${i*0.03}s` }}>
                 {msg.role==='assistant' && (
@@ -1051,7 +1026,8 @@ function InkanyeziBotWidget() {
           {showDoor && (
             <div key={openKey} style={{
               position:'absolute', inset:0, zIndex:10,
-              borderRadius:20, overflow:'hidden',
+              borderRadius: window.innerWidth <= 480 ? 0 : 20,
+              overflow:'hidden',
             }}>
               <DoorAnimationInline onComplete={() => {
                 setShowDoor(false);
