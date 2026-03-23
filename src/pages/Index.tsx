@@ -858,6 +858,7 @@ function InkanyeziBotWidget() {
   const [greetingVisible, setGreetingVisible] = useState(false);
   const [showDoor, setShowDoor]               = useState(false);
   const [openKey, setOpenKey]                 = useState(0);
+  const [isFullscreen, setIsFullscreen]       = useState(false);
 
   const hasTriggered = useRef(false);
   const messagesEnd  = useRef<HTMLDivElement>(null);
@@ -896,6 +897,7 @@ function InkanyeziBotWidget() {
 
     const doReset = () => {
       setIsOpen(false); setShowDoor(false); setShowGreeting(false); setGreetingVisible(false);
+      setIsFullscreen(false);
       setMessages([{ role:'assistant', content:"Sawubona! 👋 I'm InkanyeziBot — your AI guide to automation for South African businesses.\n\nBy chatting, you agree to our POPIA-compliant data policy.\n\nWhat does your business do, and what's the biggest challenge slowing you down right now?" }]);
       setInput(''); setShowLeadForm(false); setLeadFormSubmitted(false);
       setShowChips(true); setSessionContext(null);
@@ -960,18 +962,19 @@ function InkanyeziBotWidget() {
     if (isOpen) { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }
   }, [isOpen]);
 
-  // ── LEAD FORM TRIGGER — FIX: require name before showing form ────────
+  // ── LEAD FORM TRIGGER — shows after first user message ──────────────
+  // Strategy: form captures contact details early, then conversation
+  // continues using that context. No interrogation needed.
   useEffect(() => {
-    if (hasTriggered.current || leadFormSubmitted || !sessionContext || !sessionContext.name) return;
-    const userMsgs = messages.filter(m => m.role==='user');
-    const lastMsg  = userMsgs[userMsgs.length-1]?.content||'';
-    const { shouldShow } = scoreConversation(sessionContext, userMsgs.length, lastMsg);
-    if (shouldShow) { hasTriggered.current = true; setTimeout(() => setShowLeadForm(true), 1200); return; }
-    if (userMsgs.length >= 5 && !hasTriggered.current) {
+    if (hasTriggered.current || leadFormSubmitted) return;
+    const userMsgs = messages.filter(m => m.role === 'user');
+    // Show form after the bot has responded to the first user message
+    // i.e. when there are ≥1 user messages AND ≥2 total messages (bot replied)
+    if (userMsgs.length >= 1 && messages.length >= 2 && !isLoading) {
       hasTriggered.current = true;
-      setTimeout(() => setShowLeadForm(true), 1200);
+      setTimeout(() => setShowLeadForm(true), 800);
     }
-  }, [messages, sessionContext, leadFormSubmitted]);
+  }, [messages, leadFormSubmitted, isLoading]);
 
   const sendMessage = async (text?: string) => {
     const content = (text||input).trim();
@@ -1141,11 +1144,24 @@ function InkanyeziBotWidget() {
         )}
       </button>
 
-      {/* ── UNIFIED CONTAINER ── */}
+      {/* ── UNIFIED CONTAINER — supports fullscreen toggle ── */}
       {(showDoor || isOpen) && (
-        <div style={{ position:'fixed', bottom:100, right:24, width: 'min(370px, calc(100vw - 32px))', height:'min(580px, calc(100vh - 120px))', zIndex:99998, borderRadius:20, overflow:'hidden', boxShadow:'0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)' }}>
+        <div style={{
+          position: 'fixed',
+          bottom:   isFullscreen ? 0 : 100,
+          right:    isFullscreen ? 0 : 24,
+          left:     isFullscreen ? 0 : 'auto',
+          top:      isFullscreen ? 0 : 'auto',
+          width:    isFullscreen ? '100vw' : 'min(370px, calc(100vw - 32px))',
+          height:   isFullscreen ? '100vh' : 'min(580px, calc(100vh - 120px))',
+          zIndex: 99998,
+          borderRadius: isFullscreen ? 0 : 20,
+          overflow: 'hidden',
+          boxShadow: isFullscreen ? 'none' : '0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}>
 
-          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', borderRadius:20, overflow:'hidden', background:'#FAFBFC' }}>
+          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', borderRadius: isFullscreen ? 0 : 20, overflow:'hidden', background:'#FAFBFC' }}>
 
             {/* Header */}
             <div style={{ position:'relative', zIndex:2, flexShrink:0, background:'linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%)', borderBottom:'1px solid rgba(244,185,66,0.3)', boxShadow:'0 1px 8px rgba(0,0,0,0.06)', padding:'12px 16px', display:'flex', alignItems:'center', gap:12 }}>
@@ -1162,9 +1178,29 @@ function InkanyeziBotWidget() {
                   <SignalDot /><span>Online · AI Automation · Durban, ZA</span>
                 </div>
               </div>
-              <div style={{ textAlign:'right', flexShrink:0 }}>
-                <div style={{ fontSize:10, color:'rgba(100,80,20,0.5)', fontFamily:"'Space Mono',monospace" }}>🇿🇦 SA AI</div>
-                <HeritageStrip style={{ justifyContent:'flex-end', marginTop:3 }} />
+              {/* Right side — expand toggle + heritage strip */}
+              <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                {/* Fullscreen expand/collapse button */}
+                <button
+                  onClick={() => setIsFullscreen(f => !f)}
+                  title={isFullscreen ? 'Minimise' : 'Expand to fullscreen'}
+                  style={{
+                    width:28, height:28, borderRadius:6,
+                    background:'rgba(244,185,66,0.08)',
+                    border:'1px solid rgba(244,185,66,0.25)',
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    cursor:'pointer', fontSize:12, color:'#6B4F10',
+                    transition:'all 0.2s', flexShrink:0,
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.18)'; (e.currentTarget as HTMLButtonElement).style.borderColor='rgba(244,185,66,0.5)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.08)'; (e.currentTarget as HTMLButtonElement).style.borderColor='rgba(244,185,66,0.25)'; }}
+                >
+                  {isFullscreen ? '⊡' : '⤢'}
+                </button>
+                <div style={{ textAlign:'right' }}>
+                  <div style={{ fontSize:10, color:'rgba(100,80,20,0.5)', fontFamily:"'Space Mono',monospace" }}>🇿🇦 SA AI</div>
+                  <HeritageStrip style={{ justifyContent:'flex-end', marginTop:3 }} />
+                </div>
               </div>
             </div>
 
@@ -1175,7 +1211,7 @@ function InkanyeziBotWidget() {
                   {msg.role==='assistant' && (
                     <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, boxShadow:'0 0 8px rgba(249,115,22,0.4)' }}>⭐</div>
                   )}
-                  <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'#FFFFFF', color:'#1a1a2e', border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.3)', boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.25)':'0 1px 4px rgba(0,0,0,0.06)', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
+                  <div style={{ maxWidth: isFullscreen ? '60%' : '78%', padding:'10px 13px', borderRadius:14, fontSize: isFullscreen ? 15 : 13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'#FFFFFF', color:'#1a1a2e', border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.3)', boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.25)':'0 1px 4px rgba(0,0,0,0.06)', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
                     dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }} />
                 </div>
               ))}
