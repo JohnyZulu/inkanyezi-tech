@@ -14,7 +14,7 @@ import GlobalStarfield from "@/components/GlobalStarfield";
 import ShootingStars from "@/components/ShootingStars";
 
 // ════════════════════════════════════════════════════════════════════
-// DESIGN TOKENS — Afrofuturist Cosmos × SA Heritage × Dark Matter
+// DESIGN TOKENS
 // ════════════════════════════════════════════════════════════════════
 const C = {
   void:     '#04080F',
@@ -145,16 +145,38 @@ const SERVICES = [
   { value:'unsure',   label:'✦ Just exploring' },
 ];
 
-// ── LEAD FORM FIELD ──────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════
+// LEAD FORM — Corporate-Futuristic, Light Theme
+// Bright, clean, premium — distinct from the dark chat background
+// ════════════════════════════════════════════════════════════════════
+
 function LeadField({ label, name, type='text', placeholder, value, onChange, required }: any) {
   const [focused, setFocused] = useState(false);
   return (
     <div style={{ flex:1, minWidth:0 }}>
-      <label style={{ display:'block', fontSize:'0.56rem', letterSpacing:'0.14em', textTransform:'uppercase', fontFamily:"'Space Mono',monospace", color:focused?C.gold:'rgba(255,255,255,0.35)', marginBottom:'0.25rem', transition:'color 0.2s' }}>
-        {label}{required&&<span style={{color:C.orange}}> *</span>}
+      <label style={{
+        display:'block', fontSize:'0.58rem', letterSpacing:'0.16em',
+        textTransform:'uppercase', fontFamily:"'Space Mono',monospace",
+        color: focused ? '#1a1a2e' : '#6B7280',
+        marginBottom:'0.3rem', transition:'color 0.2s', fontWeight:600,
+      }}>
+        {label}{required && <span style={{ color: C.orange }}> *</span>}
       </label>
-      <input type={type} name={name} value={value} onChange={onChange} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)} placeholder={placeholder} required={required}
-        style={{ width:'100%', boxSizing:'border-box', background:focused?'rgba(244,185,66,0.05)':'rgba(255,255,255,0.03)', border:`1px solid ${focused?'rgba(244,185,66,0.45)':'rgba(255,255,255,0.08)'}`, borderRadius:'5px', padding:'0.48rem 0.65rem', color:'#fff', fontSize:'0.8rem', fontFamily:"'DM Sans',sans-serif", outline:'none', transition:'all 0.2s' }} />
+      <input
+        type={type} name={name} value={value} onChange={onChange}
+        onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
+        placeholder={placeholder} required={required}
+        style={{
+          width:'100%', boxSizing:'border-box',
+          background: focused ? '#FFFFFF' : '#F8F9FB',
+          border: `1.5px solid ${focused ? C.gold : '#E5E7EB'}`,
+          borderRadius:'8px', padding:'0.55rem 0.75rem',
+          color:'#111827', fontSize:'0.82rem',
+          fontFamily:"'DM Sans',sans-serif", outline:'none',
+          transition:'all 0.2s',
+          boxShadow: focused ? `0 0 0 3px rgba(244,185,66,0.15), 0 1px 4px rgba(0,0,0,0.06)` : '0 1px 2px rgba(0,0,0,0.04)',
+        }}
+      />
     </div>
   );
 }
@@ -163,105 +185,384 @@ function LeadSelect({ label, name, value, onChange, options, required }: any) {
   const [focused, setFocused] = useState(false);
   return (
     <div style={{ flex:1, minWidth:0, position:'relative' }}>
-      <label style={{ display:'block', fontSize:'0.56rem', letterSpacing:'0.14em', textTransform:'uppercase', fontFamily:"'Space Mono',monospace", color:focused?C.gold:'rgba(255,255,255,0.35)', marginBottom:'0.25rem', transition:'color 0.2s' }}>
-        {label}{required&&<span style={{color:C.orange}}> *</span>}
+      <label style={{
+        display:'block', fontSize:'0.58rem', letterSpacing:'0.16em',
+        textTransform:'uppercase', fontFamily:"'Space Mono',monospace",
+        color: focused ? '#1a1a2e' : '#6B7280',
+        marginBottom:'0.3rem', transition:'color 0.2s', fontWeight:600,
+      }}>
+        {label}{required && <span style={{ color: C.orange }}> *</span>}
       </label>
       <div style={{ position:'relative' }}>
-        <select name={name} value={value} onChange={onChange} required={required} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)}
-          style={{ width:'100%', appearance:'none', boxSizing:'border-box', background:'rgba(10,22,40,0.98)', border:`1px solid ${focused?'rgba(244,185,66,0.45)':'rgba(255,255,255,0.08)'}`, borderRadius:'5px', padding:'0.48rem 1.8rem 0.48rem 0.65rem', color:value?'#fff':'rgba(255,255,255,0.25)', fontSize:'0.8rem', fontFamily:"'DM Sans',sans-serif", outline:'none', cursor:'pointer', transition:'all 0.2s' }}>
-          <option value="" disabled style={{background:'#0A1628'}}>Select...</option>
-          {options.map((o: any) => <option key={o.value} value={o.value} style={{background:'#0A1628',color:'#fff'}}>{o.label}</option>)}
+        <select
+          name={name} value={value} onChange={onChange}
+          required={required}
+          onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
+          style={{
+            width:'100%', appearance:'none', boxSizing:'border-box',
+            background: focused ? '#FFFFFF' : '#F8F9FB',
+            border: `1.5px solid ${focused ? C.gold : '#E5E7EB'}`,
+            borderRadius:'8px', padding:'0.55rem 2rem 0.55rem 0.75rem',
+            color: value ? '#111827' : '#9CA3AF',
+            fontSize:'0.82rem', fontFamily:"'DM Sans',sans-serif",
+            outline:'none', cursor:'pointer', transition:'all 0.2s',
+            boxShadow: focused ? `0 0 0 3px rgba(244,185,66,0.15), 0 1px 4px rgba(0,0,0,0.06)` : '0 1px 2px rgba(0,0,0,0.04)',
+          }}>
+          <option value="" disabled style={{ color:'#9CA3AF' }}>Select...</option>
+          {options.map((o: any) => (
+            <option key={o.value} value={o.value} style={{ color:'#111827', background:'#fff' }}>{o.label}</option>
+          ))}
         </select>
-        <span style={{ position:'absolute', right:'0.55rem', top:'50%', transform:'translateY(-50%)', fontSize:'0.5rem', color:'rgba(255,255,255,0.3)', pointerEvents:'none' }}>▼</span>
+        <span style={{
+          position:'absolute', right:'0.65rem', top:'50%',
+          transform:'translateY(-50%)', fontSize:'0.55rem',
+          color: focused ? C.gold : '#9CA3AF', pointerEvents:'none',
+          transition:'color 0.2s',
+        }}>▼</span>
       </div>
     </div>
   );
 }
 
+// ── STEP INDICATOR ───────────────────────────────────────────────────
+function StepDot({ active, done }: { active: boolean; done: boolean }) {
+  return (
+    <div style={{
+      width: 8, height: 8, borderRadius: '50%',
+      background: done ? C.gold : active ? C.orange : '#E5E7EB',
+      transition: 'all 0.3s',
+      boxShadow: active ? `0 0 8px ${C.orange}60` : done ? `0 0 6px ${C.gold}60` : 'none',
+    }} />
+  );
+}
+
 // ── CHAT LEAD FORM ───────────────────────────────────────────────────
 function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting }: any) {
-  const [submitted, setSubmitted] = useState(false);
-  const [consent, setConsent] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const [form, setForm] = useState({ name:'', email:'', phone:'', company:'', industry:'', service_interest:'', message:'' });
+  const [submitted, setSubmitted]   = useState(false);
+  const [consent, setConsent]       = useState(false);
+  const [visible, setVisible]       = useState(false);
+  const [step, setStep]             = useState(0); // 0 = contact, 1 = business, 2 = consent+submit
+  const [form, setForm] = useState({
+    name:'', email:'', phone:'', company:'', industry:'', service_interest:'', message:''
+  });
+
   useEffect(() => { setTimeout(() => setVisible(true), 60); }, []);
   useEffect(() => {
-    setForm(f => ({ ...f,
-      name:    f.name    || sessionContext?.name     || '',
-      email:   f.email   || sessionContext?.email    || '',
-      phone:   f.phone   || sessionContext?.whatsapp || '',
-      company: f.company || sessionContext?.business || '',
-      industry:f.industry|| sessionContext?.industry || '',
-      message: f.message || sessionContext?.pain_point || '',
+    setForm(f => ({
+      ...f,
+      name:    f.name    || sessionContext?.name      || '',
+      email:   f.email   || sessionContext?.email     || '',
+      phone:   f.phone   || sessionContext?.whatsapp  || '',
+      company: f.company || sessionContext?.business  || '',
+      industry:f.industry|| sessionContext?.industry  || '',
+      message: f.message || sessionContext?.pain_point|| '',
     }));
   }, [sessionContext]);
+
   const handle = (e: any) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+
   const submit = async (e: any) => {
-    e.preventDefault(); if (!consent) return;
+    e.preventDefault();
+    if (!consent) return;
     const r = await onSubmit?.(form);
     if (r?.success !== false) setSubmitted(true);
   };
+
+  const canNext0 = form.name.trim() !== '' && form.email.trim() !== '';
+  const canNext1 = form.industry !== '';
+
+  // Auto-advance step based on pre-filled context
+  useEffect(() => {
+    if (sessionContext?.name && sessionContext?.email && step === 0) {
+      setStep(1);
+    }
+  }, []);
+
   return (
-    <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-start', opacity:visible?1:0, transform:visible?'translateY(0)':'translateY(12px)', transition:'opacity 0.45s ease, transform 0.45s ease' }}>
-      <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'5px' }}>
+    <div style={{
+      display:'flex', flexDirection:'column', alignItems:'flex-start',
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'translateY(0)' : 'translateY(14px)',
+      transition: 'opacity 0.4s ease, transform 0.4s ease',
+    }}>
+      {/* Bot avatar row */}
+      <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'6px' }}>
         <div style={{ width:20, height:20, borderRadius:'50%', background:`linear-gradient(135deg, ${C.gold}, ${C.orange})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.6rem', color:C.midnight }}>✦</div>
-        <span style={{ fontSize:'0.58rem', color:'rgba(255,255,255,0.28)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.08em' }}>InkanyeziBot</span>
+        <span style={{ fontSize:'0.58rem', color:'rgba(100,110,130,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.08em' }}>InkanyeziBot</span>
       </div>
-      <div style={{ width:'100%', position:'relative', overflow:'hidden', background:'linear-gradient(145deg, rgba(10,22,40,0.96), rgba(4,8,15,0.98))', border:'1px solid rgba(244,185,66,0.18)', borderRadius:'14px', borderTopLeftRadius:'3px', boxShadow:'0 8px 32px rgba(0,0,0,0.6)' }}>
-        <CosmosCanvas width={340} height={280} />
-        <div style={{ height:'2px', position:'relative', zIndex:2, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`, backgroundSize:'200% 100%', animation:'shimmerBar 3s linear infinite' }} />
+
+      {/* Form card — bright light theme */}
+      <div style={{
+        width:'100%', position:'relative', overflow:'hidden',
+        background:'linear-gradient(160deg, #FFFFFF 0%, #F8F9FB 60%, #FFF8EE 100%)',
+        border:'1.5px solid rgba(244,185,66,0.35)',
+        borderRadius:'16px', borderTopLeftRadius:'4px',
+        boxShadow:'0 4px 24px rgba(244,185,66,0.12), 0 1px 4px rgba(0,0,0,0.08)',
+      }}>
+
+        {/* Top accent bar — animated gold-orange gradient */}
+        <div style={{
+          height:'3px', background:`linear-gradient(90deg, ${C.saGreen}, ${C.gold}, ${C.orange}, ${C.gold}, ${C.saGreen})`,
+          backgroundSize:'300% 100%', animation:'shimmerBar 4s linear infinite',
+        }} />
+
+        {/* Top-right decorative circuit mark */}
+        <div style={{
+          position:'absolute', top:10, right:12, opacity:0.08,
+          fontFamily:'monospace', fontSize:'0.55rem', color:'#1a1a2e',
+          letterSpacing:'0.05em', userSelect:'none',
+        }}>◈ INK-OS</div>
+
         {onDismiss && !submitted && (
-          <button onClick={onDismiss} style={{ position:'absolute', top:'0.55rem', right:'0.55rem', zIndex:10, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'4px', padding:'2px 6px', color:'rgba(255,255,255,0.3)', fontSize:'0.6rem', cursor:'pointer', fontFamily:"'Space Mono',monospace" }}>✕</button>
+          <button onClick={onDismiss} style={{
+            position:'absolute', top:'0.6rem', right:'0.6rem', zIndex:10,
+            background:'rgba(107,114,128,0.08)', border:'1px solid #E5E7EB',
+            borderRadius:'6px', padding:'3px 8px',
+            color:'#9CA3AF', fontSize:'0.62rem', cursor:'pointer',
+            fontFamily:"'Space Mono',monospace",
+            transition:'all 0.2s',
+          }}>✕</button>
         )}
-        <div style={{ padding:'0.9rem 1rem 1rem', position:'relative', zIndex:1 }}>
+
+        <div style={{ padding:'1rem 1.1rem 1.1rem' }}>
           {submitted ? (
-            <div style={{ textAlign:'center', padding:'0.75rem 0 0.25rem' }}>
-              <div style={{ width:44, height:44, borderRadius:'50%', margin:'0 auto 0.65rem', background:'rgba(244,185,66,0.1)', border:'1px solid rgba(244,185,66,0.3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.2rem' }}>✦</div>
-              <p style={{ fontFamily:"'Syne',sans-serif", fontSize:'1rem', fontWeight:800, color:'#fff', margin:'0 0 0.35rem', lineHeight:1.2 }}>
+            // ── SUCCESS STATE ─────────────────────────────────────
+            <div style={{ textAlign:'center', padding:'0.5rem 0 0.25rem' }}>
+              <div style={{
+                width:52, height:52, borderRadius:'50%', margin:'0 auto 0.75rem',
+                background:`linear-gradient(135deg, rgba(244,185,66,0.15), rgba(255,107,53,0.15))`,
+                border:`2px solid ${C.gold}`,
+                display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:'1.4rem',
+                boxShadow:`0 0 20px rgba(244,185,66,0.2)`,
+              }}>✦</div>
+              <p style={{
+                fontFamily:"'Syne',sans-serif", fontSize:'1.05rem',
+                fontWeight:800, color:'#111827', margin:'0 0 0.35rem', lineHeight:1.2,
+              }}>
                 Signal received,{' '}
-                <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>{form.name?.split(' ')[0]||'friend'}</span>
+                <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
+                  {form.name?.split(' ')[0] || 'friend'}
+                </span>
               </p>
-              <p style={{ fontSize:'0.75rem', color:'rgba(255,255,255,0.4)', margin:'0 0 0.75rem', lineHeight:1.55, fontFamily:"'DM Sans',sans-serif" }}>
-                {form.company ? `Sanele will reach out to ${form.company} within 24 hours.` : 'Sanele will be in touch within 24 hours.'}
+              <p style={{
+                fontSize:'0.78rem', color:'#6B7280', margin:'0 0 0.9rem',
+                lineHeight:1.6, fontFamily:"'DM Sans',sans-serif",
+              }}>
+                {form.company
+                  ? `Sanele will reach out to ${form.company} within 24 hours.`
+                  : 'Sanele will be in touch within 24 hours.'}
               </p>
+              {/* Ref number */}
+              {sessionContext?.referenceNumber && (
+                <div style={{
+                  display:'inline-block', background:'#F8F9FB',
+                  border:'1px solid #E5E7EB', borderRadius:'6px',
+                  padding:'4px 12px', marginBottom:'0.75rem',
+                  fontFamily:"'Space Mono',monospace", fontSize:'0.6rem',
+                  color:'#6B7280', letterSpacing:'0.08em',
+                }}>REF: {sessionContext.referenceNumber}</div>
+              )}
               <HeritageStrip style={{ justifyContent:'center' }} />
             </div>
           ) : (
             <>
-              <div style={{ marginBottom:'0.8rem' }}>
-                <div style={{ fontSize:'0.52rem', letterSpacing:'0.22em', textTransform:'uppercase', color:C.gold, fontFamily:"'Space Mono',monospace", marginBottom:'0.22rem' }}>✦ Inkanyezi Technologies</div>
-                <h3 style={{ margin:0, fontFamily:"'Syne',sans-serif", fontSize:'0.95rem', fontWeight:800, color:'#fff', lineHeight:1.2 }}>
+              {/* ── HEADER ─────────────────────────────────────────── */}
+              <div style={{ marginBottom:'0.9rem' }}>
+                <div style={{
+                  fontSize:'0.52rem', letterSpacing:'0.22em',
+                  textTransform:'uppercase', color:C.orange,
+                  fontFamily:"'Space Mono',monospace", marginBottom:'0.2rem', fontWeight:700,
+                }}>✦ Inkanyezi Technologies</div>
+                <h3 style={{
+                  margin:0, fontFamily:"'Syne',sans-serif",
+                  fontSize:'1rem', fontWeight:800, color:'#111827', lineHeight:1.2,
+                }}>
                   Let's make this{' '}
-                  <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>official</span>
-                </h3>
-                <p style={{ margin:'0.22rem 0 0', fontSize:'0.7rem', color:'rgba(255,255,255,0.35)', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif" }}>Sanele will personally follow up within 24 hours.</p>
-                <HeritageStrip style={{ marginTop:'0.5rem' }} />
-              </div>
-              <form onSubmit={submit}>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.48rem' }}>
-                  <LeadField label="Your Name" name="name" placeholder="e.g. Sipho" value={form.name} onChange={handle} required />
-                  <LeadField label="Business" name="company" placeholder="Company name" value={form.company} onChange={handle} />
-                </div>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.48rem' }}>
-                  <LeadField label="Email" name="email" type="email" placeholder="you@business.co.za" value={form.email} onChange={handle} required />
-                  <LeadField label="WhatsApp" name="phone" type="tel" placeholder="+27 82..." value={form.phone} onChange={handle} />
-                </div>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.48rem' }}>
-                  <LeadSelect label="Industry" name="industry" value={form.industry} onChange={handle} options={INDUSTRIES} required />
-                  <LeadSelect label="How we help" name="service_interest" value={form.service_interest} onChange={handle} options={SERVICES} required />
-                </div>
-                <label style={{ display:'flex', gap:'0.5rem', cursor:'pointer', alignItems:'flex-start', marginBottom:'0.65rem' }}>
-                  <div onClick={()=>setConsent(c=>!c)} style={{ width:14, height:14, flexShrink:0, marginTop:2, border:`1px solid ${consent?C.gold:'rgba(255,255,255,0.2)'}`, borderRadius:'3px', background:consent?'rgba(244,185,66,0.12)':'transparent', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', cursor:'pointer' }}>
-                    {consent && <span style={{ color:C.gold, fontSize:'9px', lineHeight:1 }}>✓</span>}
-                  </div>
-                  <span style={{ fontSize:'0.63rem', color:'rgba(255,255,255,0.32)', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif" }}>
-                    I consent to Inkanyezi Technologies contacting me per <span style={{color:C.gold}}>POPIA</span>. <span style={{color:C.orange}}>*</span>
+                  <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
+                    official
                   </span>
-                </label>
-                <button type="submit" disabled={submitting||!consent} style={{ width:'100%', padding:'0.6rem', background:submitting||!consent?'rgba(244,185,66,0.1)':`linear-gradient(90deg, ${C.gold}, ${C.orange})`, border:'none', borderRadius:'6px', color:submitting||!consent?'rgba(255,255,255,0.2)':C.midnight, fontFamily:"'Space Mono',monospace", fontSize:'0.65rem', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', cursor:submitting||!consent?'not-allowed':'pointer', transition:'all 0.25s' }}>
-                  {submitting ? 'Transmitting...' : '✦ Send My Details'}
-                </button>
-                <p style={{ textAlign:'center', fontSize:'0.56rem', color:'rgba(255,255,255,0.18)', margin:'0.5rem 0 0', fontFamily:"'Space Mono',monospace" }}>Durban, KZN 🇿🇦 · We are the signal in the noise.</p>
+                </h3>
+                <p style={{
+                  margin:'0.2rem 0 0', fontSize:'0.72rem',
+                  color:'#6B7280', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif",
+                }}>Sanele will personally follow up within 24 hours.</p>
+
+                {/* Step progress indicator */}
+                <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:'0.6rem' }}>
+                  <StepDot active={step===0} done={step>0} />
+                  <div style={{ height:'1px', flex:1, background: step>0 ? C.gold : '#E5E7EB', transition:'background 0.4s' }} />
+                  <StepDot active={step===1} done={step>1} />
+                  <div style={{ height:'1px', flex:1, background: step>1 ? C.gold : '#E5E7EB', transition:'background 0.4s' }} />
+                  <StepDot active={step===2} done={false} />
+                  <div style={{ marginLeft:4, fontSize:'0.55rem', color:'#9CA3AF', fontFamily:"'Space Mono',monospace" }}>
+                    {step===0 ? 'Contact' : step===1 ? 'Business' : 'Confirm'}
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={submit}>
+
+                {/* ── STEP 0 — Contact details ─────────────────── */}
+                {step === 0 && (
+                  <div style={{ animation:'stepSlide 0.3s ease' }}>
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.5rem' }}>
+                      <LeadField label="Your Name" name="name" placeholder="e.g. Sipho Dlamini" value={form.name} onChange={handle} required />
+                      <LeadField label="Company" name="company" placeholder="Company name" value={form.company} onChange={handle} />
+                    </div>
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.85rem' }}>
+                      <LeadField label="Email" name="email" type="email" placeholder="you@business.co.za" value={form.email} onChange={handle} required />
+                      <LeadField label="WhatsApp" name="phone" type="tel" placeholder="+27 82..." value={form.phone} onChange={handle} />
+                    </div>
+                    <button type="button" disabled={!canNext0} onClick={() => setStep(1)} style={{
+                      width:'100%', padding:'0.62rem',
+                      background: canNext0 ? `linear-gradient(90deg, ${C.gold}, ${C.orange})` : '#F3F4F6',
+                      border:'none', borderRadius:'8px',
+                      color: canNext0 ? C.midnight : '#D1D5DB',
+                      fontFamily:"'Space Mono',monospace", fontSize:'0.65rem',
+                      fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase',
+                      cursor: canNext0 ? 'pointer' : 'not-allowed',
+                      transition:'all 0.25s',
+                      boxShadow: canNext0 ? `0 4px 14px rgba(244,185,66,0.3)` : 'none',
+                    }}>
+                      Continue →
+                    </button>
+                  </div>
+                )}
+
+                {/* ── STEP 1 — Business details ────────────────── */}
+                {step === 1 && (
+                  <div style={{ animation:'stepSlide 0.3s ease' }}>
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.5rem' }}>
+                      <LeadSelect label="Industry" name="industry" value={form.industry} onChange={handle} options={INDUSTRIES} required />
+                      <LeadSelect label="How we help" name="service_interest" value={form.service_interest} onChange={handle} options={SERVICES} required />
+                    </div>
+                    {/* Optional message */}
+                    <div style={{ marginBottom:'0.85rem' }}>
+                      <label style={{
+                        display:'block', fontSize:'0.58rem', letterSpacing:'0.16em',
+                        textTransform:'uppercase', fontFamily:"'Space Mono',monospace",
+                        color:'#6B7280', marginBottom:'0.3rem', fontWeight:600,
+                      }}>Your Challenge <span style={{ color:'#D1D5DB', fontSize:'0.5rem' }}>(optional)</span></label>
+                      <textarea name="message" value={form.message} onChange={handle} rows={2}
+                        placeholder="What's the biggest bottleneck in your business right now?"
+                        style={{
+                          width:'100%', boxSizing:'border-box', resize:'none',
+                          background:'#F8F9FB', border:'1.5px solid #E5E7EB',
+                          borderRadius:'8px', padding:'0.55rem 0.75rem',
+                          color:'#111827', fontSize:'0.8rem',
+                          fontFamily:"'DM Sans',sans-serif", outline:'none',
+                          transition:'all 0.2s', lineHeight:1.5,
+                        }}
+                        onFocus={e => { e.target.style.borderColor = C.gold; e.target.style.boxShadow = `0 0 0 3px rgba(244,185,66,0.15)`; }}
+                        onBlur={e => { e.target.style.borderColor = '#E5E7EB'; e.target.style.boxShadow = 'none'; }}
+                      />
+                    </div>
+                    <div style={{ display:'flex', gap:'0.5rem' }}>
+                      <button type="button" onClick={() => setStep(0)} style={{
+                        flex:'0 0 auto', padding:'0.62rem 0.9rem',
+                        background:'#F8F9FB', border:'1.5px solid #E5E7EB',
+                        borderRadius:'8px', color:'#6B7280',
+                        fontFamily:"'Space Mono',monospace", fontSize:'0.6rem',
+                        fontWeight:700, cursor:'pointer', transition:'all 0.2s',
+                      }}>← Back</button>
+                      <button type="button" disabled={!canNext1} onClick={() => setStep(2)} style={{
+                        flex:1, padding:'0.62rem',
+                        background: canNext1 ? `linear-gradient(90deg, ${C.gold}, ${C.orange})` : '#F3F4F6',
+                        border:'none', borderRadius:'8px',
+                        color: canNext1 ? C.midnight : '#D1D5DB',
+                        fontFamily:"'Space Mono',monospace", fontSize:'0.65rem',
+                        fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase',
+                        cursor: canNext1 ? 'pointer' : 'not-allowed',
+                        transition:'all 0.25s',
+                        boxShadow: canNext1 ? `0 4px 14px rgba(244,185,66,0.3)` : 'none',
+                      }}>
+                        Review →
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* ── STEP 2 — Review + Consent + Submit ───────── */}
+                {step === 2 && (
+                  <div style={{ animation:'stepSlide 0.3s ease' }}>
+                    {/* Review card */}
+                    <div style={{
+                      background:'#F8F9FB', border:'1.5px solid #E5E7EB',
+                      borderRadius:'10px', padding:'0.7rem 0.85rem',
+                      marginBottom:'0.75rem',
+                    }}>
+                      <div style={{ fontSize:'0.56rem', letterSpacing:'0.14em', color:'#9CA3AF', fontFamily:"'Space Mono',monospace", textTransform:'uppercase', marginBottom:'0.5rem' }}>✦ Your Details</div>
+                      {[
+                        { label:'Name', val: form.name },
+                        { label:'Email', val: form.email },
+                        { label:'WhatsApp', val: form.phone || '—' },
+                        { label:'Company', val: form.company || '—' },
+                        { label:'Industry', val: INDUSTRIES.find(i => i.value === form.industry)?.label || form.industry || '—' },
+                        { label:'Service', val: SERVICES.find(s => s.value === form.service_interest)?.label || form.service_interest || '—' },
+                      ].map(({ label, val }) => (
+                        <div key={label} style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom:'0.22rem' }}>
+                          <span style={{ fontSize:'0.6rem', color:'#9CA3AF', fontFamily:"'Space Mono',monospace", minWidth:60 }}>{label}</span>
+                          <span style={{ fontSize:'0.75rem', color:'#111827', fontFamily:"'DM Sans',sans-serif", fontWeight:500, textAlign:'right', maxWidth:160, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{val}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* POPIA consent */}
+                    <label style={{ display:'flex', gap:'0.5rem', cursor:'pointer', alignItems:'flex-start', marginBottom:'0.75rem' }}>
+                      <div onClick={() => setConsent(c => !c)} style={{
+                        width:16, height:16, flexShrink:0, marginTop:1,
+                        border:`2px solid ${consent ? C.gold : '#D1D5DB'}`,
+                        borderRadius:'4px',
+                        background: consent ? `linear-gradient(135deg, ${C.gold}, ${C.orange})` : '#FFFFFF',
+                        display:'flex', alignItems:'center', justifyContent:'center',
+                        transition:'all 0.2s', cursor:'pointer',
+                        boxShadow: consent ? `0 0 8px rgba(244,185,66,0.35)` : 'none',
+                      }}>
+                        {consent && <span style={{ color:'#fff', fontSize:'9px', lineHeight:1, fontWeight:900 }}>✓</span>}
+                      </div>
+                      <span style={{ fontSize:'0.64rem', color:'#6B7280', lineHeight:1.55, fontFamily:"'DM Sans',sans-serif" }}>
+                        I consent to Inkanyezi Technologies contacting me in accordance with{' '}
+                        <span style={{ color: C.gold, fontWeight:600 }}>POPIA</span>. <span style={{ color:C.orange }}>*</span>
+                      </span>
+                    </label>
+
+                    <div style={{ display:'flex', gap:'0.5rem' }}>
+                      <button type="button" onClick={() => setStep(1)} style={{
+                        flex:'0 0 auto', padding:'0.62rem 0.9rem',
+                        background:'#F8F9FB', border:'1.5px solid #E5E7EB',
+                        borderRadius:'8px', color:'#6B7280',
+                        fontFamily:"'Space Mono',monospace", fontSize:'0.6rem',
+                        fontWeight:700, cursor:'pointer', transition:'all 0.2s',
+                      }}>← Edit</button>
+                      <button type="submit" disabled={submitting || !consent} style={{
+                        flex:1, padding:'0.62rem',
+                        background: submitting || !consent
+                          ? '#F3F4F6'
+                          : `linear-gradient(90deg, ${C.gold}, ${C.orange})`,
+                        border:'none', borderRadius:'8px',
+                        color: submitting || !consent ? '#D1D5DB' : C.midnight,
+                        fontFamily:"'Space Mono',monospace", fontSize:'0.65rem',
+                        fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase',
+                        cursor: submitting || !consent ? 'not-allowed' : 'pointer',
+                        transition:'all 0.25s',
+                        boxShadow: !submitting && consent ? `0 4px 14px rgba(244,185,66,0.35)` : 'none',
+                      }}>
+                        {submitting ? '⟳ Transmitting...' : '✦ Lock In Signal'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Bottom tagline */}
+                <p style={{
+                  textAlign:'center', fontSize:'0.54rem',
+                  color:'#D1D5DB', margin:'0.6rem 0 0',
+                  fontFamily:"'Space Mono',monospace",
+                  letterSpacing:'0.05em',
+                }}>
+                  Durban, KZN 🇿🇦 · We are the signal in the noise.
+                </p>
               </form>
             </>
           )}
@@ -271,20 +572,21 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting }: an
   );
 }
 
-// ── FORMAT MESSAGE ───────────────────────────────────────────────────
+// ── FORMAT MESSAGE — strips leaked JSON context ───────────────────────
 function formatMessage(text: string) {
   if (!text) return '';
-  return text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>');
+  // FIX: strip any leaked <context> or <response> tags from AI output
+  const clean = text
+    .replace(/<context>[\s\S]*?<\/context>/gi, '')
+    .replace(/<response>|<\/response>/gi, '')
+    .trim();
+  return clean
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br/>');
 }
 
 // ════════════════════════════════════════════════════════════════════
-// INKANYEZI DOOR — Gold × Orange Afrofuturist Cosmic Redesign
-// ▸ Zero blue — pure Inkanyezi brand palette
-// ▸ Kente-inspired diagonal weave texture
-// ▸ Warm amber radial glow from void background
-// ▸ Gold constellation grid + orange particle streams
-// ▸ Radial starburst from inner seam edge
-// ▸ Brain: 1200ms   Door slide: 500ms  (fast)
+// INKANYEZI DOOR — Pure tech, holographic, plasma energy
 // ════════════════════════════════════════════════════════════════════
 function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
   const leftRef  = useRef<HTMLCanvasElement>(null);
@@ -292,8 +594,8 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
   const brainRef = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase]     = useState<'brain'|'opening'>('brain');
   const [doorPct, setDoorPct] = useState(0);
-  const animRef = useRef<number>(0);
-  const tkRef   = useRef(0);
+  const animRef  = useRef<number>(0);
+  const tkRef    = useRef(0);
 
   const paintPanel = (canvas: HTMLCanvasElement, side: 'left'|'right', tk: number, op: number) => {
     const ctx = canvas.getContext('2d')!;
@@ -301,209 +603,171 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     const isL = side === 'left';
     ctx.clearRect(0, 0, W, H);
 
-    // Base — deep warm void, brown-black not navy
-    ctx.fillStyle = '#0E0A04';
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#0a1628'; ctx.fillRect(0,0,W,H);
+    const radial=ctx.createRadialGradient(W*0.5,H*0.5,0,W*0.5,H*0.5,W*0.9);
+    radial.addColorStop(0,'rgba(30,60,110,0.55)');
+    radial.addColorStop(0.6,'rgba(15,35,70,0.3)');
+    radial.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=radial; ctx.fillRect(0,0,W,H);
 
-    // Warm amber radial glow from centre
-    const radial = ctx.createRadialGradient(W*0.5, H*0.5, 0, W*0.5, H*0.5, W*1.1);
-    radial.addColorStop(0,   'rgba(244,185,66,0.22)');
-    radial.addColorStop(0.4, 'rgba(255,107,53,0.12)');
-    radial.addColorStop(0.8, 'rgba(180,80,20,0.05)');
-    radial.addColorStop(1,   'rgba(0,0,0,0)');
-    ctx.fillStyle = radial; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(120,180,255,0.14)'; ctx.lineWidth = 0.5;
+    for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
-    // Kente diagonal weave — gold stripes
-    ctx.save();
-    ctx.strokeStyle = 'rgba(244,185,66,0.09)'; ctx.lineWidth = 1;
-    for (let d = -H; d < W + H; d += 18) {
-      ctx.beginPath(); ctx.moveTo(d, 0); ctx.lineTo(d + H, H); ctx.stroke();
-    }
-    // Orange counter-diagonal
-    ctx.strokeStyle = 'rgba(255,107,53,0.055)';
-    for (let d = -H; d < W + H; d += 36) {
-      ctx.beginPath(); ctx.moveTo(d + H, 0); ctx.lineTo(d, H); ctx.stroke();
-    }
-    ctx.restore();
+    ctx.strokeStyle = 'rgba(120,180,255,0.08)'; ctx.lineWidth = 1;
+    for(let x=0;x<W;x+=100){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=100){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
-    // Constellation dot grid — warm gold
-    ctx.fillStyle = 'rgba(244,185,66,0.11)';
-    for (let x = 10; x < W; x += 22) {
-      for (let y = 10; y < H; y += 22) {
-        ctx.beginPath(); ctx.arc(x, y, 0.8, 0, Math.PI*2); ctx.fill();
+    const hr = 15, hw = hr*Math.sqrt(3);
+    ctx.strokeStyle = 'rgba(244,185,66,0.14)'; ctx.lineWidth = 0.7;
+    for(let row=-1;row<H/(hr*1.5)+1;row++){
+      for(let col=-1;col<W/hw+1;col++){
+        const cx=col*hw+(row%2===0?0:hw/2), cy=row*hr*1.5;
+        ctx.beginPath();
+        for(let i=0;i<6;i++){const a=(Math.PI/3)*i-Math.PI/6;ctx.lineTo(cx+hr*Math.cos(a),cy+hr*Math.sin(a));}
+        ctx.closePath(); ctx.stroke();
       }
     }
 
-    // Horizontal circuit pulse traces
-    [H*0.12, H*0.28, H*0.5, H*0.72, H*0.88].forEach((y, i) => {
-      const p = 0.4 + 0.5 * Math.sin(tk*2.2 + i*1.4);
-      ctx.strokeStyle = `rgba(244,185,66,${0.20 + p*0.30})`; ctx.lineWidth = 1;
+    const cols = isL ? [W*0.18,W*0.38,W*0.62,W*0.82] : [W*0.18,W*0.38,W*0.62,W*0.82];
+    cols.forEach((sx,ci) => {
+      const chars=['01','10','AI','∑','λ','π','∞','⟨⟩','11','00','NN','ML'];
+      for(let i=0;i<7;i++){
+        const yPos=((tk*55*(0.7+ci*0.2)+i*(H/7))%H);
+        const alpha=(0.08+0.1*Math.sin(tk+i+ci*2))*Math.max(0,1-op*2);
+        ctx.fillStyle=`rgba(140,200,255,${alpha})`;
+        ctx.font=`${7+i%2}px monospace`; ctx.textAlign='center';
+        ctx.fillText(chars[(Math.floor(tk*2+i+ci*5))%chars.length],sx,yPos);
+      }
+    });
+
+    [H*0.15,H*0.3,H*0.5,H*0.7,H*0.85].forEach((y,i)=>{
+      const p=0.4+0.5*Math.sin(tk*2+i*1.3);
+      ctx.strokeStyle=`rgba(244,185,66,${0.18+p*0.22})`; ctx.lineWidth=1;
       ctx.beginPath();
-      const mid = W/2;
-      ctx.moveTo(0, y);
-      ctx.lineTo(mid-28, y); ctx.lineTo(mid-16, y-8);
-      ctx.lineTo(mid+16, y-8); ctx.lineTo(mid+28, y);
-      ctx.lineTo(W, y); ctx.stroke();
-      [W*0.12, mid, W*0.88].forEach(nx => {
-        const ng = ctx.createRadialGradient(nx, y, 0, nx, y, 5);
-        ng.addColorStop(0, `rgba(255,107,53,${0.5 + p*0.5})`);
-        ng.addColorStop(1, 'rgba(255,107,53,0)');
-        ctx.beginPath(); ctx.arc(nx, y, 5, 0, Math.PI*2); ctx.fillStyle = ng; ctx.fill();
-        ctx.beginPath(); ctx.arc(nx, y, 2, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(255,210,100,${0.6 + p*0.4})`; ctx.fill();
+      const mid=W/2;
+      ctx.moveTo(0,y);
+      ctx.lineTo(mid-30,y); ctx.lineTo(mid-18,y-9); ctx.lineTo(mid+18,y-9); ctx.lineTo(mid+30,y);
+      ctx.lineTo(W,y); ctx.stroke();
+      [W*0.1, mid, W*0.9].forEach(nx=>{
+        ctx.beginPath(); ctx.arc(nx,y,2,0,Math.PI*2);
+        ctx.fillStyle=`rgba(244,185,66,${0.35+p*0.55})`; ctx.fill();
       });
     });
 
-    // Falling warm gold particles (replaces blue streams)
-    [W*0.15, W*0.35, W*0.65, W*0.85].forEach((sx, ci) => {
-      for (let i = 0; i < 6; i++) {
-        const yPos = ((tk*48*(0.6+ci*0.15) + i*(H/6)) % H);
-        const alpha = (0.12 + 0.1*Math.sin(tk+i+ci*2)) * Math.max(0, 1 - op*2);
-        if (alpha <= 0) continue;
-        const pg = ctx.createRadialGradient(sx, yPos, 0, sx, yPos, 4);
-        pg.addColorStop(0, `rgba(255,200,80,${alpha*2})`);
-        pg.addColorStop(1, 'rgba(255,140,40,0)');
-        ctx.beginPath(); ctx.arc(sx, yPos, 4, 0, Math.PI*2); ctx.fillStyle = pg; ctx.fill();
-      }
-    });
+    const scanY=((tk*40)%(H+80))-40;
+    const sg=ctx.createLinearGradient(0,scanY-25,0,scanY+25);
+    sg.addColorStop(0,'rgba(100,160,255,0)');
+    sg.addColorStop(0.4,`rgba(100,200,255,${0.05+op*0.03})`);
+    sg.addColorStop(0.5,`rgba(180,220,255,${0.18+op*0.1})`);
+    sg.addColorStop(0.6,`rgba(100,200,255,${0.05+op*0.03})`);
+    sg.addColorStop(1,'rgba(100,160,255,0)');
+    ctx.fillStyle=sg; ctx.fillRect(0,scanY-25,W,50);
 
-    // Radial starburst from inner seam
-    const seamX = isL ? W : 0;
-    for (let r = 0; r < 8; r++) {
-      const angle = (Math.PI/2) + (r - 4) * (Math.PI/8) * 0.7;
-      const rayLen = 55 + 35*Math.sin(tk*1.5 + r*0.8);
-      const rayAlpha = (0.07 + 0.05*Math.sin(tk*2 + r)) * (1 - op*1.5);
-      if (rayAlpha <= 0) continue;
-      const endX = seamX + (isL ? -1 : 1) * rayLen * Math.cos(angle);
-      const endY = H*0.5 + rayLen * Math.sin(angle);
-      const rg = ctx.createLinearGradient(seamX, H*0.5, endX, endY);
-      rg.addColorStop(0, `rgba(255,107,53,${rayAlpha*2})`);
-      rg.addColorStop(1, 'rgba(244,185,66,0)');
-      ctx.strokeStyle = rg; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.moveTo(seamX, H*0.5); ctx.lineTo(endX, endY); ctx.stroke();
-    }
-
-    // Amber scan sweep
-    const scanY = ((tk*38) % (H+80)) - 40;
-    const sg = ctx.createLinearGradient(0, scanY-20, 0, scanY+20);
-    sg.addColorStop(0,   'rgba(244,185,66,0)');
-    sg.addColorStop(0.5, `rgba(255,220,100,${0.14 + op*0.05})`);
-    sg.addColorStop(1,   'rgba(244,185,66,0)');
-    ctx.fillStyle = sg; ctx.fillRect(0, scanY-20, W, 40);
-
-    // Plasma seam conduit — gold-to-orange vertical glow
-    const conduitAlpha = Math.max(0, 1 - op*3);
+    const conduitAlpha = Math.max(0, 1 - op * 3);
     if (conduitAlpha > 0) {
-      const cg = ctx.createLinearGradient(0, 0, 0, H);
-      cg.addColorStop(0,   'rgba(244,185,66,0)');
-      cg.addColorStop(0.2, `rgba(244,185,66,${0.55*conduitAlpha})`);
-      cg.addColorStop(0.5, `rgba(255,107,53,${0.9*conduitAlpha})`);
-      cg.addColorStop(0.8, `rgba(244,185,66,${0.55*conduitAlpha})`);
-      cg.addColorStop(1,   'rgba(244,185,66,0)');
-      ctx.fillStyle = cg; ctx.fillRect(isL ? W-3 : 0, 0, 3, H);
+      const cg=ctx.createLinearGradient(0,0,0,H);
+      cg.addColorStop(0,'rgba(244,185,66,0)');
+      cg.addColorStop(0.25,`rgba(244,185,66,${0.6*conduitAlpha})`);
+      cg.addColorStop(0.5,`rgba(255,140,60,${0.8*conduitAlpha})`);
+      cg.addColorStop(0.75,`rgba(244,185,66,${0.5*conduitAlpha})`);
+      cg.addColorStop(1,'rgba(244,185,66,0)');
+      ctx.fillStyle=cg; ctx.fillRect(isL?W-4:0,0,4,H);
     }
 
-    // Edge warm bloom
-    const bloomAlpha = Math.max(0, 1 - op*2.5);
-    const eg = ctx.createLinearGradient(isL ? W : 0, 0, isL ? W-70 : 70, 0);
-    eg.addColorStop(0, `rgba(255,107,53,${(0.18+op*0.25)*bloomAlpha})`);
-    eg.addColorStop(0.5, `rgba(244,185,66,${(0.08+op*0.1)*bloomAlpha})`);
-    eg.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = eg; ctx.fillRect(isL ? W-70 : 0, 0, 70, H);
+    const bloomAlpha = Math.max(0, 1 - op * 2.5);
+    const eg=ctx.createLinearGradient(isL?W:0,0,isL?W-80:80,0);
+    eg.addColorStop(0,`rgba(255,107,53,${(0.12+op*0.3)*bloomAlpha})`);
+    eg.addColorStop(0.5,`rgba(244,185,66,${(0.05+op*0.1)*bloomAlpha})`);
+    eg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=eg; ctx.fillRect(isL?W-80:0,0,80,H);
 
-    // Gold frame
-    ctx.strokeStyle = 'rgba(244,185,66,0.5)'; ctx.lineWidth = 1;
-    ctx.strokeRect(5, 5, W-10, H-10);
-    ctx.strokeStyle = 'rgba(255,107,53,0.14)'; ctx.lineWidth = 0.5;
-    ctx.strokeRect(10, 10, W-20, H-20);
+    ctx.strokeStyle='rgba(244,185,66,0.35)'; ctx.lineWidth=1;
+    ctx.strokeRect(5,5,W-10,H-10);
+    ctx.strokeStyle='rgba(100,160,255,0.08)'; ctx.lineWidth=0.5;
+    ctx.strokeRect(11,11,W-22,H-22);
 
-    // Corner brackets with orange accent dots
-    const b = 16;
-    [[5,5],[5,H-5],[W-5,5],[W-5,H-5]].forEach(([bx,by]) => {
-      const mx = bx > W/2 ? -b : b, my = by > H/2 ? -b : b;
-      ctx.strokeStyle = 'rgba(244,185,66,0.9)'; ctx.lineWidth = 2.5;
+    const b=18;
+    [[5,5],[5,H-5],[W-5,5],[W-5,H-5]].forEach(([bx,by])=>{
+      ctx.strokeStyle='rgba(244,185,66,0.75)'; ctx.lineWidth=2;
+      const mx=bx>W/2?-b:b, my=by>H/2?-b:b;
       ctx.beginPath(); ctx.moveTo(bx+mx,by); ctx.lineTo(bx,by); ctx.lineTo(bx,by+my); ctx.stroke();
-      ctx.beginPath(); ctx.arc(bx, by, 2.5, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba(255,107,53,0.85)'; ctx.fill();
     });
 
-    // SA flag strip at bottom
-    ctx.fillStyle='#007A4D'; ctx.fillRect(0,     H-4, W*0.2, 4);
-    ctx.fillStyle='#FFB612'; ctx.fillRect(W*0.2, H-4, W*0.2, 4);
-    ctx.fillStyle='#DE3831'; ctx.fillRect(W*0.4, H-4, W*0.2, 4);
-    ctx.fillStyle='#002395'; ctx.fillRect(W*0.6, H-4, W*0.2, 4);
-    ctx.fillStyle='#FFFFFF'; ctx.fillRect(W*0.8, H-4, W*0.2, 4);
+    ctx.font='7px monospace'; ctx.textAlign='center';
+    ctx.fillStyle=`rgba(140,190,255,${0.5+0.15*Math.sin(tk*4)})`;
+    ctx.fillText(isL?'◈ INK-L':'◈ INK-R',W/2,H-16);
+    ctx.fillStyle='rgba(244,185,66,0.45)';
+    ctx.fillText(isL?'UNIT·ALPHA':'UNIT·SIGMA',W/2,H-8);
 
-    // Panel ID
-    ctx.font = '7px monospace'; ctx.textAlign = 'center';
-    ctx.fillStyle = `rgba(255,200,80,${0.45 + 0.15*Math.sin(tk*4)})`;
-    ctx.fillText(isL ? '◈ INK-L' : '◈ INK-R', W/2, H-20);
-    ctx.fillStyle = 'rgba(255,107,53,0.5)';
-    ctx.fillText(isL ? 'UNIT·ALPHA' : 'UNIT·SIGMA', W/2, H-12);
-
-    // Opening flash letters A / I
-    if (op > 0) {
+    if(op > 0) {
       const letter = isL ? 'A' : 'I';
-      const lx = isL ? W*0.75 : W*0.25, ly = H*0.5;
-      const letterAlpha = Math.min(op*3,1) * Math.max(0, 1-op*1.2);
-      if (letterAlpha > 0) {
-        const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, 52);
-        lg.addColorStop(0,   `rgba(255,200,80,${letterAlpha*0.3})`);
-        lg.addColorStop(0.5, `rgba(255,107,53,${letterAlpha*0.12})`);
-        lg.addColorStop(1,   'rgba(0,0,0,0)');
-        ctx.beginPath(); ctx.arc(lx, ly, 52, 0, Math.PI*2); ctx.fillStyle = lg; ctx.fill();
+      const lx = isL ? W * 0.78 : W * 0.22;
+      const ly = H * 0.5;
+      const letterAlpha = Math.min(op * 3, 1) * Math.max(0, 1 - op * 1.2);
+      if(letterAlpha > 0) {
+        const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, 55);
+        lg.addColorStop(0, `rgba(244,185,66,${letterAlpha * 0.25})`);
+        lg.addColorStop(0.5, `rgba(255,107,53,${letterAlpha * 0.1})`);
+        lg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(lx, ly, 55, 0, Math.PI*2);
+        ctx.fillStyle = lg; ctx.fill();
         ctx.save();
-        ctx.font = 'bold 70px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.shadowColor = '#F4B942'; ctx.shadowBlur = 24*letterAlpha;
-        ctx.fillStyle = `rgba(255,220,120,${letterAlpha})`;
-        ctx.fillText(letter, lx, ly); ctx.restore();
-        const uw = letter==='I' ? 26 : 42;
-        const ug = ctx.createLinearGradient(lx-uw/2, ly+42, lx+uw/2, ly+42);
+        ctx.font = 'bold 72px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = '#F4B942';
+        ctx.shadowBlur = 20 * letterAlpha;
+        ctx.fillStyle = `rgba(255,255,255,${letterAlpha})`;
+        ctx.fillText(letter, lx, ly);
+        ctx.restore();
+        const uw = letter === 'I' ? 28 : 44;
+        const ug = ctx.createLinearGradient(lx-uw/2, ly+44, lx+uw/2, ly+44);
         ug.addColorStop(0, 'rgba(244,185,66,0)');
-        ug.addColorStop(0.5, `rgba(244,185,66,${letterAlpha*0.85})`);
+        ug.addColorStop(0.5, `rgba(244,185,66,${letterAlpha * 0.8})`);
         ug.addColorStop(1, 'rgba(244,185,66,0)');
-        ctx.fillStyle = ug; ctx.fillRect(lx-uw/2, ly+36, uw, 2);
+        ctx.fillStyle = ug; ctx.fillRect(lx-uw/2, ly+38, uw, 2);
       }
     }
   };
 
-  useEffect(() => {
-    let raf: number;
-    const loop = () => {
-      tkRef.current += 0.022;
-      const op = phase === 'opening' ? doorPct : 0;
-      if (leftRef.current)  paintPanel(leftRef.current,  'left',  tkRef.current, op);
-      if (rightRef.current) paintPanel(rightRef.current, 'right', tkRef.current, op);
-      raf = requestAnimationFrame(loop);
+  useEffect(()=>{
+    let raf:number;
+    const loop=()=>{
+      tkRef.current+=0.022;
+      const op=phase==='opening'?doorPct:0;
+      if(leftRef.current) paintPanel(leftRef.current,'left',tkRef.current,op);
+      if(rightRef.current) paintPanel(rightRef.current,'right',tkRef.current,op);
+      raf=requestAnimationFrame(loop);
     };
-    loop(); return () => cancelAnimationFrame(raf);
-  }, [phase, doorPct]);
+    loop(); return ()=>cancelAnimationFrame(raf);
+  },[phase,doorPct]);
 
-  useEffect(() => {
-    const canvas = brainRef.current; if (!canvas) return;
-    const ctx = canvas.getContext('2d')!;
-    const W = 280, H = 220; canvas.width = W; canvas.height = H;
-    const CX = W/2, CY = H/2-10;
-    const Ln = [{x:CX-52,y:CY-62},{x:CX-82,y:CY-32},{x:CX-88,y:CY+5},{x:CX-74,y:CY+40},{x:CX-48,y:CY+58},{x:CX-28,y:CY-28},{x:CX-38,y:CY+14},{x:CX-18,y:CY-55}];
-    const Rn = [{x:CX+52,y:CY-62},{x:CX+82,y:CY-32},{x:CX+88,y:CY+5},{x:CX+74,y:CY+40},{x:CX+48,y:CY+58},{x:CX+28,y:CY-28},{x:CX+38,y:CY+14},{x:CX+18,y:CY-55}];
-    const all = [...Ln,...Rn];
-    const cs = [[0,5],[5,7],[7,0],[1,2],[2,3],[3,4],[4,6],[5,6],[8,13],[13,15],[15,8],[9,10],[10,11],[11,12],[12,14],[13,14],[5,13],[6,14]];
-    const ps: {a:number;b:number;t:number;s:number}[] = [];
-    const seed = () => { const c = cs[Math.floor(Math.random()*cs.length)]; ps.push({a:c[0],b:c[1],t:0,s:0.022+Math.random()*0.025}); };
-    for (let i=0;i<9;i++) seed();
-    let tk=0; let raf2: number;
-    const draw = () => {
-      ctx.clearRect(0,0,W,H); tk += 0.025;
-      const ag = ctx.createRadialGradient(CX,CY,0,CX,CY,100);
-      ag.addColorStop(0,'rgba(244,185,66,0.1)'); ag.addColorStop(1,'rgba(0,0,0,0)');
+  useEffect(()=>{
+    const canvas=brainRef.current; if(!canvas) return;
+    const ctx=canvas.getContext('2d')!;
+    const W=280,H=220; canvas.width=W; canvas.height=H;
+    const CX=W/2,CY=H/2-10;
+    const Ln=[{x:CX-52,y:CY-62},{x:CX-82,y:CY-32},{x:CX-88,y:CY+5},{x:CX-74,y:CY+40},{x:CX-48,y:CY+58},{x:CX-28,y:CY-28},{x:CX-38,y:CY+14},{x:CX-18,y:CY-55}];
+    const Rn=[{x:CX+52,y:CY-62},{x:CX+82,y:CY-32},{x:CX+88,y:CY+5},{x:CX+74,y:CY+40},{x:CX+48,y:CY+58},{x:CX+28,y:CY-28},{x:CX+38,y:CY+14},{x:CX+18,y:CY-55}];
+    const all=[...Ln,...Rn];
+    const cs=[[0,5],[5,7],[7,0],[1,2],[2,3],[3,4],[4,6],[5,6],[8,13],[13,15],[15,8],[9,10],[10,11],[11,12],[12,14],[13,14],[5,13],[6,14]];
+    const ps:{a:number;b:number;t:number;s:number}[]=[];
+    const seed=()=>{const c=cs[Math.floor(Math.random()*cs.length)];ps.push({a:c[0],b:c[1],t:0,s:0.022+Math.random()*0.025});};
+    for(let i=0;i<9;i++) seed();
+    let tk=0; let raf2:number;
+    const draw=()=>{
+      ctx.clearRect(0,0,W,H); tk+=0.025;
+      const ag=ctx.createRadialGradient(CX,CY,0,CX,CY,100);
+      ag.addColorStop(0,'rgba(244,185,66,0.07)'); ag.addColorStop(1,'rgba(0,0,0,0)');
       ctx.fillStyle=ag; ctx.fillRect(0,0,W,H);
       cs.forEach(([a,b])=>{
         ctx.beginPath(); ctx.moveTo(all[a].x,all[a].y); ctx.lineTo(all[b].x,all[b].y);
-        ctx.strokeStyle='rgba(244,185,66,0.22)'; ctx.lineWidth=0.8; ctx.stroke();
+        ctx.strokeStyle='rgba(244,185,66,0.18)'; ctx.lineWidth=0.8; ctx.stroke();
       });
       ctx.beginPath(); ctx.moveTo(CX,CY-78); ctx.lineTo(CX,CY+68);
-      ctx.strokeStyle='rgba(255,107,53,0.15)'; ctx.lineWidth=1.5; ctx.stroke();
-      for (let i=ps.length-1;i>=0;i--){
+      ctx.strokeStyle='rgba(244,185,66,0.1)'; ctx.lineWidth=1.5; ctx.stroke();
+      for(let i=ps.length-1;i>=0;i--){
         const p=ps[i]; p.t+=p.s;
         if(p.t>=1){ps.splice(i,1);seed();continue;}
         const n1=all[p.a],n2=all[p.b]; if(!n1||!n2) continue;
@@ -511,7 +775,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
         const pg=ctx.createRadialGradient(px,py,0,px,py,9);
         pg.addColorStop(0,'#F4B942'); pg.addColorStop(1,'rgba(0,0,0,0)');
         ctx.beginPath(); ctx.arc(px,py,9,0,Math.PI*2); ctx.fillStyle=pg; ctx.fill();
-        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2); ctx.fillStyle='#FF6B35'; ctx.fill();
+        ctx.beginPath(); ctx.arc(px,py,2.5,0,Math.PI*2); ctx.fillStyle='#F4B942'; ctx.fill();
       }
       all.forEach((n,i)=>{
         const pls=0.4+0.5*Math.sin(tk*2.5+i*0.85);
@@ -519,7 +783,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
         ng.addColorStop(0,`rgba(244,185,66,${pls*0.85})`); ng.addColorStop(1,'rgba(0,0,0,0)');
         ctx.beginPath(); ctx.arc(n.x,n.y,7,0,Math.PI*2); ctx.fillStyle=ng; ctx.fill();
         ctx.beginPath(); ctx.arc(n.x,n.y,2.8,0,Math.PI*2);
-        ctx.fillStyle=`rgba(255,200,100,${0.7+pls*0.3})`; ctx.fill();
+        ctx.fillStyle=`rgba(255,220,120,${0.7+pls*0.3})`; ctx.fill();
       });
       ctx.save();
       ctx.shadowColor='#F4B942'; ctx.shadowBlur=20+7*Math.sin(tk);
@@ -527,34 +791,33 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       ctx.fillStyle=`rgba(255,255,255,${0.82+0.18*Math.sin(tk*1.5)})`;
       ctx.fillText('AI',CX,CY+4); ctx.restore();
       ctx.font='9px monospace'; ctx.textAlign='center';
-      ctx.fillStyle='rgba(244,185,66,0.55)';
+      ctx.fillStyle='rgba(244,185,66,0.5)';
       const bar='▮'.repeat((Math.floor(tk*4)%4)+1);
       ctx.fillText(`INKANYEZI OS  ${bar}`,CX,CY+82);
       raf2=requestAnimationFrame(draw);
     };
     draw();
-    const t=setTimeout(()=>{cancelAnimationFrame(raf2);setPhase('opening');},1200);
+    const t=setTimeout(()=>{cancelAnimationFrame(raf2);setPhase('opening');},2500);
     return ()=>{cancelAnimationFrame(raf2);clearTimeout(t);};
   },[]);
 
   useEffect(()=>{
     if(phase!=='opening') return;
-    const dur=500,start=performance.now();
+    const dur=900,start=performance.now();
     const run=(now:number)=>{
       const p=Math.min((now-start)/dur,1);
       setDoorPct(1-Math.pow(1-p,3));
       if(p<1) animRef.current=requestAnimationFrame(run);
       else setTimeout(onComplete,60);
     };
-    animRef.current=requestAnimationFrame(run);
-    return ()=>cancelAnimationFrame(animRef.current);
+    animRef.current=requestAnimationFrame(run); return ()=>cancelAnimationFrame(animRef.current);
   },[phase,onComplete]);
 
   const slide=doorPct*52;
   const brainFade=phase==='brain'?1:Math.max(0,1-doorPct*2.2);
 
   return (
-    <div style={{position:'absolute',inset:0,display:'flex',overflow:'hidden',borderRadius:'inherit'}}>
+    <div style={{position:'absolute',inset:0,display:'flex',overflow:'hidden',borderRadius:20}}>
       <div style={{position:'absolute',top:0,left:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(-${slide}%)`,overflow:'hidden'}}>
         <canvas ref={leftRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
       </div>
@@ -569,40 +832,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
 }
 
 // ════════════════════════════════════════════════════════════════════
-// RESPONSIVE DIMENSIONS HOOK
-// FIX: Mobile = contained floating card (NOT full-screen)
-//   - Width:  viewport width minus 24px margins = snug but not edge-to-edge
-//   - Height: max 78% viewport height — plenty of room to see the page behind
-//   - Sits above the FAB button, visibly floating
-// ════════════════════════════════════════════════════════════════════
-function useChatDims() {
-  const [dims, setDims] = useState({ width:370, height:560, bottom:100, right:24, radius:20 });
-  useEffect(() => {
-    const calc = () => {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      if (vw <= 480) {
-        // Mobile: contained card, 12px margin each side, max 78% height
-        const w = vw - 24;
-        const h = Math.min(Math.floor(vh * 0.78), 540);
-        setDims({ width:w, height:h, bottom:92, right:12, radius:18 });
-      } else if (vh <= 700) {
-        // Short laptop / landscape tablet
-        setDims({ width:Math.min(370, vw-48), height:vh-110, bottom:86, right:24, radius:20 });
-      } else {
-        // Standard desktop
-        setDims({ width:Math.min(370, vw-48), height:Math.min(560, vh-120), bottom:100, right:24, radius:20 });
-      }
-    };
-    calc();
-    window.addEventListener('resize', calc);
-    return () => window.removeEventListener('resize', calc);
-  }, []);
-  return dims;
-}
-
-// ════════════════════════════════════════════════════════════════════
-// INKANYEZI BOT WIDGET
+// MAIN WIDGET
 // ════════════════════════════════════════════════════════════════════
 function InkanyeziBotWidget() {
   const [isOpen, setIsOpen]   = useState(false);
@@ -610,288 +840,396 @@ function InkanyeziBotWidget() {
     role:'assistant',
     content:"Sawubona! 👋 I'm InkanyeziBot — your AI guide to automation for South African businesses.\n\nBy chatting, you agree to our POPIA-compliant data policy.\n\nWhat does your business do, and what's the biggest challenge slowing you down right now?",
   }]);
-  const [input, setInput]         = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [input, setInput]             = useState('');
+  const [isLoading, setIsLoading]     = useState(false);
   const [sessionContext, setSessionContext] = useState<any>(null);
-  const [sessionId] = useState(()=>`session_${Date.now()}_${Math.random().toString(36).substr(2,9)}`);
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substr(2,9)}`);
   const [showLeadForm, setShowLeadForm]           = useState(false);
   const [leadFormSubmitted, setLeadFormSubmitted] = useState(false);
   const [leadSubmitting, setLeadSubmitting]       = useState(false);
-  const [showChips, setShowChips]     = useState(true);
+  const [showChips, setShowChips]   = useState(true);
   const [showGreeting, setShowGreeting]       = useState(false);
   const [greetingVisible, setGreetingVisible] = useState(false);
-  const [showDoor, setShowDoor] = useState(false);
-  const [openKey, setOpenKey]   = useState(0);
-
-  const dims = useChatDims();
+  const [showDoor, setShowDoor]               = useState(false);
+  const [openKey, setOpenKey]                 = useState(0);
 
   const hasTriggered = useRef(false);
   const messagesEnd  = useRef<HTMLDivElement>(null);
   const textareaRef  = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(()=>{ messagesEnd.current?.scrollIntoView({behavior:'smooth'}); },[messages,showLeadForm,isLoading]);
+  useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior:'smooth' }); }, [messages, showLeadForm, isLoading]);
 
-  useEffect(()=>{
-    const STORAGE_KEY='inkanyezi_chat_session';
-    const VISITOR_KEY='inkanyezi_visitor';
-    const INACTIVITY_MS=20*60*1000;
-    const visitCount=parseInt(localStorage.getItem(VISITOR_KEY)||'0')+1;
-    localStorage.setItem(VISITOR_KEY,String(visitCount));
-    if(visitCount>1){const savedName=localStorage.getItem('inkanyezi_name');(window as any).__inkanyezi_returning={count:visitCount,name:savedName};}
-    try{
-      const saved=sessionStorage.getItem(STORAGE_KEY);
-      if(saved){const parsed=JSON.parse(saved);if(parsed.messages?.length>1){setMessages(parsed.messages);setShowChips(false);if(parsed.sessionContext)setSessionContext(parsed.sessionContext);}}
-    }catch{}
-    let inactivityTimer:ReturnType<typeof setTimeout>|null=null;
-    let isPageVisible=!document.hidden,isPageFocused=document.hasFocus();
-    const doReset=()=>{
-      setIsOpen(false);setShowDoor(false);setShowGreeting(false);setGreetingVisible(false);
-      setMessages([{role:'assistant',content:"Sawubona! 👋 I'm InkanyeziBot — your AI guide to automation for South African businesses.\n\nBy chatting, you agree to our POPIA-compliant data policy.\n\nWhat does your business do, and what's the biggest challenge slowing you down right now?"}]);
-      setInput('');setShowLeadForm(false);setLeadFormSubmitted(false);setShowChips(true);setSessionContext(null);
-      hasTriggered.current=false;sessionStorage.removeItem(STORAGE_KEY);
+  useEffect(() => {
+    const STORAGE_KEY = 'inkanyezi_chat_session';
+    const VISITOR_KEY = 'inkanyezi_visitor';
+    const INACTIVITY_MS = 20 * 60 * 1000;
+    const GREETING_SCROLL = 0.35;
+
+    const visitCount = parseInt(localStorage.getItem(VISITOR_KEY) || '0') + 1;
+    localStorage.setItem(VISITOR_KEY, String(visitCount));
+    if (visitCount > 1) {
+      const savedName = localStorage.getItem('inkanyezi_name');
+      (window as any).__inkanyezi_returning = { count: visitCount, name: savedName };
+    }
+
+    try {
+      const saved = sessionStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.messages?.length > 1) {
+          setMessages(parsed.messages);
+          setShowChips(false);
+          if (parsed.sessionContext) setSessionContext(parsed.sessionContext);
+        }
+      }
+    } catch {}
+
+    let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
+    let isPageVisible = !document.hidden;
+    let isPageFocused = document.hasFocus();
+
+    const doReset = () => {
+      setIsOpen(false); setShowDoor(false); setShowGreeting(false); setGreetingVisible(false);
+      setMessages([{ role:'assistant', content:"Sawubona! 👋 I'm InkanyeziBot — your AI guide to automation for South African businesses.\n\nBy chatting, you agree to our POPIA-compliant data policy.\n\nWhat does your business do, and what's the biggest challenge slowing you down right now?" }]);
+      setInput(''); setShowLeadForm(false); setLeadFormSubmitted(false);
+      setShowChips(true); setSessionContext(null);
+      hasTriggered.current = false;
+      sessionStorage.removeItem(STORAGE_KEY);
     };
-    const startTimer=()=>{if(inactivityTimer)clearTimeout(inactivityTimer);if(isPageVisible&&isPageFocused)inactivityTimer=setTimeout(doReset,INACTIVITY_MS);};
-    const stopTimer=()=>{if(inactivityTimer){clearTimeout(inactivityTimer);inactivityTimer=null;}};
-    const onActivity=()=>{if(isPageVisible&&isPageFocused)startTimer();};
-    const activityEvents=['mousedown','keydown','touchstart','scroll','click'];
-    activityEvents.forEach(e=>window.addEventListener(e,onActivity,{passive:true}));
-    const onVisibilityChange=()=>{isPageVisible=!document.hidden;if(isPageVisible&&isPageFocused)startTimer();else stopTimer();};
-    document.addEventListener('visibilitychange',onVisibilityChange);
-    const onFocus=()=>{isPageFocused=true;startTimer();};
-    const onBlur=()=>{isPageFocused=false;stopTimer();};
-    window.addEventListener('focus',onFocus);window.addEventListener('blur',onBlur);
-    let greetingFired=false;
-    const onScroll=()=>{if(greetingFired)return;const scrolled=window.scrollY/(document.documentElement.scrollHeight-window.innerHeight);if(scrolled>=0.35)greetingFired=true;};
-    window.addEventListener('scroll',onScroll,{passive:true});
+
+    const startTimer = () => {
+      if (inactivityTimer) clearTimeout(inactivityTimer);
+      if (isPageVisible && isPageFocused) inactivityTimer = setTimeout(doReset, INACTIVITY_MS);
+    };
+    const stopTimer = () => { if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; } };
+    const onActivity = () => { if (isPageVisible && isPageFocused) startTimer(); };
+    const activityEvents = ['mousedown','keydown','touchstart','scroll','click'];
+    activityEvents.forEach(e => window.addEventListener(e, onActivity, { passive:true }));
+
+    const onVisibilityChange = () => {
+      isPageVisible = !document.hidden;
+      if (isPageVisible && isPageFocused) startTimer(); else stopTimer();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    const onFocus = () => { isPageFocused = true; startTimer(); };
+    const onBlur  = () => { isPageFocused = false; stopTimer(); };
+    window.addEventListener('focus', onFocus);
+    window.addEventListener('blur', onBlur);
+
+    let greetingFired = false;
+    const onScroll = () => {
+      if (greetingFired) return;
+      const scrolled = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+      if (scrolled >= GREETING_SCROLL) { greetingFired = true; }
+    };
+    window.addEventListener('scroll', onScroll, { passive:true });
     startTimer();
-    return()=>{stopTimer();activityEvents.forEach(e=>window.removeEventListener(e,onActivity));document.removeEventListener('visibilitychange',onVisibilityChange);window.removeEventListener('focus',onFocus);window.removeEventListener('blur',onBlur);window.removeEventListener('scroll',onScroll);};
-  },[]);
 
-  useEffect(()=>{
-    if(messages.length<=1)return;
-    try{sessionStorage.setItem('inkanyezi_chat_session',JSON.stringify({messages:messages.slice(-20),sessionContext,savedAt:Date.now()}));if(sessionContext?.name)localStorage.setItem('inkanyezi_name',sessionContext.name);}catch{}
-  },[messages,sessionContext]);
+    return () => {
+      stopTimer();
+      activityEvents.forEach(e => window.removeEventListener(e, onActivity));
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('focus', onFocus);
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
 
-  useEffect(()=>{
-    const show=setTimeout(()=>{if(!isOpen){setShowGreeting(true);setTimeout(()=>setGreetingVisible(true),50);}},8000);
-    const hide=setTimeout(()=>{setGreetingVisible(false);setTimeout(()=>setShowGreeting(false),400);},20000);
-    return()=>{clearTimeout(show);clearTimeout(hide);};
-  },[]);
+  useEffect(() => {
+    if (messages.length <= 1) return;
+    try {
+      sessionStorage.setItem('inkanyezi_chat_session', JSON.stringify({ messages:messages.slice(-20), sessionContext, savedAt:Date.now() }));
+      if (sessionContext?.name) localStorage.setItem('inkanyezi_name', sessionContext.name);
+    } catch {}
+  }, [messages, sessionContext]);
 
-  useEffect(()=>{if(isOpen){setGreetingVisible(false);setTimeout(()=>setShowGreeting(false),400);}},[isOpen]);
+  useEffect(() => {
+    const show = setTimeout(() => { if (!isOpen) { setShowGreeting(true); setTimeout(() => setGreetingVisible(true), 50); } }, 8000);
+    const hide = setTimeout(() => { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }, 20000);
+    return () => { clearTimeout(show); clearTimeout(hide); };
+  }, []);
 
-  useEffect(()=>{
-    if(hasTriggered.current||leadFormSubmitted||!sessionContext)return;
-    const userMsgs=messages.filter(m=>m.role==='user');
-    const lastMsg=userMsgs[userMsgs.length-1]?.content||'';
-    const{shouldShow}=scoreConversation(sessionContext,userMsgs.length,lastMsg);
-    if(shouldShow){hasTriggered.current=true;setTimeout(()=>setShowLeadForm(true),1200);return;}
-    if(userMsgs.length>=5&&!hasTriggered.current){hasTriggered.current=true;setTimeout(()=>setShowLeadForm(true),1200);}
-  },[messages,sessionContext,leadFormSubmitted]);
+  useEffect(() => {
+    if (isOpen) { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }
+  }, [isOpen]);
 
-  const sendMessage=async(text?:string)=>{
-    const content=(text||input).trim();
-    if(!content||isLoading)return;
+  // ── LEAD FORM TRIGGER — FIX: require name before showing form ────────
+  useEffect(() => {
+    if (hasTriggered.current || leadFormSubmitted || !sessionContext || !sessionContext.name) return;
+    const userMsgs = messages.filter(m => m.role==='user');
+    const lastMsg  = userMsgs[userMsgs.length-1]?.content||'';
+    const { shouldShow } = scoreConversation(sessionContext, userMsgs.length, lastMsg);
+    if (shouldShow) { hasTriggered.current = true; setTimeout(() => setShowLeadForm(true), 1200); return; }
+    if (userMsgs.length >= 5 && !hasTriggered.current) {
+      hasTriggered.current = true;
+      setTimeout(() => setShowLeadForm(true), 1200);
+    }
+  }, [messages, sessionContext, leadFormSubmitted]);
+
+  const sendMessage = async (text?: string) => {
+    const content = (text||input).trim();
+    if (!content||isLoading) return;
     setShowChips(false);
-    const userMessage={role:'user',content};
-    const newMessages=[...messages,userMessage];
-    setMessages(newMessages);setInput('');
-    if(textareaRef.current)textareaRef.current.style.height='auto';
+    const userMessage  = { role:'user', content };
+    const newMessages  = [...messages, userMessage];
+    setMessages(newMessages); setInput('');
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
     setIsLoading(true);
-    try{
-      const res=await fetch('https://inkanyezibot-v2.vercel.app/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:newMessages,sessionId})});
-      const data=await res.json();
-      setMessages([...newMessages,{role:'assistant',content:data.message}]);
-      if(data.context)setSessionContext(data.context);
-    }catch{setMessages([...newMessages,{role:'assistant',content:'Something went wrong — please try again.'}]);}
-    finally{setIsLoading(false);}
+    try {
+      const res  = await fetch('https://inkanyezibot-v2.vercel.app/api/chat', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ messages:newMessages, sessionId, context:sessionContext }),
+      });
+      const data = await res.json();
+      // FIX: Strip any leaked <context> / <response> tags before displaying
+      const cleanMessage = (data.message || '')
+        .replace(/<context>[\s\S]*?<\/context>/gi, '')
+        .replace(/<response>|<\/response>/gi, '')
+        .trim();
+      setMessages([...newMessages, { role:'assistant', content: cleanMessage }]);
+      if (data.context) setSessionContext(data.context);
+    } catch {
+      setMessages([...newMessages, { role:'assistant', content:'Something went wrong — please try again.' }]);
+    } finally { setIsLoading(false); }
   };
 
-  const handleLeadSubmit=useCallback(async(formData:any)=>{
+  const handleLeadSubmit = useCallback(async (formData: any) => {
     setLeadSubmitting(true);
-    try{
-      const userMsgs=messages.filter(m=>m.role==='user');
-      const lastMsg=userMsgs[userMsgs.length-1]?.content||'';
-      const{score}=scoreConversation(sessionContext,userMsgs.length,lastMsg);
-      const payload={
-        name:formData.name||sessionContext?.name||'',email:formData.email||sessionContext?.email||'',
-        phone:formData.phone||sessionContext?.whatsapp||'',company:formData.company||sessionContext?.business||'',
-        industry:formData.industry||sessionContext?.industry||'',service_interest:formData.service_interest||'',
-        message:formData.message||sessionContext?.pain_point||'',
-        has_email:(formData.email||sessionContext?.email)?'true':'false',
-        has_whatsapp:(formData.phone||sessionContext?.whatsapp)?'true':'false',
-        source:'lovable-site-lead-form',session_id:sessionId,
-        message_count:userMsgs.length,
-        conversation_summary:messages.slice(-6).map(m=>`${m.role==='user'?'Customer':'Bot'}: ${m.content}`).join('\n'),
-        qualification_stage:sessionContext?.qualification_stage||'new',
-        pain_point:sessionContext?.pain_point||'',budget_signal:sessionContext?.budget_signal||'',
-        demo_booked:sessionContext?.demo_booked||false,reference_number:sessionContext?.referenceNumber||'',
-        trigger_score:score,timestamp:new Date().toISOString(),
-        sast_time:new Date().toLocaleString('en-ZA',{timeZone:'Africa/Johannesburg'}),
+    try {
+      const userMsgs = messages.filter(m => m.role==='user');
+      const lastMsg  = userMsgs[userMsgs.length-1]?.content||'';
+      const { score } = scoreConversation(sessionContext, userMsgs.length, lastMsg);
+      const payload = {
+        name:             formData.name    || sessionContext?.name     || '',
+        email:            formData.email   || sessionContext?.email    || '',
+        phone:            formData.phone   || sessionContext?.whatsapp || '',
+        company:          formData.company || sessionContext?.business || '',
+        industry:         formData.industry|| sessionContext?.industry || '',
+        service_interest: formData.service_interest || '',
+        message:          formData.message || sessionContext?.pain_point || '',
+        has_email:        (formData.email||sessionContext?.email)    ? 'true':'false',
+        has_whatsapp:     (formData.phone||sessionContext?.whatsapp) ? 'true':'false',
+        source:           'lovable-site-lead-form',
+        session_id:       sessionId,
+        message_count:    userMsgs.length,
+        conversation_summary: messages.slice(-6).map(m=>`${m.role==='user'?'Customer':'Bot'}: ${m.content}`).join('\n'),
+        qualification_stage: sessionContext?.qualification_stage||'new',
+        pain_point:          sessionContext?.pain_point||'',
+        budget_signal:       sessionContext?.budget_signal||'',
+        demo_booked:         sessionContext?.demo_booked||false,
+        reference_number:    sessionContext?.referenceNumber||'',
+        trigger_score:       score,
+        timestamp:           new Date().toISOString(),
+        sast_time:           new Date().toLocaleString('en-ZA',{timeZone:'Africa/Johannesburg'}),
       };
-      await fetch('https://hook.eu1.make.com/rq1e6yppdpa6orvw87fg1xabekvq4id8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-      setLeadFormSubmitted(true);setShowLeadForm(false);
-      setTimeout(()=>{setMessages(prev=>[...prev,{role:'assistant',content:`✦ Signal locked in${formData.name?`, ${formData.name.split(' ')[0]}`:''}! Sanele will personally reach out within 24 hours.\n\nIs there anything else you'd like to know about how we can transform ${formData.company||'your business'}?`}]);},700);
-      return{success:true};
-    }catch{return{success:false};}
-    finally{setLeadSubmitting(false);}
-  },[messages,sessionContext,sessionId]);
+      await fetch('https://hook.eu1.make.com/rq1e6yppdpa6orvw87fg1xabekvq4id8', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
+      });
+      setLeadFormSubmitted(true); setShowLeadForm(false);
+      setTimeout(() => {
+        setMessages(prev => [...prev, { role:'assistant', content:`✦ Signal locked in${formData.name?`, ${formData.name.split(' ')[0]}`:''}! Sanele will personally reach out within 24 hours.\n\nIs there anything else you'd like to know about how we can transform ${formData.company||'your business'}?` }]);
+      }, 700);
+      return { success:true };
+    } catch { return { success:false }; }
+    finally { setLeadSubmitting(false); }
+  }, [messages, sessionContext, sessionId]);
 
   return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&family=Syne:wght@700;800&display=swap');
-        @keyframes ping{0%{transform:scale(1);opacity:0.8;}70%{transform:scale(2.2);opacity:0;}100%{transform:scale(2.2);opacity:0;}}
-        @keyframes floatBubble{0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 30px rgba(249,115,22,0.55),0 0 60px rgba(249,115,22,0.2);}50%{transform:translateY(-6px) scale(1.03);box-shadow:0 0 40px rgba(249,115,22,0.7),0 0 80px rgba(249,115,22,0.3);}}
-        @keyframes orbitRing{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-        @keyframes headerShimmer{0%{background-position:-200% center;}100%{background-position:200% center;}}
-        @keyframes shimmerBar{0%{background-position:-200% center;}100%{background-position:200% center;}}
-        @keyframes msgFadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-        @keyframes thinkPulse{0%,80%,100%{opacity:0.15;transform:scale(0.8);}40%{opacity:1;transform:scale(1);}}
-        @keyframes chipAppear{from{opacity:0;transform:translateX(-6px);}to{opacity:1;transform:translateX(0);}}
-        @keyframes rocketGlow{0%,100%{box-shadow:0 0 14px rgba(249,115,22,0.5);}50%{box-shadow:0 0 22px rgba(249,115,22,0.8),0 0 40px rgba(249,115,22,0.3);}}
-        @keyframes closePulse{0%{box-shadow:0 0 0 0 rgba(229,62,62,0.6),0 4px 20px rgba(229,62,62,0.4);transform:scale(1);}50%{box-shadow:0 0 0 10px rgba(229,62,62,0),0 4px 20px rgba(229,62,62,0.4);transform:scale(1.06);}100%{box-shadow:0 0 0 0 rgba(229,62,62,0),0 4px 20px rgba(229,62,62,0.4);transform:scale(1);}}
-        .ink-msg{animation:msgFadeUp 0.3s ease forwards;}
-        .ink-chip{animation:chipAppear 0.3s ease forwards;transition:all 0.2s !important;}
-        .ink-chip:hover{background:rgba(244,185,66,0.12) !important;border-color:#F4B942 !important;color:#1a1a2e !important;transform:translateX(2px);}
-        .ink-rocket{animation:rocketGlow 2s ease infinite;}
-        .ink-rocket:hover:not(:disabled){transform:scale(1.08) rotate(-5deg) !important;box-shadow:0 0 30px rgba(249,115,22,0.9) !important;}
-        .ink-msgs::-webkit-scrollbar{width:3px;}
-        .ink-msgs::-webkit-scrollbar-track{background:transparent;}
-        .ink-msgs::-webkit-scrollbar-thumb{background:rgba(244,185,66,0.4);border-radius:2px;}
-        .ink-textarea::placeholder{color:rgba(100,110,130,0.5) !important;}
+        @keyframes ping { 0%{transform:scale(1);opacity:0.8;} 70%{transform:scale(2.2);opacity:0;} 100%{transform:scale(2.2);opacity:0;} }
+        @keyframes floatBubble { 0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 30px rgba(249,115,22,0.55),0 0 60px rgba(249,115,22,0.2);} 50%{transform:translateY(-6px) scale(1.03);box-shadow:0 0 40px rgba(249,115,22,0.7),0 0 80px rgba(249,115,22,0.3);} }
+        @keyframes orbitRing { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+        @keyframes windowSlide { 
+          0%  { opacity:0; transform:translateY(30px) scaleY(0.05) scaleX(0.8); transform-origin: bottom center; }
+          40% { opacity:1; transform:translateY(0) scaleY(0.6) scaleX(1); transform-origin: bottom center; }
+          70% { transform:translateY(0) scaleY(1.02) scaleX(1); transform-origin: bottom center; }
+          100%{ transform:translateY(0) scaleY(1) scaleX(1); transform-origin: bottom center; }
+        }
+        @keyframes headerShimmer { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
+        @keyframes shimmerBar { 0%{background-position:-200% center;} 100%{background-position:200% center;} }
+        @keyframes msgFadeUp { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+        @keyframes thinkPulse { 0%,80%,100%{opacity:0.15;transform:scale(0.8);} 40%{opacity:1;transform:scale(1);} }
+        @keyframes chipAppear { from{opacity:0;transform:translateX(-6px);} to{opacity:1;transform:translateX(0);} }
+        @keyframes rocketGlow { 0%,100%{box-shadow:0 0 14px rgba(249,115,22,0.5);} 50%{box-shadow:0 0 22px rgba(249,115,22,0.8),0 0 40px rgba(249,115,22,0.3);} }
+        @keyframes greetingPop { from{opacity:0;transform:translateY(10px) scale(0.95);} to{opacity:1;transform:translateY(0) scale(1);} }
+        @keyframes stepSlide { from{opacity:0;transform:translateX(10px);} to{opacity:1;transform:translateX(0);} }
+        .ink-msg { animation: msgFadeUp 0.3s ease forwards; }
+        .ink-chip { animation: chipAppear 0.3s ease forwards; transition: all 0.2s !important; }
+        .ink-chip:hover { background: rgba(244,185,66,0.12) !important; border-color: #F4B942 !important; color: #1a1a2e !important; transform: translateX(2px); }
+        .ink-rocket { animation: rocketGlow 2s ease infinite; }
+        .ink-rocket:hover:not(:disabled) { transform: scale(1.08) rotate(-5deg) !important; box-shadow: 0 0 30px rgba(249,115,22,0.9) !important; }
+        .ink-msgs::-webkit-scrollbar { width: 3px; }
+        .ink-msgs::-webkit-scrollbar-track { background: transparent; }
+        .ink-msgs::-webkit-scrollbar-thumb { background: rgba(244,185,66,0.4); border-radius: 2px; }
+        .ink-textarea::placeholder { color: rgba(100,110,130,0.5) !important; }
+        @keyframes closePulse {
+          0%   { box-shadow: 0 0 0 0 rgba(229,62,62,0.6), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1); }
+          50%  { box-shadow: 0 0 0 10px rgba(229,62,62,0), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1.06); }
+          100% { box-shadow: 0 0 0 0 rgba(229,62,62,0), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1); }
+        }
       `}</style>
 
-      {/* Proactive greeting */}
+      {/* ── PROACTIVE GREETING ── */}
       {showGreeting && !isOpen && (
-        <div onClick={()=>{setShowDoor(true);setOpenKey(k=>k+1);}} style={{position:'fixed',bottom:100,right:24,zIndex:10001,maxWidth:260,cursor:'pointer',opacity:greetingVisible?1:0,transform:greetingVisible?'translateY(0) scale(1)':'translateY(10px) scale(0.95)',transition:'opacity 0.35s ease, transform 0.35s ease'}}>
-          <div style={{background:'linear-gradient(145deg, rgba(15,27,53,0.98), rgba(10,22,40,0.98))',border:'1px solid rgba(249,115,22,0.25)',borderRadius:16,borderBottomRightRadius:4,padding:'12px 14px',boxShadow:'0 8px 32px rgba(0,0,0,0.5)',position:'relative',overflow:'hidden'}}>
-            <div style={{position:'absolute',top:0,left:0,right:0,height:1.5,background:'linear-gradient(90deg, transparent, rgba(244,185,66,0.6), transparent)'}}/>
-            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:6}}>
-              <div style={{width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg, #FF6B35, #c2410c)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,boxShadow:'0 0 10px rgba(249,115,22,0.5)'}}>⭐</div>
+        <div onClick={()=>{ setShowDoor(true); setOpenKey(k=>k+1); }} style={{ position:'fixed', bottom:100, right:24, zIndex:10001, maxWidth:260, cursor:'pointer', opacity:greetingVisible?1:0, transform:greetingVisible?'translateY(0) scale(1)':'translateY(10px) scale(0.95)', transition:'opacity 0.35s ease, transform 0.35s ease' }}>
+          <div style={{ background:'linear-gradient(145deg, rgba(15,27,53,0.98), rgba(10,22,40,0.98))', border:'1px solid rgba(249,115,22,0.25)', borderRadius:16, borderBottomRightRadius:4, padding:'12px 14px', boxShadow:'0 8px 32px rgba(0,0,0,0.5)', position:'relative', overflow:'hidden' }}>
+            <div style={{ position:'absolute', top:0, left:0, right:0, height:1.5, background:'linear-gradient(90deg, transparent, rgba(244,185,66,0.6), transparent)' }} />
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
+              <div style={{ width:28, height:28, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, boxShadow:'0 0 10px rgba(249,115,22,0.5)' }}>⭐</div>
               <div>
-                <div style={{fontSize:'0.7rem',fontWeight:700,color:'#fff',fontFamily:"'Syne',sans-serif"}}>InkanyeziBot</div>
-                <div style={{fontSize:'0.55rem',color:'#f97316',fontFamily:"'Space Mono',monospace",display:'flex',alignItems:'center',gap:4}}><span style={{width:5,height:5,borderRadius:'50%',background:'#22c55e',display:'inline-block'}}/> Online now</div>
+                <div style={{ fontSize:'0.7rem', fontWeight:700, color:'#fff', fontFamily:"'Syne',sans-serif" }}>InkanyeziBot</div>
+                <div style={{ fontSize:'0.55rem', color:'#f97316', fontFamily:"'Space Mono',monospace", display:'flex', alignItems:'center', gap:4 }}>
+                  <span style={{ width:5, height:5, borderRadius:'50%', background:'#22c55e', display:'inline-block' }} /> Online now
+                </div>
               </div>
             </div>
-            <p style={{margin:0,fontSize:'0.78rem',color:'rgba(255,255,255,0.85)',lineHeight:1.55,fontFamily:"'DM Sans',sans-serif"}}>
-              {(()=>{const r=(window as any).__inkanyezi_returning;if(r?.count>1&&r?.name)return<>Welcome back, <span style={{color:'#F4B942',fontWeight:600}}>{r.name}</span>! 👋 Ready to continue where we left off?</>;if(r?.count>1)return<>Welcome back! 👋 <span style={{color:'#F4B942',fontWeight:600}}>Shall we continue exploring AI for your business?</span></>;return<>Sawubona! 👋 Automating a South African business?{' '}<span style={{color:'#F4B942',fontWeight:600}}>I can show you how in 3 minutes.</span></>;})()} 
+            <p style={{ margin:0, fontSize:'0.78rem', color:'rgba(255,255,255,0.85)', lineHeight:1.55, fontFamily:"'DM Sans',sans-serif" }}>
+              {(() => {
+                const r = (window as any).__inkanyezi_returning;
+                if (r?.count > 1 && r?.name) return <>Welcome back, <span style={{color:'#F4B942',fontWeight:600}}>{r.name}</span>! 👋 Ready to continue where we left off?</>;
+                if (r?.count > 1) return <>Welcome back! 👋 <span style={{color:'#F4B942',fontWeight:600}}>Shall we continue exploring AI for your business?</span></>;
+                return <>Sawubona! 👋 Automating a South African business?{' '}<span style={{color:'#F4B942',fontWeight:600}}>I can show you how in 3 minutes.</span></>;
+              })()}
             </p>
-            <div style={{marginTop:8,display:'flex',alignItems:'center',gap:4,fontSize:'0.65rem',color:'rgba(255,255,255,0.4)',fontFamily:"'Space Mono',monospace"}}><span>Tap to chat</span><span style={{color:'#F4B942'}}>→</span></div>
+            <div style={{ marginTop:8, display:'flex', alignItems:'center', gap:4, fontSize:'0.65rem', color:'rgba(255,255,255,0.4)', fontFamily:"'Space Mono',monospace" }}>
+              <span>Tap to chat</span><span style={{color:'#F4B942'}}>→</span>
+            </div>
           </div>
-          <div style={{position:'absolute',bottom:-7,right:18,width:0,height:0,borderLeft:'8px solid transparent',borderRight:'8px solid transparent',borderTop:'8px solid rgba(15,27,53,0.98)'}}/>
+          <div style={{ position:'absolute', bottom:-7, right:18, width:0, height:0, borderLeft:'8px solid transparent', borderRight:'8px solid transparent', borderTop:'8px solid rgba(15,27,53,0.98)' }} />
         </div>
       )}
 
-      {/* FAB */}
+      {/* ── FLOATING BUBBLE ── */}
       <button
-        onClick={()=>{if(!isOpen){setShowDoor(true);setOpenKey(k=>k+1);}else{setIsOpen(false);}}}
+        onClick={()=>{ if(!isOpen){ setShowDoor(true); setOpenKey(k=>k+1); } else { setIsOpen(false); } }}
         aria-label={isOpen?'Close InkanyeziBot':'Open InkanyeziBot'}
-        style={{position:'fixed',bottom:24,right:24,zIndex:99999,width:64,height:64,borderRadius:'50%',background:isOpen?'linear-gradient(135deg, #e53e3e, #c53030)':'linear-gradient(135deg, #FF6B35, #c2410c)',border:isOpen?'2.5px solid rgba(229,62,62,0.6)':'2px solid rgba(249,115,22,0.45)',cursor:'pointer',fontSize:isOpen?22:26,animation:isOpen?'closePulse 1.8s ease-in-out infinite':'floatBubble 3s ease-in-out infinite',display:'flex',alignItems:'center',justifyContent:'center',transition:'background 0.3s, border 0.3s',boxShadow:isOpen?'0 0 0 0 rgba(229,62,62,0.4), 0 4px 20px rgba(229,62,62,0.4)':'0 0 30px rgba(249,115,22,0.55)'}}>
-        {!isOpen&&!showDoor&&(<div style={{position:'absolute',width:64,height:64,animation:'orbitRing 4s linear infinite',pointerEvents:'none'}}><div style={{position:'absolute',top:-3,left:'50%',width:7,height:7,borderRadius:'50%',background:C.gold,transform:'translateX(-50%)',boxShadow:`0 0 10px ${C.gold}`}}/></div>)}
-        {isOpen?(
-          <div style={{position:'relative',width:24,height:24}}>
-            <div style={{position:'absolute',top:'50%',left:0,right:0,height:2.5,background:'#fff',borderRadius:2,transform:'translateY(-50%) rotate(45deg)',boxShadow:'0 0 6px rgba(255,255,255,0.8)'}}/>
-            <div style={{position:'absolute',top:'50%',left:0,right:0,height:2.5,background:'#fff',borderRadius:2,transform:'translateY(-50%) rotate(-45deg)',boxShadow:'0 0 6px rgba(255,255,255,0.8)'}}/>
+        style={{
+          position:'fixed', bottom:24, right:24, zIndex:99999,
+          width:64, height:64, borderRadius:'50%',
+          background: isOpen ? 'linear-gradient(135deg, #e53e3e, #c53030)' : 'linear-gradient(135deg, #FF6B35, #c2410c)',
+          border: isOpen ? '2.5px solid rgba(229,62,62,0.6)' : '2px solid rgba(249,115,22,0.45)',
+          cursor:'pointer', fontSize: isOpen ? 22 : 26,
+          animation: isOpen ? 'closePulse 1.8s ease-in-out infinite' : 'floatBubble 3s ease-in-out infinite',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          transition:'background 0.3s, border 0.3s',
+          boxShadow: isOpen ? '0 0 0 0 rgba(229,62,62,0.4), 0 4px 20px rgba(229,62,62,0.4)' : '0 0 30px rgba(249,115,22,0.55)',
+        }}>
+        {!isOpen && !showDoor && (
+          <div style={{ position:'absolute', width:64, height:64, animation:'orbitRing 4s linear infinite', pointerEvents:'none' }}>
+            <div style={{ position:'absolute', top:-3, left:'50%', width:7, height:7, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 10px ${C.gold}` }} />
           </div>
-        ):(
-          <span style={{position:'relative',zIndex:1}}>⭐</span>
         )}
-        {isOpen&&(<div style={{position:'absolute',bottom:'calc(100% + 8px)',left:'50%',transform:'translateX(-50%)',background:'rgba(229,62,62,0.9)',color:'#fff',fontSize:'0.55rem',fontFamily:"'Space Mono',monospace",letterSpacing:'0.1em',padding:'3px 8px',borderRadius:4,whiteSpace:'nowrap',pointerEvents:'none',boxShadow:'0 2px 8px rgba(229,62,62,0.4)'}}>CLOSE</div>)}
+        {isOpen ? (
+          <div style={{ position:'relative', width:24, height:24 }}>
+            <div style={{ position:'absolute', top:'50%', left:0, right:0, height:2.5, background:'#fff', borderRadius:2, transform:'translateY(-50%) rotate(45deg)', boxShadow:'0 0 6px rgba(255,255,255,0.8)' }}/>
+            <div style={{ position:'absolute', top:'50%', left:0, right:0, height:2.5, background:'#fff', borderRadius:2, transform:'translateY(-50%) rotate(-45deg)', boxShadow:'0 0 6px rgba(255,255,255,0.8)' }}/>
+          </div>
+        ) : (
+          <span style={{ position:'relative', zIndex:1 }}>⭐</span>
+        )}
+        {isOpen && (
+          <div style={{ position:'absolute', bottom:'calc(100% + 8px)', left:'50%', transform:'translateX(-50%)', background:'rgba(229,62,62,0.9)', color:'#fff', fontSize:'0.55rem', fontFamily:"'Space Mono',monospace", letterSpacing:'0.1em', padding:'3px 8px', borderRadius:4, whiteSpace:'nowrap', pointerEvents:'none', boxShadow:'0 2px 8px rgba(229,62,62,0.4)' }}>CLOSE</div>
+        )}
       </button>
 
-      {/* Chat container — always a contained floating card */}
-      {(showDoor||isOpen)&&(
-        <div style={{
-          position:'fixed',
-          bottom:dims.bottom,
-          right:dims.right,
-          width:dims.width,
-          height:dims.height,
-          zIndex:99998,
-          borderRadius:dims.radius,
-          overflow:'hidden',
-          boxShadow:'0 0 0 1px rgba(244,185,66,0.2), 0 16px 60px rgba(0,0,0,0.6), 0 4px 20px rgba(255,107,53,0.1)',
-        }}>
+      {/* ── UNIFIED CONTAINER ── */}
+      {(showDoor || isOpen) && (
+        <div style={{ position:'fixed', bottom:100, right:24, width:370, height:580, zIndex:99998, borderRadius:20, overflow:'hidden', boxShadow:'0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)' }}>
 
-          {/* Chat panel */}
-          <div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',borderRadius:dims.radius,overflow:'hidden',background:'#FAFBFC'}}>
+          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', borderRadius:20, overflow:'hidden', background:'#FAFBFC' }}>
 
             {/* Header */}
-            <div style={{position:'relative',zIndex:2,flexShrink:0,background:'linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%)',borderBottom:'1px solid rgba(244,185,66,0.3)',boxShadow:'0 1px 8px rgba(0,0,0,0.06)',padding:'10px 14px',display:'flex',alignItems:'center',gap:10}}>
-              <div style={{position:'absolute',top:0,left:0,right:0,height:2,background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`,backgroundSize:'200% 100%',animation:'headerShimmer 3s linear infinite'}}/>
-              <div style={{position:'relative',flexShrink:0}}>
-                <div style={{width:38,height:38,borderRadius:'50%',background:'linear-gradient(135deg, #FF6B35, #c2410c)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,boxShadow:'0 0 14px rgba(249,115,22,0.6)'}}>⭐</div>
-                <div style={{position:'absolute',inset:-4,animation:'orbitRing 5s linear infinite',pointerEvents:'none'}}>
-                  <div style={{position:'absolute',top:0,left:'50%',width:5,height:5,borderRadius:'50%',background:C.gold,transform:'translateX(-50%)',boxShadow:`0 0 6px ${C.gold}`}}/>
+            <div style={{ position:'relative', zIndex:2, flexShrink:0, background:'linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%)', borderBottom:'1px solid rgba(244,185,66,0.3)', boxShadow:'0 1px 8px rgba(0,0,0,0.06)', padding:'12px 16px', display:'flex', alignItems:'center', gap:12 }}>
+              <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`, backgroundSize:'200% 100%', animation:'headerShimmer 3s linear infinite' }} />
+              <div style={{ position:'relative', flexShrink:0 }}>
+                <div style={{ width:42, height:42, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, boxShadow:'0 0 16px rgba(249,115,22,0.6)' }}>⭐</div>
+                <div style={{ position:'absolute', inset:-4, animation:'orbitRing 5s linear infinite', pointerEvents:'none' }}>
+                  <div style={{ position:'absolute', top:0, left:'50%', width:5, height:5, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 6px ${C.gold}` }} />
                 </div>
               </div>
-              <div style={{flex:1,minWidth:0}}>
-                <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:14,color:'#1a1a2e',letterSpacing:'-0.01em'}}>InkanyeziBot <span style={{fontSize:10,color:C.gold,fontFamily:"'Space Mono',monospace",fontWeight:400}}>✦</span></div>
-                <div style={{fontSize:10,color:'#F4B942',display:'flex',alignItems:'center',gap:5,fontFamily:"'DM Sans',sans-serif"}}><SignalDot/><span>Online · AI Automation · Durban, ZA</span></div>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:15, color:'#1a1a2e', letterSpacing:'-0.01em' }}>InkanyeziBot <span style={{ fontSize:11, color:C.gold, fontFamily:"'Space Mono',monospace", fontWeight:400 }}>✦</span></div>
+                <div style={{ fontSize:11, color:'#F4B942', display:'flex', alignItems:'center', gap:5, fontFamily:"'DM Sans',sans-serif" }}>
+                  <SignalDot /><span>Online · AI Automation · Durban, ZA</span>
+                </div>
               </div>
-              <div style={{textAlign:'right',flexShrink:0}}>
-                <div style={{fontSize:9,color:'rgba(100,80,20,0.5)',fontFamily:"'Space Mono',monospace"}}>🇿🇦 SA AI</div>
-                <HeritageStrip style={{justifyContent:'flex-end',marginTop:3}}/>
+              <div style={{ textAlign:'right', flexShrink:0 }}>
+                <div style={{ fontSize:10, color:'rgba(100,80,20,0.5)', fontFamily:"'Space Mono',monospace" }}>🇿🇦 SA AI</div>
+                <HeritageStrip style={{ justifyContent:'flex-end', marginTop:3 }} />
               </div>
             </div>
 
             {/* Messages */}
-            <div className="ink-msgs" style={{flex:1,overflowY:'auto',padding:'12px 12px 6px',display:'flex',flexDirection:'column',gap:10,background:'#F5F7FA',minHeight:0}}>
-              {messages.map((msg,i)=>(
-                <div key={i} className="ink-msg" style={{display:'flex',justifyContent:msg.role==='user'?'flex-end':'flex-start',alignItems:'flex-end',gap:6,animationDelay:`${i*0.03}s`}}>
-                  {msg.role==='assistant'&&(<div style={{width:22,height:22,borderRadius:'50%',flexShrink:0,background:'linear-gradient(135deg, #FF6B35, #c2410c)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,boxShadow:'0 0 8px rgba(249,115,22,0.4)'}}>⭐</div>)}
-                  <div style={{maxWidth:'78%',padding:'9px 12px',borderRadius:14,fontSize:13,lineHeight:1.6,wordBreak:'break-word',background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'#FFFFFF',color:'#1a1a2e',border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.3)',boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.25)':'0 1px 4px rgba(0,0,0,0.06)',borderBottomLeftRadius:msg.role==='assistant'?3:14,borderBottomRightRadius:msg.role==='user'?3:14,fontFamily:"'DM Sans',sans-serif"}}
-                    dangerouslySetInnerHTML={{__html:formatMessage(msg.content)}}/>
+            <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'#F5F7FA' }}>
+              {messages.map((msg,i) => (
+                <div key={i} className="ink-msg" style={{ display:'flex', justifyContent:msg.role==='user'?'flex-end':'flex-start', alignItems:'flex-end', gap:6, animationDelay:`${i*0.03}s` }}>
+                  {msg.role==='assistant' && (
+                    <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, boxShadow:'0 0 8px rgba(249,115,22,0.4)' }}>⭐</div>
+                  )}
+                  <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'#FFFFFF', color:'#1a1a2e', border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.3)', boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.25)':'0 1px 4px rgba(0,0,0,0.06)', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
+                    dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }} />
                 </div>
               ))}
-              {showChips&&messages.length===1&&(
-                <div style={{display:'flex',flexDirection:'column',gap:5,marginTop:4}}>
-                  <div style={{fontSize:'0.6rem',color:'rgba(100,110,130,0.6)',fontFamily:"'Space Mono',monospace",letterSpacing:'0.1em',textAlign:'center',marginBottom:2}}>Quick questions:</div>
-                  {CHIPS.map((chip,i)=>(
+
+              {/* Quick chips */}
+              {showChips && messages.length===1 && (
+                <div style={{ display:'flex', flexDirection:'column', gap:6, marginTop:4 }}>
+                  <div style={{ fontSize:'0.6rem', color:'rgba(100,110,130,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.1em', textAlign:'center', marginBottom:2 }}>Quick questions:</div>
+                  {CHIPS.map((chip,i) => (
                     <button key={i} className="ink-chip" onClick={()=>sendMessage(chip.msg)}
-                      style={{background:'#FFFFFF',border:'1px solid rgba(244,185,66,0.35)',borderRadius:8,padding:'7px 11px',color:'#1a1a2e',fontSize:12,cursor:'pointer',textAlign:'left',fontFamily:"'DM Sans',sans-serif",animationDelay:`${i*0.08}s`,opacity:0}}>
+                      style={{ background:'#FFFFFF', border:'1px solid rgba(244,185,66,0.35)', borderRadius:8, padding:'8px 12px', color:'#1a1a2e', fontSize:12, cursor:'pointer', textAlign:'left', fontFamily:"'DM Sans',sans-serif", animationDelay:`${i*0.08}s`, opacity:0 }}>
                       {chip.label}
                     </button>
                   ))}
                 </div>
               )}
-              {showLeadForm&&!leadFormSubmitted&&(<ChatLeadForm onSubmit={handleLeadSubmit} onDismiss={()=>setShowLeadForm(false)} sessionContext={sessionContext} submitting={leadSubmitting}/>)}
-              {isLoading&&(
-                <div style={{display:'flex',alignItems:'flex-end',gap:6}}>
-                  <div style={{width:22,height:22,borderRadius:'50%',background:'linear-gradient(135deg, #FF6B35, #c2410c)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,flexShrink:0}}>⭐</div>
-                  <div style={{background:'#FFFFFF',padding:'10px 14px',borderRadius:14,borderBottomLeftRadius:3,border:'1px solid rgba(244,185,66,0.25)',boxShadow:'0 1px 4px rgba(0,0,0,0.06)',display:'flex',alignItems:'center',gap:5}}>
-                    {[0,1,2].map(i=><div key={i} style={{width:6,height:6,borderRadius:'50%',background:'#F4B942',opacity:0.4,animation:'thinkPulse 1.2s ease-in-out infinite',animationDelay:`${i*0.2}s`}}/>)}
+
+              {/* Lead form */}
+              {showLeadForm && !leadFormSubmitted && (
+                <ChatLeadForm onSubmit={handleLeadSubmit} onDismiss={()=>setShowLeadForm(false)} sessionContext={sessionContext} submitting={leadSubmitting} />
+              )}
+
+              {/* Thinking */}
+              {isLoading && (
+                <div style={{ display:'flex', alignItems:'flex-end', gap:6 }}>
+                  <div style={{ width:24, height:24, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, flexShrink:0 }}>⭐</div>
+                  <div style={{ background:'#FFFFFF', padding:'12px 16px', borderRadius:14, borderBottomLeftRadius:3, border:'1px solid rgba(244,185,66,0.25)', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', display:'flex', alignItems:'center', gap:5 }}>
+                    {[0,1,2].map(i => <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'#F4B942', opacity:0.4, animation:'thinkPulse 1.2s ease-in-out infinite', animationDelay:`${i*0.2}s` }} />)}
                   </div>
                 </div>
               )}
-              <div ref={messagesEnd}/>
+              <div ref={messagesEnd} />
             </div>
 
             {/* Input */}
-            <div style={{flexShrink:0,padding:'9px 11px 11px',borderTop:'1px solid rgba(244,185,66,0.2)',background:'#FFFFFF'}}>
-              <div style={{display:'flex',gap:7,alignItems:'flex-end'}}>
+            <div style={{ flexShrink:0, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#FFFFFF' }}>
+              <div style={{ display:'flex', gap:8, alignItems:'flex-end' }}>
                 <textarea ref={textareaRef} value={input} className="ink-textarea"
-                  onChange={e=>{setInput(e.target.value);e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,80)+'px';}}
-                  onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}}
+                  onChange={e => { setInput(e.target.value); e.target.style.height='auto'; e.target.style.height=Math.min(e.target.scrollHeight,96)+'px'; }}
+                  onKeyDown={e => { if (e.key==='Enter'&&!e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                   placeholder="Type your message..." rows={1}
-                  style={{flex:1,padding:'8px 12px',borderRadius:14,background:'#F5F7FA',border:'1px solid rgba(244,185,66,0.3)',color:'#1a1a2e',outline:'none',fontSize:13,resize:'none',lineHeight:1.5,wordBreak:'break-word',overflowY:'auto',maxHeight:80,fontFamily:"'DM Sans',sans-serif",transition:'border-color 0.2s'}}
+                  style={{ flex:1, padding:'9px 13px', borderRadius:14, background:'#F5F7FA', border:'1px solid rgba(244,185,66,0.3)', color:'#1a1a2e', outline:'none', fontSize:13, resize:'none', lineHeight:1.5, wordBreak:'break-word', overflowY:'auto', maxHeight:96, fontFamily:"'DM Sans',sans-serif", transition:'border-color 0.2s' }}
                   onFocus={e=>e.target.style.borderColor='#F4B942'}
                   onBlur={e=>e.target.style.borderColor='rgba(244,185,66,0.3)'}
                 />
                 <button className="ink-rocket" onClick={()=>sendMessage()} disabled={isLoading||!input.trim()}
-                  style={{width:40,height:40,borderRadius:'50%',flexShrink:0,background:isLoading||!input.trim()?'rgba(249,115,22,0.3)':'linear-gradient(135deg, #FF6B35, #c2410c)',border:'none',cursor:isLoading||!input.trim()?'not-allowed':'pointer',color:C.white,fontSize:16,display:'flex',alignItems:'center',justifyContent:'center',transition:'all 0.2s',opacity:isLoading||!input.trim()?0.5:1}}>
+                  style={{ width:42, height:42, borderRadius:'50%', flexShrink:0, background:isLoading||!input.trim()?'rgba(249,115,22,0.3)':'linear-gradient(135deg, #FF6B35, #c2410c)', border:'none', cursor:isLoading||!input.trim()?'not-allowed':'pointer', color:C.white, fontSize:18, display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', opacity:isLoading||!input.trim()?0.5:1 }}>
                   🚀
                 </button>
               </div>
-              <div style={{marginTop:5,textAlign:'center',fontSize:9,color:'rgba(150,120,60,0.6)',fontFamily:"'Space Mono',monospace",letterSpacing:'0.05em'}}>✦ INKANYEZI TECHNOLOGIES · WE ARE THE SIGNAL IN THE NOISE ✦</div>
+              <div style={{ marginTop:6, textAlign:'center', fontSize:10, color:'rgba(150,120,60,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.05em' }}>
+                ✦ INKANYEZI TECHNOLOGIES · WE ARE THE SIGNAL IN THE NOISE ✦
+              </div>
             </div>
           </div>
 
-          {/* Door overlay */}
-          {showDoor&&(
-            <div key={openKey} style={{position:'absolute',inset:0,zIndex:10,borderRadius:dims.radius,overflow:'hidden'}}>
-              <DoorAnimationInline onComplete={()=>{setShowDoor(false);setIsOpen(true);}}/>
+          {/* DOOR */}
+          {showDoor && (
+            <div key={openKey} style={{ position:'absolute', inset:0, zIndex:10, borderRadius:20, overflow:'hidden' }}>
+              <DoorAnimationInline onComplete={() => { setShowDoor(false); setIsOpen(true); }} />
             </div>
           )}
         </div>
@@ -904,27 +1242,29 @@ function InkanyeziBotWidget() {
 // WHATSAPP WIDGET
 // ════════════════════════════════════════════════════════════════════
 function WhatsAppWidget() {
-  const [hovered,setHovered]=useState(false);
-  const [visible,setVisible]=useState(false);
-  useEffect(()=>{const t=setTimeout(()=>setVisible(true),1500);return()=>clearTimeout(t);},[]);
-  return(
+  const [hovered, setHovered] = useState(false);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setVisible(true), 1500); return () => clearTimeout(t); }, []);
+  return (
     <>
       <style>{`
-        @keyframes waPulse{0%{box-shadow:0 0 0 0 rgba(37,211,102,0.6);}70%{box-shadow:0 0 0 14px rgba(37,211,102,0);}100%{box-shadow:0 0 0 0 rgba(37,211,102,0);}}
-        @keyframes waFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
-        @keyframes waFade{from{opacity:0;transform:translateX(8px);}to{opacity:1;transform:translateX(0);}}
-        .wa-btn{animation:waPulse 2.5s ease-out infinite,waFloat 3s ease-in-out infinite;transition:all 0.25s ease !important;}
-        .wa-btn:hover{transform:scale(1.1) !important;box-shadow:0 8px 30px rgba(37,211,102,0.6) !important;animation:none !important;}
-        .wa-tip{animation:waFade 0.2s ease forwards;}
+        @keyframes waPulse { 0%{box-shadow:0 0 0 0 rgba(37,211,102,0.6);} 70%{box-shadow:0 0 0 14px rgba(37,211,102,0);} 100%{box-shadow:0 0 0 0 rgba(37,211,102,0);} }
+        @keyframes waFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-4px);} }
+        @keyframes waFade { from{opacity:0;transform:translateX(8px);} to{opacity:1;transform:translateX(0);} }
+        .wa-btn { animation: waPulse 2.5s ease-out infinite, waFloat 3s ease-in-out infinite; transition: all 0.25s ease !important; }
+        .wa-btn:hover { transform: scale(1.1) !important; box-shadow: 0 8px 30px rgba(37,211,102,0.6) !important; animation: none !important; }
+        .wa-tip { animation: waFade 0.2s ease forwards; }
       `}</style>
-      <div style={{position:'fixed',bottom:96,right:28,zIndex:10002,display:'flex',alignItems:'center',gap:10,opacity:visible?1:0,transform:visible?'scale(1)':'scale(0.8)',transition:'opacity 0.4s ease, transform 0.4s ease'}}>
-        {hovered&&(<div className="wa-tip" style={{background:'linear-gradient(135deg, rgba(10,22,40,0.98), rgba(4,8,15,0.98))',border:'1px solid rgba(37,211,102,0.3)',borderRadius:10,padding:'8px 14px',whiteSpace:'nowrap',boxShadow:'0 4px 20px rgba(0,0,0,0.5)',position:'relative'}}>
-          <div style={{fontSize:12,fontWeight:700,color:'#fff',fontFamily:"'Syne',sans-serif",marginBottom:2}}>Chat with Sanele</div>
-          <div style={{fontSize:10,color:'rgba(255,255,255,0.5)',fontFamily:"'Space Mono',monospace"}}>+27 65 880 4122</div>
-          <div style={{position:'absolute',right:-6,top:'50%',transform:'translateY(-50%)',width:0,height:0,borderTop:'6px solid transparent',borderBottom:'6px solid transparent',borderLeft:'6px solid rgba(37,211,102,0.3)'}}/>
-        </div>)}
+      <div style={{ position:'fixed', bottom:96, right:28, zIndex:10002, display:'flex', alignItems:'center', gap:10, opacity:visible?1:0, transform:visible?'scale(1)':'scale(0.8)', transition:'opacity 0.4s ease, transform 0.4s ease' }}>
+        {hovered && (
+          <div className="wa-tip" style={{ background:'linear-gradient(135deg, rgba(10,22,40,0.98), rgba(4,8,15,0.98))', border:'1px solid rgba(37,211,102,0.3)', borderRadius:10, padding:'8px 14px', whiteSpace:'nowrap', boxShadow:'0 4px 20px rgba(0,0,0,0.5)', position:'relative' }}>
+            <div style={{ fontSize:12, fontWeight:700, color:'#fff', fontFamily:"'Syne',sans-serif", marginBottom:2 }}>Chat with Sanele</div>
+            <div style={{ fontSize:10, color:'rgba(255,255,255,0.5)', fontFamily:"'Space Mono',monospace" }}>+27 65 880 4122</div>
+            <div style={{ position:'absolute', right:-6, top:'50%', transform:'translateY(-50%)', width:0, height:0, borderTop:'6px solid transparent', borderBottom:'6px solid transparent', borderLeft:'6px solid rgba(37,211,102,0.3)' }} />
+          </div>
+        )}
         <a href="https://wa.me/27658804122?text=Sawubona%21%20I%20visited%20Inkanyezi%20Technologies%20and%20would%20like%20to%20know%20more%20about%20AI%20automation%20for%20my%20business." target="_blank" rel="noopener noreferrer" className="wa-btn" onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)}
-          style={{width:56,height:56,borderRadius:'50%',background:'linear-gradient(135deg, #25D366, #128C7E)',display:'flex',alignItems:'center',justifyContent:'center',textDecoration:'none',flexShrink:0}} aria-label="Chat with us on WhatsApp">
+          style={{ width:56, height:56, borderRadius:'50%', background:'linear-gradient(135deg, #25D366, #128C7E)', display:'flex', alignItems:'center', justifyContent:'center', textDecoration:'none', flexShrink:0 }} aria-label="Chat with us on WhatsApp">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="28" height="28">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
           </svg>
