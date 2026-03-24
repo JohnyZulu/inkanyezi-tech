@@ -1044,7 +1044,7 @@ function InkanyeziBotWidget() {
         timestamp:           new Date().toISOString(),
         sast_time:           new Date().toLocaleString('en-ZA',{timeZone:'Africa/Johannesburg'}),
       };
-      await fetch('https://hook.eu1.make.com/rq1e6yppdpa6orvw87fg1xabekvq4id8', {
+      await fetch('https://hook.eu1.make.com/szwnkr7dbgk4uq8aymnxa5vzuw3jb85j', {
         method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
       });
       setLeadFormSubmitted(true); setShowLeadForm(false);
