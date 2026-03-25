@@ -860,13 +860,56 @@ function InkanyeziBotWidget() {
   const [openKey, setOpenKey]                 = useState(0);
   const [isFullscreen, setIsFullscreen]       = useState(false);
 
+  const [isListening, setIsListening]   = useState(false);
+  const [micSupported, setMicSupported] = useState(false);
+  const [showMicHint, setShowMicHint]   = useState(false);
+  const recognitionRef = useRef<any>(null);
+
   const hasTriggered = useRef(false);
   const messagesEnd  = useRef<HTMLDivElement>(null);
   const textareaRef  = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior:'smooth' }); }, [messages, showLeadForm, isLoading]);
 
+  /* ── Speech Recognition setup ── */
   useEffect(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      setMicSupported(true);
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-ZA';
+      recognition.onresult = (e: any) => {
+        const transcript = Array.from(e.results)
+          .map((r: any) => r[0].transcript)
+          .join('');
+        setInput(transcript);
+        if (e.results[e.results.length - 1].isFinal) {
+          setIsListening(false);
+        }
+      };
+      recognition.onerror = () => setIsListening(false);
+      recognition.onend   = () => setIsListening(false);
+      recognitionRef.current = recognition;
+      // Show onboarding hint 3s after opening, only if not seen before
+      if (!localStorage.getItem('ink_mic_seen')) {
+        setTimeout(() => setShowMicHint(true), 3000);
+      }
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) return;
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      setInput('');
+      recognitionRef.current.start();
+      setIsListening(true);
+    }
+  };
     const STORAGE_KEY = 'inkanyezi_chat_session';
     const VISITOR_KEY = 'inkanyezi_visitor';
     const INACTIVITY_MS = 20 * 60 * 1000;
@@ -1077,6 +1120,8 @@ function InkanyeziBotWidget() {
         @keyframes rocketGlow { 0%,100%{box-shadow:0 0 14px rgba(249,115,22,0.5);} 50%{box-shadow:0 0 22px rgba(249,115,22,0.8),0 0 40px rgba(249,115,22,0.3);} }
         @keyframes greetingPop { from{opacity:0;transform:translateY(10px) scale(0.95);} to{opacity:1;transform:translateY(0) scale(1);} }
         @keyframes stepSlide { from{opacity:0;transform:translateX(10px);} to{opacity:1;transform:translateX(0);} }
+        @keyframes micHintPop { from{opacity:0;transform:translateX(-50%) translateY(4px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+        @keyframes micHintFade { 0%,70%{opacity:1;} 100%{opacity:0;} }
         .ink-msg { animation: msgFadeUp 0.3s ease forwards; }
 
         /* ── CHIPS ── */
@@ -1144,7 +1189,29 @@ function InkanyeziBotWidget() {
         }
 
         /* ── INPUT BAR — account for home bar on iPhone X+ ── */
-        .ink-input-bar {
+        .ink-mic {
+          width:44px; height:44px; border-radius:50%; flex-shrink:0;
+          border:none; cursor:pointer; display:flex; align-items:center;
+          justify-content:center; font-size:18px; transition:all 0.2s;
+          touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+          position:relative;
+        }
+        .ink-mic.listening {
+          animation: mic-pulse 1.2s ease-in-out infinite;
+        }
+        @keyframes mic-pulse {
+          0%,100% { box-shadow: 0 0 0 0 rgba(244,185,66,0.5); }
+          50%      { box-shadow: 0 0 0 10px rgba(244,185,66,0); }
+        }
+        .ink-mic-tooltip {
+          position:absolute; bottom:52px; left:50%; transform:translateX(-50%);
+          background:#0A1628; color:#F4B942; font-size:11px; white-space:nowrap;
+          padding:4px 10px; border-radius:6px; pointer-events:none;
+          opacity:0; transition:opacity 0.2s;
+          font-family:"'Space Mono',monospace";
+          border:1px solid rgba(244,185,66,0.3);
+        }
+        .ink-mic:hover .ink-mic-tooltip { opacity:1; }
           padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
         }
 
@@ -1347,7 +1414,7 @@ function InkanyeziBotWidget() {
                       sendMessage();
                     }
                   }}
-                  placeholder="Type your message..."
+                  placeholder={isListening ? '🎙 Listening… speak now' : 'Type a message or tap 🎙 to speak'}
                   rows={1}
                   autoComplete="off"
                   autoCorrect="on"
@@ -1376,6 +1443,44 @@ function InkanyeziBotWidget() {
                   onFocus={e => e.target.style.borderColor = '#F4B942'}
                   onBlur={e => e.target.style.borderColor = 'rgba(244,185,66,0.3)'}
                 />
+                {/* Mic button — speech to text */}
+                {micSupported && (
+                  <div style={{ position:'relative', flexShrink:0 }}>
+                    {/* First-open onboarding hint — shows once then hides */}
+                    {showMicHint && !isListening && (
+                      <div style={{
+                        position:'absolute', bottom:52, left:'50%',
+                        transform:'translateX(-50%)',
+                        background:'#0A1628', color:'#F4B942',
+                        fontSize:11, whiteSpace:'nowrap',
+                        padding:'6px 12px', borderRadius:8,
+                        border:'1px solid rgba(244,185,66,0.4)',
+                        fontFamily:"'Space Mono',monospace",
+                        pointerEvents:'none', zIndex:10,
+                        animation:'micHintPop 0.3s ease',
+                      }}>
+                        🎙 Tap to speak
+                        <div style={{ position:'absolute', bottom:-5, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'5px solid #0A1628' }} />
+                      </div>
+                    )}
+                    <button
+                      className={`ink-mic${isListening ? ' listening' : ''}`}
+                      onPointerUp={() => { setShowMicHint(false); toggleListening(); }}
+                      aria-label={isListening ? 'Stop recording' : 'Speak your message'}
+                      style={{
+                        background: isListening
+                          ? 'linear-gradient(135deg, #F4B942, #FF6B35)'
+                          : 'rgba(244,185,66,0.15)',
+                        border: isListening
+                          ? '2px solid #F4B942'
+                          : '1.5px solid rgba(244,185,66,0.5)',
+                        color: isListening ? '#0A1628' : '#F4B942',
+                        WebkitTapHighlightColor:'transparent',
+                      }}>
+                      {isListening ? '⏹' : '🎙'}
+                    </button>
+                  </div>
+                )}
                 {/* Send button — tap-friendly 44×44 touch target */}
                 <button
                   className="ink-rocket"
