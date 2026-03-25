@@ -29,41 +29,136 @@ const C = {
   saBlue:   '#002395',
 };
 
-// ── CONSTELLATION CANVAS ─────────────────────────────────────────────
+// ── GALAXY CANVAS — Milky Way + Nebula + Drifting Stars ──────────────
 function CosmosCanvas({ width, height }: { width: number; height: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = ref.current; if (!canvas) return;
     const ctx = canvas.getContext('2d')!;
     canvas.width = width; canvas.height = height;
+    const W = width, H = height;
     let raf: number;
-    const stars = Array.from({ length: 80 }, () => ({
-      x: Math.random(), y: Math.random(),
-      r: Math.random() * 1.4 + 0.2,
+    let tick = 0;
+
+    // Distant background stars — many, tiny, slow drift
+    const bgStars = Array.from({ length: 220 }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      r: Math.random() * 0.8 + 0.1,
+      op: Math.random() * 0.6 + 0.1,
       pulse: Math.random() * Math.PI * 2,
-      speed: Math.random() * 0.015 + 0.003,
-      gold: Math.random() > 0.85,
-      twinkle: Math.random() * 0.5 + 0.5,
+      speed: Math.random() * 0.006 + 0.001,
+      driftX: (Math.random() - 0.5) * 0.015,
+      driftY: Math.random() * 0.008 + 0.002,
     }));
-    const lines = [[0,7],[7,15],[15,22],[22,8],[8,3],[3,17],[17,31],[31,42],[12,28],[28,44]];
+
+    // Brighter foreground stars — gold + white, cross-flare
+    const fgStars = Array.from({ length: 40 }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      r: Math.random() * 1.6 + 0.5,
+      pulse: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.012 + 0.004,
+      driftX: (Math.random() - 0.5) * 0.025,
+      driftY: Math.random() * 0.012 + 0.004,
+      gold: Math.random() > 0.5,
+    }));
+
+    // Milky Way band — dense micro-stars along a diagonal
+    const milkyWay = Array.from({ length: 180 }, () => {
+      const t = Math.random();
+      return {
+        x: W * 0.08 + t * W * 0.84 + (Math.random() - 0.5) * W * 0.36,
+        y: H * 0.62 - t * H * 0.42 + (Math.random() - 0.5) * H * 0.30,
+        r: Math.random() * 1.1 + 0.15,
+        op: Math.random() * 0.55 + 0.05,
+        pulse: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.007 + 0.002,
+        driftX: (Math.random() - 0.5) * 0.008,
+        driftY: -Math.random() * 0.005,
+      };
+    });
+
     const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      lines.forEach(([a,b]) => {
-        if (!stars[a] || !stars[b]) return;
-        ctx.beginPath();
-        ctx.moveTo(stars[a].x * canvas.width, stars[a].y * canvas.height);
-        ctx.lineTo(stars[b].x * canvas.width, stars[b].y * canvas.height);
-        ctx.strokeStyle = 'rgba(244,185,66,0.06)'; ctx.lineWidth = 0.5; ctx.stroke();
+      ctx.clearRect(0, 0, W, H);
+      tick += 0.008;
+
+      // Deep space base gradient
+      const bg = ctx.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, 'rgba(2,4,14,0.97)');
+      bg.addColorStop(0.45, 'rgba(4,8,24,0.95)');
+      bg.addColorStop(1, 'rgba(8,4,20,0.97)');
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+      // Purple/blue nebula haze — left
+      const neb1 = ctx.createRadialGradient(W*0.22, H*0.32, 0, W*0.22, H*0.32, W*0.58);
+      neb1.addColorStop(0, 'rgba(90,45,170,0.11)');
+      neb1.addColorStop(0.5, 'rgba(45,22,110,0.05)');
+      neb1.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = neb1; ctx.fillRect(0, 0, W, H);
+
+      // Blue nebula haze — right
+      const neb2 = ctx.createRadialGradient(W*0.78, H*0.68, 0, W*0.78, H*0.68, W*0.48);
+      neb2.addColorStop(0, 'rgba(22,65,130,0.10)');
+      neb2.addColorStop(0.5, 'rgba(10,32,85,0.04)');
+      neb2.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = neb2; ctx.fillRect(0, 0, W, H);
+
+      // Gold Inkanyezi nebula glint — breathes slowly
+      const neb3 = ctx.createRadialGradient(W*0.56, H*0.18, 0, W*0.56, H*0.18, W*0.32);
+      neb3.addColorStop(0, `rgba(244,185,66,${0.045 + 0.022*Math.sin(tick)})`);
+      neb3.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = neb3; ctx.fillRect(0, 0, W, H);
+
+      // Milky Way diffuse band — diagonal glow
+      const mwGrad = ctx.createLinearGradient(W*0.04, H*0.68, W*0.96, H*0.12);
+      mwGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      mwGrad.addColorStop(0.18, 'rgba(200,185,255,0.055)');
+      mwGrad.addColorStop(0.5, 'rgba(220,210,255,0.11)');
+      mwGrad.addColorStop(0.82, 'rgba(200,185,255,0.055)');
+      mwGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = mwGrad; ctx.fillRect(0, 0, W, H);
+
+      // Milky Way micro-star particles
+      milkyWay.forEach(s => {
+        s.pulse += s.speed; s.x += s.driftX; s.y += s.driftY;
+        if (s.y < -2) { s.y = H + 2; s.x = Math.random() * W; }
+        if (s.x < -2) s.x = W + 2; if (s.x > W + 2) s.x = -2;
+        const op = s.op * (0.4 + 0.6 * Math.sin(s.pulse));
+        const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 2.5);
+        g.addColorStop(0, `rgba(205,215,255,${op})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
       });
-      stars.forEach(s => {
-        s.pulse += s.speed;
-        const op = s.twinkle * (0.5 + 0.5 * Math.sin(s.pulse));
-        const grd = ctx.createRadialGradient(s.x*canvas.width, s.y*canvas.height, 0, s.x*canvas.width, s.y*canvas.height, s.r*3);
-        grd.addColorStop(0, s.gold ? `rgba(244,185,66,${op})` : `rgba(255,255,255,${op*0.7})`);
-        grd.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.beginPath(); ctx.arc(s.x*canvas.width, s.y*canvas.height, s.r*1.5, 0, Math.PI*2);
-        ctx.fillStyle = grd; ctx.fill();
+
+      // Background stars — drift slowly upward
+      bgStars.forEach(s => {
+        s.pulse += s.speed; s.x += s.driftX; s.y += s.driftY;
+        if (s.y > H + 2) { s.y = -2; s.x = Math.random() * W; }
+        if (s.x < -2) s.x = W + 2; if (s.x > W + 2) s.x = -2;
+        const op = s.op * (0.5 + 0.5 * Math.sin(s.pulse));
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(210,225,255,${op})`; ctx.fill();
       });
+
+      // Foreground bright stars — gold + white, cross-flare on bright ones
+      fgStars.forEach(s => {
+        s.pulse += s.speed; s.x += s.driftX; s.y += s.driftY;
+        if (s.y > H + 2) { s.y = -2; s.x = Math.random() * W; }
+        if (s.x < -2) s.x = W + 2; if (s.x > W + 2) s.x = -2;
+        const op = 0.5 + 0.5 * Math.sin(s.pulse);
+        const color = s.gold ? `rgba(244,185,66,${op * 0.9})` : `rgba(255,255,255,${op * 0.75})`;
+        const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 3);
+        g.addColorStop(0, color); g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 1.8, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+        if (op > 0.72 && s.r > 1.2) {
+          ctx.strokeStyle = s.gold ? `rgba(244,185,66,${op * 0.28})` : `rgba(255,255,255,${op * 0.18})`;
+          ctx.lineWidth = 0.4;
+          ctx.beginPath(); ctx.moveTo(s.x - s.r*2.8, s.y); ctx.lineTo(s.x + s.r*2.8, s.y); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(s.x, s.y - s.r*2.8); ctx.lineTo(s.x, s.y + s.r*2.8); ctx.stroke();
+        }
+      });
+
       raf = requestAnimationFrame(draw);
     };
     draw();
@@ -154,7 +249,7 @@ function LeadField({ label, name, type='text', placeholder, value, onChange, req
         {label}{required&&<span style={{color:C.orange}}> *</span>}
       </label>
       <input type={type} name={name} value={value} onChange={onChange} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)} placeholder={placeholder} required={required}
-        style={{ width:'100%', boxSizing:'border-box', background:focused?'rgba(244,185,66,0.05)':'rgba(255,255,255,0.03)', border:`1px solid ${focused?'rgba(244,185,66,0.45)':'rgba(255,255,255,0.08)'}`, borderRadius:'5px', padding:'0.48rem 0.65rem', color:'#fff', fontSize:'0.8rem', fontFamily:"'DM Sans',sans-serif", outline:'none', transition:'all 0.2s' }} />
+        style={{ width:'100%', boxSizing:'border-box', background:focused?'rgba(255,255,255,0.28)':'rgba(255,255,255,0.16)', border:`1px solid ${focused?'rgba(244,185,66,0.75)':'rgba(255,255,255,0.35)'}`, borderRadius:'5px', padding:'0.48rem 0.65rem', color:'#fff', fontSize:'0.8rem', fontFamily:"'DM Sans',sans-serif", outline:'none', transition:'all 0.2s', boxShadow:focused?'0 0 0 2px rgba(244,185,66,0.12), inset 0 1px 0 rgba(255,255,255,0.08)':'inset 0 1px 0 rgba(255,255,255,0.05)' }} />
     </div>
   );
 }
@@ -168,7 +263,7 @@ function LeadSelect({ label, name, value, onChange, options, required }: any) {
       </label>
       <div style={{ position:'relative' }}>
         <select name={name} value={value} onChange={onChange} required={required} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)}
-          style={{ width:'100%', appearance:'none', boxSizing:'border-box', background:'rgba(10,22,40,0.98)', border:`1px solid ${focused?'rgba(244,185,66,0.45)':'rgba(255,255,255,0.08)'}`, borderRadius:'5px', padding:'0.48rem 1.8rem 0.48rem 0.65rem', color:value?'#fff':'rgba(255,255,255,0.25)', fontSize:'0.8rem', fontFamily:"'DM Sans',sans-serif", outline:'none', cursor:'pointer', transition:'all 0.2s' }}>
+          style={{ width:'100%', appearance:'none', boxSizing:'border-box', background:focused?'rgba(255,255,255,0.28)':'rgba(255,255,255,0.16)', border:`1px solid ${focused?'rgba(244,185,66,0.75)':'rgba(255,255,255,0.35)'}`, borderRadius:'5px', padding:'0.48rem 1.8rem 0.48rem 0.65rem', color:value?'#fff':'rgba(255,255,255,0.45)', fontSize:'0.8rem', fontFamily:"'DM Sans',sans-serif", outline:'none', cursor:'pointer', transition:'all 0.2s', boxShadow:focused?'0 0 0 2px rgba(244,185,66,0.12), inset 0 1px 0 rgba(255,255,255,0.08)':'inset 0 1px 0 rgba(255,255,255,0.05)' }}>
           <option value="" disabled style={{background:'#0A1628'}}>Select...</option>
           {options.map((o: any) => <option key={o.value} value={o.value} style={{background:'#0A1628',color:'#fff'}}>{o.label}</option>)}
         </select>
@@ -898,9 +993,15 @@ function InkanyeziBotWidget() {
         .ink-msgs canvas { position:absolute; inset:0; pointer-events:none; z-index:0; border-radius:0; }
         .ink-msgs > *:not(canvas) { position:relative; z-index:1; }
         @supports (height: 100dvh) {
-          .ink-widget-container { height: min(580px, calc(100dvh - 110px)) !important; }
+          .ink-widget-container { height: min(580px, calc(100dvh - 100px)) !important; }
           .ink-widget-container.ink-fullscreen { height: 100dvh !important; width: 100vw !important; bottom: 0 !important; right: 0 !important; border-radius: 0 !important; }
         }
+        @supports (height: 100svh) {
+          .ink-widget-container { height: min(580px, calc(100svh - 100px)) !important; }
+        }
+        .ink-widget-inner { display:flex; flex-direction:column; height:100%; overflow:hidden; }
+        .ink-msgs { flex:1 1 0 !important; min-height:0 !important; }
+        .ink-input-bar { flex-shrink:0; }
         .ink-bubble-hidden { opacity:0 !important; pointer-events:none !important; }
         @keyframes greetingPop { from{opacity:0;transform:translateY(10px) scale(0.95);} to{opacity:1;transform:translateY(0) scale(1);} }
         .ink-msg { animation: msgFadeUp 0.3s ease forwards; }
@@ -959,7 +1060,7 @@ function InkanyeziBotWidget() {
         aria-label={isOpen?'Close InkanyeziBot':'Open InkanyeziBot'}
         style={{
           position:'fixed', bottom:24, right:24, zIndex:99999,
-          width:64, height:64, borderRadius:'50%',
+          width:52, height:52, borderRadius:'50%',
           background: isOpen
             ? 'linear-gradient(135deg, #e53e3e, #c53030)'
             : 'linear-gradient(135deg, #FF6B35, #c2410c)',
@@ -976,7 +1077,7 @@ function InkanyeziBotWidget() {
         }}>
         {/* Orbit ring — only when closed */}
         {!isOpen && !showDoor && (
-          <div style={{ position:'absolute', width:64, height:64, animation:'orbitRing 4s linear infinite', pointerEvents:'none' }}>
+          <div style={{ position:'absolute', width:52, height:52, animation:'orbitRing 4s linear infinite', pointerEvents:'none' }}>
             <div style={{ position:'absolute', top:-3, left:'50%', width:7, height:7, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 10px ${C.gold}` }} />
           </div>
         )}
@@ -999,25 +1100,14 @@ function InkanyeziBotWidget() {
         ) : (
           <span style={{ position:'relative', zIndex:1 }}>⭐</span>
         )}
-        {/* Close label — appears above button */}
-        {isOpen && (
-          <div style={{
-            position:'absolute', bottom:'calc(100% + 8px)', left:'50%',
-            transform:'translateX(-50%)',
-            background:'rgba(229,62,62,0.9)',
-            color:'#fff', fontSize:'0.55rem', fontFamily:"'Space Mono',monospace",
-            letterSpacing:'0.1em', padding:'3px 8px', borderRadius:4,
-            whiteSpace:'nowrap', pointerEvents:'none',
-            boxShadow:'0 2px 8px rgba(229,62,62,0.4)',
-          }}>CLOSE</div>
-        )}
+
       </button>
 
       {/* ── UNIFIED CONTAINER — door + chat always together, no gap ── */}
       {(showDoor || isOpen) && (
         <div className={`ink-widget-container${isFullscreen?' ink-fullscreen':''}`} style={{
           position:'fixed',
-          bottom: isFullscreen ? 0 : 90,
+          bottom: isFullscreen ? 0 : 82,
           right:  isFullscreen ? 0 : 24,
           left:   isFullscreen ? 0 : 'auto',
           top:    isFullscreen ? 0 : 'auto',
@@ -1030,8 +1120,7 @@ function InkanyeziBotWidget() {
           transition:'all 0.3s cubic-bezier(0.4,0,0.2,1)',
         }}>
 
-          {/* CHAT — fills container, always present, door sits on top */}
-          <div style={{
+          <div className="ink-widget-inner" style={{
             position:'absolute', inset:0,
             display:'flex', flexDirection:'column',
             borderRadius:20, overflow:'hidden',
@@ -1075,30 +1164,19 @@ function InkanyeziBotWidget() {
           </div>
 
           {/* Messages — with twinkling star background */}
-          <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'#0A1628', position:'relative' }}>
+          <div className="ink-msgs" style={{ flex:'1 1 0', minHeight:0, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'#0A1628', position:'relative' }}>
             <CosmosCanvas width={370} height={580} />
             {messages.map((msg,i) => (
               <div key={i} className="ink-msg" style={{ display:'flex', justifyContent:msg.role==='user'?'flex-end':'flex-start', alignItems:'flex-end', gap:6, animationDelay:`${i*0.03}s` }}>
                 {msg.role==='assistant' && (
                   <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, boxShadow:'0 0 8px rgba(249,115,22,0.4)' }}>⭐</div>
                 )}
-                <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'rgba(255,255,255,0.95)', color:'#1a1a2e', border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.2)', boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.3)':'0 2px 8px rgba(0,0,0,0.2)', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
+                <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'linear-gradient(145deg, rgba(18,32,60,0.96) 0%, rgba(10,22,40,0.98) 100%)', color:msg.role==='user'?'#1a1a2e':'rgba(240,245,255,0.95)', border:msg.role==='user'?'1px solid rgba(255,200,80,0.4)':'1px solid rgba(120,160,255,0.18)', boxShadow:msg.role==='user'?'0 2px 14px rgba(244,185,66,0.35), 0 1px 0 rgba(255,230,120,0.4) inset, 0 -1px 0 rgba(180,100,20,0.3) inset':'0 4px 20px rgba(0,0,20,0.6), 0 1px 0 rgba(130,170,255,0.15) inset, 0 -1px 0 rgba(0,0,30,0.5) inset, 1px 0 0 rgba(100,140,255,0.08) inset', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:\"'DM Sans',sans-serif" }}
                   dangerouslySetInnerHTML={{ __html:formatMessage(msg.content) }} />
               </div>
             ))}
 
-            {/* Quick chips */}
-            {showChips && messages.length===1 && (
-              <div style={{ display:'flex', flexDirection:'column', gap:6, marginTop:4 }}>
-                <div style={{ fontSize:'0.6rem', color:'rgba(100,110,130,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.1em', textAlign:'center', marginBottom:2 }}>Quick questions:</div>
-                {CHIPS.map((chip,i) => (
-                  <button key={i} className="ink-chip" onClick={()=>sendMessage(chip.msg)}
-                    style={{ background:'rgba(255,255,255,0.9)', border:'1px solid rgba(244,185,66,0.4)', borderRadius:8, padding:'8px 12px', color:'#1a1a2e', fontSize:12, cursor:'pointer', textAlign:'left', fontFamily:"'DM Sans',sans-serif", animationDelay:`${i*0.08}s`, opacity:0 }}>
-                    {chip.label}
-                  </button>
-                ))}
-              </div>
-            )}
+
 
             {/* Lead form */}
             {showLeadForm && !leadFormSubmitted && (
@@ -1118,7 +1196,7 @@ function InkanyeziBotWidget() {
           </div>
 
           {/* Input */}
-          <div style={{ flexShrink:0, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#FFFFFF' }}>
+          <div className="ink-input-bar" style={{ flexShrink:0, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#FFFFFF' }}>
             <div style={{ display:'flex', gap:8, alignItems:'flex-end' }}>
               <textarea ref={textareaRef} value={input} className="ink-textarea"
                 onChange={e => { setInput(e.target.value); e.target.style.height='auto'; e.target.style.height=Math.min(e.target.scrollHeight,96)+'px'; }}
