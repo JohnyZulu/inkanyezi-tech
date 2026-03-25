@@ -179,11 +179,12 @@ function LeadSelect({ label, name, value, onChange, options, required }: any) {
 }
 
 // ── CHAT LEAD FORM ───────────────────────────────────────────────────
-function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting }: any) {
+function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting, onVoiceField }: any) {
   const [submitted, setSubmitted] = useState(false);
   const [consent, setConsent] = useState(false);
   const [visible, setVisible] = useState(false);
   const [form, setForm] = useState({ name:'', email:'', phone:'', company:'', industry:'', service_interest:'', message:'' });
+  const setField = (field: string) => (val: string) => setForm(f => ({ ...f, [field]: val }));
   useEffect(() => { setTimeout(() => setVisible(true), 60); }, []);
   useEffect(() => {
     setForm(f => ({ ...f,
@@ -239,8 +240,14 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting }: an
               </div>
               <form onSubmit={submit}>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.48rem' }}>
-                  <LeadField label="Your Name" name="name" placeholder="e.g. Sipho" value={form.name} onChange={handle} required />
-                  <LeadField label="Business" name="company" placeholder="Company name" value={form.company} onChange={handle} />
+                  <div style={{position:'relative'}}>
+                    <LeadField label="Your Name" name="name" placeholder="e.g. Sipho" value={form.name} onChange={handle} required />
+                    {onVoiceField && <button type="button" onPointerUp={()=>onVoiceField(setField('name'))} style={{position:'absolute',right:6,bottom:6,width:22,height:22,borderRadius:'50%',background:'rgba(244,185,66,0.15)',border:'1px solid rgba(244,185,66,0.4)',color:'#F4B942',fontSize:11,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}} title="Speak your name">🎙</button>}
+                  </div>
+                  <div style={{position:'relative'}}>
+                    <LeadField label="Business" name="company" placeholder="Company name" value={form.company} onChange={handle} />
+                    {onVoiceField && <button type="button" onPointerUp={()=>onVoiceField(setField('company'))} style={{position:'absolute',right:6,bottom:6,width:22,height:22,borderRadius:'50%',background:'rgba(244,185,66,0.15)',border:'1px solid rgba(244,185,66,0.4)',color:'#F4B942',fontSize:11,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}} title="Speak company name">🎙</button>}
+                  </div>
                 </div>
                 <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.48rem' }}>
                   <LeadField label="Email" name="email" type="email" placeholder="you@business.co.za" value={form.email} onChange={handle} required />
@@ -561,11 +568,28 @@ function InkanyeziBotWidget() {
   const [greetingVisible, setGreetingVisible] = useState(false);
   const [showDoor, setShowDoor]               = useState(false);
   const [openKey, setOpenKey]                 = useState(0);
+  const [isFullscreen, setIsFullscreen]       = useState(false);
 
   const [isListening, setIsListening]   = useState(false);
   const [micSupported, setMicSupported] = useState(false);
   const [showMicHint, setShowMicHint]   = useState(false);
   const recognitionRef = useRef<any>(null);
+
+  // Voice fill helper — fills a form field by name using speech
+  const startVoiceForField = (fieldSetter: (v: string) => void) => {
+    if (!recognitionRef.current) return;
+    const r = recognitionRef.current;
+    r.onresult = (e: any) => {
+      const t = Array.from(e.results).map((r: any) => r[0].transcript).join('');
+      fieldSetter(t);
+      if (e.results[e.results.length - 1].isFinal) setIsListening(false);
+    };
+    r.onerror = () => setIsListening(false);
+    r.onend   = () => setIsListening(false);
+    setInput('');
+    setIsListening(true);
+    r.start();
+  };
 
   const hasTriggered = useRef(false);
   const messagesEnd  = useRef<HTMLDivElement>(null);
@@ -765,13 +789,14 @@ function InkanyeziBotWidget() {
     if (isOpen) { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }
   }, [isOpen]);
 
-  // Lead form trigger — show after first bot reply so contact is captured early
+  // Lead form trigger — show after 2nd user message for natural flow
   useEffect(() => {
     if (hasTriggered.current || leadFormSubmitted) return;
     const userMsgs = messages.filter(m => m.role === 'user');
-    if (userMsgs.length >= 1 && messages.length >= 2 && !isLoading) {
+    // Wait for 2 user exchanges so conversation feels natural before asking for details
+    if (userMsgs.length >= 2 && !isLoading) {
       hasTriggered.current = true;
-      setTimeout(() => setShowLeadForm(true), 800);
+      setTimeout(() => setShowLeadForm(true), 1200);
     }
   }, [messages, leadFormSubmitted, isLoading]);
 
@@ -869,6 +894,14 @@ function InkanyeziBotWidget() {
         @keyframes rocketGlow { 0%,100%{box-shadow:0 0 14px rgba(249,115,22,0.5);} 50%{box-shadow:0 0 22px rgba(249,115,22,0.8),0 0 40px rgba(249,115,22,0.3);} }
         @keyframes micPulse { 0%,100%{box-shadow:0 0 0 0 rgba(244,185,66,0.6);} 50%{box-shadow:0 0 0 10px rgba(244,185,66,0);} }
         @keyframes micHintPop { from{opacity:0;transform:translateX(-50%) translateY(4px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+        @keyframes starTwinkle { 0%,100%{opacity:0.6;} 50%{opacity:1;} }
+        .ink-msgs canvas { position:absolute; inset:0; pointer-events:none; z-index:0; border-radius:0; }
+        .ink-msgs > *:not(canvas) { position:relative; z-index:1; }
+        @supports (height: 100dvh) {
+          .ink-widget-container { height: min(580px, calc(100dvh - 110px)) !important; }
+          .ink-widget-container.ink-fullscreen { height: 100dvh !important; width: 100vw !important; bottom: 0 !important; right: 0 !important; border-radius: 0 !important; }
+        }
+        .ink-bubble-hidden { opacity:0 !important; pointer-events:none !important; }
         @keyframes greetingPop { from{opacity:0;transform:translateY(10px) scale(0.95);} to{opacity:1;transform:translateY(0) scale(1);} }
         .ink-msg { animation: msgFadeUp 0.3s ease forwards; }
         .ink-chip { animation: chipAppear 0.3s ease forwards; transition: all 0.2s !important; }
@@ -982,10 +1015,19 @@ function InkanyeziBotWidget() {
 
       {/* ── UNIFIED CONTAINER — door + chat always together, no gap ── */}
       {(showDoor || isOpen) && (
-        <div style={{
-          position:'fixed', bottom:100, right:24, width:370, height:580,
-          zIndex:99998, borderRadius:20, overflow:'hidden',
-          boxShadow:'0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)',
+        <div className={`ink-widget-container${isFullscreen?' ink-fullscreen':''}`} style={{
+          position:'fixed',
+          bottom: isFullscreen ? 0 : 90,
+          right:  isFullscreen ? 0 : 24,
+          left:   isFullscreen ? 0 : 'auto',
+          top:    isFullscreen ? 0 : 'auto',
+          width:  isFullscreen ? '100vw' : 'min(370px, calc(100vw - 32px))',
+          height: isFullscreen ? '100vh' : 'min(580px, calc(100vh - 110px))',
+          zIndex:99998,
+          borderRadius: isFullscreen ? 0 : 20,
+          overflow:'hidden',
+          boxShadow: isFullscreen ? 'none' : '0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)',
+          transition:'all 0.3s cubic-bezier(0.4,0,0.2,1)',
         }}>
 
           {/* CHAT — fills container, always present, door sits on top */}
@@ -1017,20 +1059,30 @@ function InkanyeziBotWidget() {
                 <SignalDot /><span>Online · AI Automation · Durban, ZA</span>
               </div>
             </div>
-            <div style={{ textAlign:'right', flexShrink:0 }}>
-              <div style={{ fontSize:10, color:'rgba(100,80,20,0.5)', fontFamily:"'Space Mono',monospace" }}>🇿🇦 SA AI</div>
-              <HeritageStrip style={{ justifyContent:'flex-end', marginTop:3 }} />
+            <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+              <button
+                onClick={() => setIsFullscreen(f => !f)}
+                title={isFullscreen ? 'Minimise' : 'Expand'}
+                style={{ width:28, height:28, borderRadius:6, background:'rgba(244,185,66,0.08)', border:'1px solid rgba(244,185,66,0.25)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:13, color:'#6B4F10', transition:'all 0.2s', flexShrink:0 }}
+                onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.2)';}}
+                onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.08)';}}
+              >{isFullscreen ? '⊡' : '⤢'}</button>
+              <div style={{ textAlign:'right' }}>
+                <div style={{ fontSize:10, color:'rgba(100,80,20,0.5)', fontFamily:"'Space Mono',monospace" }}>🇿🇦 SA AI</div>
+                <HeritageStrip style={{ justifyContent:'flex-end', marginTop:3 }} />
+              </div>
             </div>
           </div>
 
-          {/* Messages */}
-          <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'#F5F7FA' }}>
+          {/* Messages — with twinkling star background */}
+          <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'#0A1628', position:'relative' }}>
+            <CosmosCanvas width={370} height={580} />
             {messages.map((msg,i) => (
               <div key={i} className="ink-msg" style={{ display:'flex', justifyContent:msg.role==='user'?'flex-end':'flex-start', alignItems:'flex-end', gap:6, animationDelay:`${i*0.03}s` }}>
                 {msg.role==='assistant' && (
                   <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, boxShadow:'0 0 8px rgba(249,115,22,0.4)' }}>⭐</div>
                 )}
-                <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'#FFFFFF', color:'#1a1a2e', border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.3)', boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.25)':'0 1px 4px rgba(0,0,0,0.06)', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
+                <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'rgba(255,255,255,0.95)', color:'#1a1a2e', border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.2)', boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.3)':'0 2px 8px rgba(0,0,0,0.2)', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
                   dangerouslySetInnerHTML={{ __html:formatMessage(msg.content) }} />
               </div>
             ))}
@@ -1041,7 +1093,7 @@ function InkanyeziBotWidget() {
                 <div style={{ fontSize:'0.6rem', color:'rgba(100,110,130,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.1em', textAlign:'center', marginBottom:2 }}>Quick questions:</div>
                 {CHIPS.map((chip,i) => (
                   <button key={i} className="ink-chip" onClick={()=>sendMessage(chip.msg)}
-                    style={{ background:'#FFFFFF', border:'1px solid rgba(244,185,66,0.35)', borderRadius:8, padding:'8px 12px', color:'#1a1a2e', fontSize:12, cursor:'pointer', textAlign:'left', fontFamily:"'DM Sans',sans-serif", animationDelay:`${i*0.08}s`, opacity:0 }}>
+                    style={{ background:'rgba(255,255,255,0.9)', border:'1px solid rgba(244,185,66,0.4)', borderRadius:8, padding:'8px 12px', color:'#1a1a2e', fontSize:12, cursor:'pointer', textAlign:'left', fontFamily:"'DM Sans',sans-serif", animationDelay:`${i*0.08}s`, opacity:0 }}>
                     {chip.label}
                   </button>
                 ))}
@@ -1050,14 +1102,14 @@ function InkanyeziBotWidget() {
 
             {/* Lead form */}
             {showLeadForm && !leadFormSubmitted && (
-              <ChatLeadForm onSubmit={handleLeadSubmit} onDismiss={()=>setShowLeadForm(false)} sessionContext={sessionContext} submitting={leadSubmitting} />
+              <ChatLeadForm onSubmit={handleLeadSubmit} onDismiss={()=>setShowLeadForm(false)} sessionContext={sessionContext} submitting={leadSubmitting} onVoiceField={micSupported ? startVoiceForField : undefined} />
             )}
 
             {/* Thinking */}
             {isLoading && (
               <div style={{ display:'flex', alignItems:'flex-end', gap:6 }}>
                 <div style={{ width:24, height:24, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, flexShrink:0 }}>⭐</div>
-                <div style={{ background:'#FFFFFF', padding:'12px 16px', borderRadius:14, borderBottomLeftRadius:3, border:'1px solid rgba(244,185,66,0.25)', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', display:'flex', alignItems:'center', gap:5 }}>
+                <div style={{ background:'rgba(255,255,255,0.95)', padding:'12px 16px', borderRadius:14, borderBottomLeftRadius:3, border:'1px solid rgba(244,185,66,0.2)', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', display:'flex', alignItems:'center', gap:5 }}>
                   {[0,1,2].map(i => <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'#F4B942', opacity:0.4, animation:'thinkPulse 1.2s ease-in-out infinite', animationDelay:`${i*0.2}s` }} />)}
                 </div>
               </div>
@@ -1072,6 +1124,7 @@ function InkanyeziBotWidget() {
                 onChange={e => { setInput(e.target.value); e.target.style.height='auto'; e.target.style.height=Math.min(e.target.scrollHeight,96)+'px'; }}
                 onKeyDown={e => { if (e.key==='Enter'&&!e.shiftKey&&!('ontouchstart' in window)) { e.preventDefault(); sendMessage(); } }}
                 placeholder={isListening ? '🎙 Listening… speak now' : 'Type or tap 🎙 to speak...'} rows={1}
+                autoComplete="on" autoCorrect="on" autoCapitalize="sentences" spellCheck={true}
                 style={{ flex:1, padding:'9px 13px', borderRadius:14, background:'#F5F7FA', border:`1px solid ${isListening ? '#F4B942' : 'rgba(244,185,66,0.3)'}`, color:'#1a1a2e', outline:'none', fontSize:16, resize:'none', lineHeight:1.5, wordBreak:'break-word', overflowY:'auto', maxHeight:96, fontFamily:"'DM Sans',sans-serif", transition:'border-color 0.2s', WebkitAppearance:'none' }}
                 onFocus={e=>e.target.style.borderColor='#F4B942'}
                 onBlur={e=>e.target.style.borderColor=isListening?'#F4B942':'rgba(244,185,66,0.3)'}
