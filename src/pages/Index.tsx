@@ -14,7 +14,7 @@ import GlobalStarfield from "@/components/GlobalStarfield";
 import ShootingStars from "@/components/ShootingStars";
 
 // ════════════════════════════════════════════════════════════════════
-// DESIGN TOKENS
+// DESIGN TOKENS — Afrofuturist Cosmos × SA Heritage × Dark Matter
 // ════════════════════════════════════════════════════════════════════
 const C = {
   void:     '#04080F',
@@ -145,38 +145,16 @@ const SERVICES = [
   { value:'unsure',   label:'✦ Just exploring' },
 ];
 
-// ════════════════════════════════════════════════════════════════════
-// LEAD FORM — Corporate-Futuristic, Light Theme
-// Bright, clean, premium — distinct from the dark chat background
-// ════════════════════════════════════════════════════════════════════
-
+// ── LEAD FORM FIELD ──────────────────────────────────────────────────
 function LeadField({ label, name, type='text', placeholder, value, onChange, required }: any) {
   const [focused, setFocused] = useState(false);
   return (
     <div style={{ flex:1, minWidth:0 }}>
-      <label style={{
-        display:'block', fontSize:'0.58rem', letterSpacing:'0.16em',
-        textTransform:'uppercase', fontFamily:"'Space Mono',monospace",
-        color: focused ? '#1a1a2e' : '#6B7280',
-        marginBottom:'0.3rem', transition:'color 0.2s', fontWeight:600,
-      }}>
-        {label}{required && <span style={{ color: C.orange }}> *</span>}
+      <label style={{ display:'block', fontSize:'0.56rem', letterSpacing:'0.14em', textTransform:'uppercase', fontFamily:"'Space Mono',monospace", color:focused?C.gold:'rgba(255,255,255,0.35)', marginBottom:'0.25rem', transition:'color 0.2s' }}>
+        {label}{required&&<span style={{color:C.orange}}> *</span>}
       </label>
-      <input
-        type={type} name={name} value={value} onChange={onChange}
-        onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
-        placeholder={placeholder} required={required}
-        style={{
-          width:'100%', boxSizing:'border-box',
-          background: focused ? '#FFFFFF' : '#F8F9FB',
-          border: `1.5px solid ${focused ? C.gold : '#E5E7EB'}`,
-          borderRadius:'8px', padding:'0.55rem 0.75rem',
-          color:'#111827', fontSize:'0.82rem',
-          fontFamily:"'DM Sans',sans-serif", outline:'none',
-          transition:'all 0.2s',
-          boxShadow: focused ? `0 0 0 3px rgba(244,185,66,0.15), 0 1px 4px rgba(0,0,0,0.06)` : '0 1px 2px rgba(0,0,0,0.04)',
-        }}
-      />
+      <input type={type} name={name} value={value} onChange={onChange} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)} placeholder={placeholder} required={required}
+        style={{ width:'100%', boxSizing:'border-box', background:focused?'rgba(244,185,66,0.05)':'rgba(255,255,255,0.03)', border:`1px solid ${focused?'rgba(244,185,66,0.45)':'rgba(255,255,255,0.08)'}`, borderRadius:'5px', padding:'0.48rem 0.65rem', color:'#fff', fontSize:'0.8rem', fontFamily:"'DM Sans',sans-serif", outline:'none', transition:'all 0.2s' }} />
     </div>
   );
 }
@@ -185,384 +163,105 @@ function LeadSelect({ label, name, value, onChange, options, required }: any) {
   const [focused, setFocused] = useState(false);
   return (
     <div style={{ flex:1, minWidth:0, position:'relative' }}>
-      <label style={{
-        display:'block', fontSize:'0.58rem', letterSpacing:'0.16em',
-        textTransform:'uppercase', fontFamily:"'Space Mono',monospace",
-        color: focused ? '#1a1a2e' : '#6B7280',
-        marginBottom:'0.3rem', transition:'color 0.2s', fontWeight:600,
-      }}>
-        {label}{required && <span style={{ color: C.orange }}> *</span>}
+      <label style={{ display:'block', fontSize:'0.56rem', letterSpacing:'0.14em', textTransform:'uppercase', fontFamily:"'Space Mono',monospace", color:focused?C.gold:'rgba(255,255,255,0.35)', marginBottom:'0.25rem', transition:'color 0.2s' }}>
+        {label}{required&&<span style={{color:C.orange}}> *</span>}
       </label>
       <div style={{ position:'relative' }}>
-        <select
-          name={name} value={value} onChange={onChange}
-          required={required}
-          onFocus={() => setFocused(true)} onBlur={() => setFocused(false)}
-          style={{
-            width:'100%', appearance:'none', boxSizing:'border-box',
-            background: focused ? '#FFFFFF' : '#F8F9FB',
-            border: `1.5px solid ${focused ? C.gold : '#E5E7EB'}`,
-            borderRadius:'8px', padding:'0.55rem 2rem 0.55rem 0.75rem',
-            color: value ? '#111827' : '#9CA3AF',
-            fontSize:'0.82rem', fontFamily:"'DM Sans',sans-serif",
-            outline:'none', cursor:'pointer', transition:'all 0.2s',
-            boxShadow: focused ? `0 0 0 3px rgba(244,185,66,0.15), 0 1px 4px rgba(0,0,0,0.06)` : '0 1px 2px rgba(0,0,0,0.04)',
-          }}>
-          <option value="" disabled style={{ color:'#9CA3AF' }}>Select...</option>
-          {options.map((o: any) => (
-            <option key={o.value} value={o.value} style={{ color:'#111827', background:'#fff' }}>{o.label}</option>
-          ))}
+        <select name={name} value={value} onChange={onChange} required={required} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)}
+          style={{ width:'100%', appearance:'none', boxSizing:'border-box', background:'rgba(10,22,40,0.98)', border:`1px solid ${focused?'rgba(244,185,66,0.45)':'rgba(255,255,255,0.08)'}`, borderRadius:'5px', padding:'0.48rem 1.8rem 0.48rem 0.65rem', color:value?'#fff':'rgba(255,255,255,0.25)', fontSize:'0.8rem', fontFamily:"'DM Sans',sans-serif", outline:'none', cursor:'pointer', transition:'all 0.2s' }}>
+          <option value="" disabled style={{background:'#0A1628'}}>Select...</option>
+          {options.map((o: any) => <option key={o.value} value={o.value} style={{background:'#0A1628',color:'#fff'}}>{o.label}</option>)}
         </select>
-        <span style={{
-          position:'absolute', right:'0.65rem', top:'50%',
-          transform:'translateY(-50%)', fontSize:'0.55rem',
-          color: focused ? C.gold : '#9CA3AF', pointerEvents:'none',
-          transition:'color 0.2s',
-        }}>▼</span>
+        <span style={{ position:'absolute', right:'0.55rem', top:'50%', transform:'translateY(-50%)', fontSize:'0.5rem', color:'rgba(255,255,255,0.3)', pointerEvents:'none' }}>▼</span>
       </div>
     </div>
   );
 }
 
-// ── STEP INDICATOR ───────────────────────────────────────────────────
-function StepDot({ active, done }: { active: boolean; done: boolean }) {
-  return (
-    <div style={{
-      width: 8, height: 8, borderRadius: '50%',
-      background: done ? C.gold : active ? C.orange : '#E5E7EB',
-      transition: 'all 0.3s',
-      boxShadow: active ? `0 0 8px ${C.orange}60` : done ? `0 0 6px ${C.gold}60` : 'none',
-    }} />
-  );
-}
-
 // ── CHAT LEAD FORM ───────────────────────────────────────────────────
 function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting }: any) {
-  const [submitted, setSubmitted]   = useState(false);
-  const [consent, setConsent]       = useState(false);
-  const [visible, setVisible]       = useState(false);
-  const [step, setStep]             = useState(0); // 0 = contact, 1 = business, 2 = consent+submit
-  const [form, setForm] = useState({
-    name:'', email:'', phone:'', company:'', industry:'', service_interest:'', message:''
-  });
-
+  const [submitted, setSubmitted] = useState(false);
+  const [consent, setConsent] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [form, setForm] = useState({ name:'', email:'', phone:'', company:'', industry:'', service_interest:'', message:'' });
   useEffect(() => { setTimeout(() => setVisible(true), 60); }, []);
   useEffect(() => {
-    setForm(f => ({
-      ...f,
-      name:    f.name    || sessionContext?.name      || '',
-      email:   f.email   || sessionContext?.email     || '',
-      phone:   f.phone   || sessionContext?.whatsapp  || '',
-      company: f.company || sessionContext?.business  || '',
-      industry:f.industry|| sessionContext?.industry  || '',
-      message: f.message || sessionContext?.pain_point|| '',
+    setForm(f => ({ ...f,
+      name:    f.name    || sessionContext?.name     || '',
+      email:   f.email   || sessionContext?.email    || '',
+      phone:   f.phone   || sessionContext?.whatsapp || '',
+      company: f.company || sessionContext?.business || '',
+      industry:f.industry|| sessionContext?.industry || '',
+      message: f.message || sessionContext?.pain_point || '',
     }));
   }, [sessionContext]);
-
   const handle = (e: any) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-
   const submit = async (e: any) => {
-    e.preventDefault();
-    if (!consent) return;
+    e.preventDefault(); if (!consent) return;
     const r = await onSubmit?.(form);
     if (r?.success !== false) setSubmitted(true);
   };
-
-  const canNext0 = form.name.trim() !== '' && form.email.trim() !== '';
-  const canNext1 = form.industry !== '';
-
-  // Auto-advance step based on pre-filled context
-  useEffect(() => {
-    if (sessionContext?.name && sessionContext?.email && step === 0) {
-      setStep(1);
-    }
-  }, []);
-
   return (
-    <div style={{
-      display:'flex', flexDirection:'column', alignItems:'flex-start',
-      opacity: visible ? 1 : 0,
-      transform: visible ? 'translateY(0)' : 'translateY(14px)',
-      transition: 'opacity 0.4s ease, transform 0.4s ease',
-    }}>
-      {/* Bot avatar row */}
-      <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'6px' }}>
+    <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-start', opacity:visible?1:0, transform:visible?'translateY(0)':'translateY(12px)', transition:'opacity 0.45s ease, transform 0.45s ease' }}>
+      <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'5px' }}>
         <div style={{ width:20, height:20, borderRadius:'50%', background:`linear-gradient(135deg, ${C.gold}, ${C.orange})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.6rem', color:C.midnight }}>✦</div>
-        <span style={{ fontSize:'0.58rem', color:'rgba(100,110,130,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.08em' }}>InkanyeziBot</span>
+        <span style={{ fontSize:'0.58rem', color:'rgba(255,255,255,0.28)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.08em' }}>InkanyeziBot</span>
       </div>
-
-      {/* Form card — bright light theme */}
-      <div style={{
-        width:'100%', position:'relative', overflow:'hidden',
-        background:'linear-gradient(160deg, #FFFFFF 0%, #F8F9FB 60%, #FFF8EE 100%)',
-        border:'1.5px solid rgba(244,185,66,0.35)',
-        borderRadius:'16px', borderTopLeftRadius:'4px',
-        boxShadow:'0 4px 24px rgba(244,185,66,0.12), 0 1px 4px rgba(0,0,0,0.08)',
-      }}>
-
-        {/* Top accent bar — animated gold-orange gradient */}
-        <div style={{
-          height:'3px', background:`linear-gradient(90deg, ${C.saGreen}, ${C.gold}, ${C.orange}, ${C.gold}, ${C.saGreen})`,
-          backgroundSize:'300% 100%', animation:'shimmerBar 4s linear infinite',
-        }} />
-
-        {/* Top-right decorative circuit mark */}
-        <div style={{
-          position:'absolute', top:10, right:12, opacity:0.08,
-          fontFamily:'monospace', fontSize:'0.55rem', color:'#1a1a2e',
-          letterSpacing:'0.05em', userSelect:'none',
-        }}>◈ INK-OS</div>
-
+      <div style={{ width:'100%', position:'relative', overflow:'hidden', background:'linear-gradient(145deg, rgba(10,22,40,0.96), rgba(4,8,15,0.98))', border:'1px solid rgba(244,185,66,0.18)', borderRadius:'14px', borderTopLeftRadius:'3px', boxShadow:'0 8px 32px rgba(0,0,0,0.6)' }}>
+        <CosmosCanvas width={340} height={280} />
+        <div style={{ height:'2px', position:'relative', zIndex:2, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`, backgroundSize:'200% 100%', animation:'shimmerBar 3s linear infinite' }} />
         {onDismiss && !submitted && (
-          <button onClick={onDismiss} style={{
-            position:'absolute', top:'0.6rem', right:'0.6rem', zIndex:10,
-            background:'rgba(107,114,128,0.08)', border:'1px solid #E5E7EB',
-            borderRadius:'6px', padding:'3px 8px',
-            color:'#9CA3AF', fontSize:'0.62rem', cursor:'pointer',
-            fontFamily:"'Space Mono',monospace",
-            transition:'all 0.2s',
-          }}>✕</button>
+          <button onClick={onDismiss} style={{ position:'absolute', top:'0.55rem', right:'0.55rem', zIndex:10, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'4px', padding:'2px 6px', color:'rgba(255,255,255,0.3)', fontSize:'0.6rem', cursor:'pointer', fontFamily:"'Space Mono',monospace" }}>✕</button>
         )}
-
-        <div style={{ padding:'1rem 1.1rem 1.1rem' }}>
+        <div style={{ padding:'0.9rem 1rem 1rem', position:'relative', zIndex:1 }}>
           {submitted ? (
-            // ── SUCCESS STATE ─────────────────────────────────────
-            <div style={{ textAlign:'center', padding:'0.5rem 0 0.25rem' }}>
-              <div style={{
-                width:52, height:52, borderRadius:'50%', margin:'0 auto 0.75rem',
-                background:`linear-gradient(135deg, rgba(244,185,66,0.15), rgba(255,107,53,0.15))`,
-                border:`2px solid ${C.gold}`,
-                display:'flex', alignItems:'center', justifyContent:'center',
-                fontSize:'1.4rem',
-                boxShadow:`0 0 20px rgba(244,185,66,0.2)`,
-              }}>✦</div>
-              <p style={{
-                fontFamily:"'Syne',sans-serif", fontSize:'1.05rem',
-                fontWeight:800, color:'#111827', margin:'0 0 0.35rem', lineHeight:1.2,
-              }}>
+            <div style={{ textAlign:'center', padding:'0.75rem 0 0.25rem' }}>
+              <div style={{ width:44, height:44, borderRadius:'50%', margin:'0 auto 0.65rem', background:'rgba(244,185,66,0.1)', border:'1px solid rgba(244,185,66,0.3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.2rem' }}>✦</div>
+              <p style={{ fontFamily:"'Syne',sans-serif", fontSize:'1rem', fontWeight:800, color:'#fff', margin:'0 0 0.35rem', lineHeight:1.2 }}>
                 Signal received,{' '}
-                <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
-                  {form.name?.split(' ')[0] || 'friend'}
-                </span>
+                <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>{form.name?.split(' ')[0]||'friend'}</span>
               </p>
-              <p style={{
-                fontSize:'0.78rem', color:'#6B7280', margin:'0 0 0.9rem',
-                lineHeight:1.6, fontFamily:"'DM Sans',sans-serif",
-              }}>
-                {form.company
-                  ? `Sanele will reach out to ${form.company} within 24 hours.`
-                  : 'Sanele will be in touch within 24 hours.'}
+              <p style={{ fontSize:'0.75rem', color:'rgba(255,255,255,0.4)', margin:'0 0 0.75rem', lineHeight:1.55, fontFamily:"'DM Sans',sans-serif" }}>
+                {form.company ? `Sanele will reach out to ${form.company} within 24 hours.` : 'Sanele will be in touch within 24 hours.'}
               </p>
-              {/* Ref number */}
-              {sessionContext?.referenceNumber && (
-                <div style={{
-                  display:'inline-block', background:'#F8F9FB',
-                  border:'1px solid #E5E7EB', borderRadius:'6px',
-                  padding:'4px 12px', marginBottom:'0.75rem',
-                  fontFamily:"'Space Mono',monospace", fontSize:'0.6rem',
-                  color:'#6B7280', letterSpacing:'0.08em',
-                }}>REF: {sessionContext.referenceNumber}</div>
-              )}
               <HeritageStrip style={{ justifyContent:'center' }} />
             </div>
           ) : (
             <>
-              {/* ── HEADER ─────────────────────────────────────────── */}
-              <div style={{ marginBottom:'0.9rem' }}>
-                <div style={{
-                  fontSize:'0.52rem', letterSpacing:'0.22em',
-                  textTransform:'uppercase', color:C.orange,
-                  fontFamily:"'Space Mono',monospace", marginBottom:'0.2rem', fontWeight:700,
-                }}>✦ Inkanyezi Technologies</div>
-                <h3 style={{
-                  margin:0, fontFamily:"'Syne',sans-serif",
-                  fontSize:'1rem', fontWeight:800, color:'#111827', lineHeight:1.2,
-                }}>
+              <div style={{ marginBottom:'0.8rem' }}>
+                <div style={{ fontSize:'0.52rem', letterSpacing:'0.22em', textTransform:'uppercase', color:C.gold, fontFamily:"'Space Mono',monospace", marginBottom:'0.22rem' }}>✦ Inkanyezi Technologies</div>
+                <h3 style={{ margin:0, fontFamily:"'Syne',sans-serif", fontSize:'0.95rem', fontWeight:800, color:'#fff', lineHeight:1.2 }}>
                   Let's make this{' '}
-                  <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
-                    official
-                  </span>
+                  <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>official</span>
                 </h3>
-                <p style={{
-                  margin:'0.2rem 0 0', fontSize:'0.72rem',
-                  color:'#6B7280', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif",
-                }}>Sanele will personally follow up within 24 hours.</p>
-
-                {/* Step progress indicator */}
-                <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:'0.6rem' }}>
-                  <StepDot active={step===0} done={step>0} />
-                  <div style={{ height:'1px', flex:1, background: step>0 ? C.gold : '#E5E7EB', transition:'background 0.4s' }} />
-                  <StepDot active={step===1} done={step>1} />
-                  <div style={{ height:'1px', flex:1, background: step>1 ? C.gold : '#E5E7EB', transition:'background 0.4s' }} />
-                  <StepDot active={step===2} done={false} />
-                  <div style={{ marginLeft:4, fontSize:'0.55rem', color:'#9CA3AF', fontFamily:"'Space Mono',monospace" }}>
-                    {step===0 ? 'Contact' : step===1 ? 'Business' : 'Confirm'}
-                  </div>
-                </div>
+                <p style={{ margin:'0.22rem 0 0', fontSize:'0.7rem', color:'rgba(255,255,255,0.35)', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif" }}>Sanele will personally follow up within 24 hours.</p>
+                <HeritageStrip style={{ marginTop:'0.5rem' }} />
               </div>
-
               <form onSubmit={submit}>
-
-                {/* ── STEP 0 — Contact details ─────────────────── */}
-                {step === 0 && (
-                  <div style={{ animation:'stepSlide 0.3s ease' }}>
-                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.5rem' }}>
-                      <LeadField label="Your Name" name="name" placeholder="e.g. Sipho Dlamini" value={form.name} onChange={handle} required />
-                      <LeadField label="Company" name="company" placeholder="Company name" value={form.company} onChange={handle} />
-                    </div>
-                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.85rem' }}>
-                      <LeadField label="Email" name="email" type="email" placeholder="you@business.co.za" value={form.email} onChange={handle} required />
-                      <LeadField label="WhatsApp" name="phone" type="tel" placeholder="+27 82..." value={form.phone} onChange={handle} />
-                    </div>
-                    <button type="button" disabled={!canNext0} onClick={() => setStep(1)} style={{
-                      width:'100%', padding:'0.62rem',
-                      background: canNext0 ? `linear-gradient(90deg, ${C.gold}, ${C.orange})` : '#F3F4F6',
-                      border:'none', borderRadius:'8px',
-                      color: canNext0 ? C.midnight : '#D1D5DB',
-                      fontFamily:"'Space Mono',monospace", fontSize:'0.65rem',
-                      fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase',
-                      cursor: canNext0 ? 'pointer' : 'not-allowed',
-                      transition:'all 0.25s',
-                      boxShadow: canNext0 ? `0 4px 14px rgba(244,185,66,0.3)` : 'none',
-                    }}>
-                      Continue →
-                    </button>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.48rem' }}>
+                  <LeadField label="Your Name" name="name" placeholder="e.g. Sipho" value={form.name} onChange={handle} required />
+                  <LeadField label="Business" name="company" placeholder="Company name" value={form.company} onChange={handle} />
+                </div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.48rem' }}>
+                  <LeadField label="Email" name="email" type="email" placeholder="you@business.co.za" value={form.email} onChange={handle} required />
+                  <LeadField label="WhatsApp" name="phone" type="tel" placeholder="+27 82..." value={form.phone} onChange={handle} />
+                </div>
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.48rem' }}>
+                  <LeadSelect label="Industry" name="industry" value={form.industry} onChange={handle} options={INDUSTRIES} required />
+                  <LeadSelect label="How we help" name="service_interest" value={form.service_interest} onChange={handle} options={SERVICES} required />
+                </div>
+                <label style={{ display:'flex', gap:'0.5rem', cursor:'pointer', alignItems:'flex-start', marginBottom:'0.65rem' }}>
+                  <div onClick={()=>setConsent(c=>!c)} style={{ width:14, height:14, flexShrink:0, marginTop:2, border:`1px solid ${consent?C.gold:'rgba(255,255,255,0.2)'}`, borderRadius:'3px', background:consent?'rgba(244,185,66,0.12)':'transparent', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', cursor:'pointer' }}>
+                    {consent && <span style={{ color:C.gold, fontSize:'9px', lineHeight:1 }}>✓</span>}
                   </div>
-                )}
-
-                {/* ── STEP 1 — Business details ────────────────── */}
-                {step === 1 && (
-                  <div style={{ animation:'stepSlide 0.3s ease' }}>
-                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.5rem' }}>
-                      <LeadSelect label="Industry" name="industry" value={form.industry} onChange={handle} options={INDUSTRIES} required />
-                      <LeadSelect label="How we help" name="service_interest" value={form.service_interest} onChange={handle} options={SERVICES} required />
-                    </div>
-                    {/* Optional message */}
-                    <div style={{ marginBottom:'0.85rem' }}>
-                      <label style={{
-                        display:'block', fontSize:'0.58rem', letterSpacing:'0.16em',
-                        textTransform:'uppercase', fontFamily:"'Space Mono',monospace",
-                        color:'#6B7280', marginBottom:'0.3rem', fontWeight:600,
-                      }}>Your Challenge <span style={{ color:'#D1D5DB', fontSize:'0.5rem' }}>(optional)</span></label>
-                      <textarea name="message" value={form.message} onChange={handle} rows={2}
-                        placeholder="What's the biggest bottleneck in your business right now?"
-                        style={{
-                          width:'100%', boxSizing:'border-box', resize:'none',
-                          background:'#F8F9FB', border:'1.5px solid #E5E7EB',
-                          borderRadius:'8px', padding:'0.55rem 0.75rem',
-                          color:'#111827', fontSize:'0.8rem',
-                          fontFamily:"'DM Sans',sans-serif", outline:'none',
-                          transition:'all 0.2s', lineHeight:1.5,
-                        }}
-                        onFocus={e => { e.target.style.borderColor = C.gold; e.target.style.boxShadow = `0 0 0 3px rgba(244,185,66,0.15)`; }}
-                        onBlur={e => { e.target.style.borderColor = '#E5E7EB'; e.target.style.boxShadow = 'none'; }}
-                      />
-                    </div>
-                    <div style={{ display:'flex', gap:'0.5rem' }}>
-                      <button type="button" onClick={() => setStep(0)} style={{
-                        flex:'0 0 auto', padding:'0.62rem 0.9rem',
-                        background:'#F8F9FB', border:'1.5px solid #E5E7EB',
-                        borderRadius:'8px', color:'#6B7280',
-                        fontFamily:"'Space Mono',monospace", fontSize:'0.6rem',
-                        fontWeight:700, cursor:'pointer', transition:'all 0.2s',
-                      }}>← Back</button>
-                      <button type="button" disabled={!canNext1} onClick={() => setStep(2)} style={{
-                        flex:1, padding:'0.62rem',
-                        background: canNext1 ? `linear-gradient(90deg, ${C.gold}, ${C.orange})` : '#F3F4F6',
-                        border:'none', borderRadius:'8px',
-                        color: canNext1 ? C.midnight : '#D1D5DB',
-                        fontFamily:"'Space Mono',monospace", fontSize:'0.65rem',
-                        fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase',
-                        cursor: canNext1 ? 'pointer' : 'not-allowed',
-                        transition:'all 0.25s',
-                        boxShadow: canNext1 ? `0 4px 14px rgba(244,185,66,0.3)` : 'none',
-                      }}>
-                        Review →
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* ── STEP 2 — Review + Consent + Submit ───────── */}
-                {step === 2 && (
-                  <div style={{ animation:'stepSlide 0.3s ease' }}>
-                    {/* Review card */}
-                    <div style={{
-                      background:'#F8F9FB', border:'1.5px solid #E5E7EB',
-                      borderRadius:'10px', padding:'0.7rem 0.85rem',
-                      marginBottom:'0.75rem',
-                    }}>
-                      <div style={{ fontSize:'0.56rem', letterSpacing:'0.14em', color:'#9CA3AF', fontFamily:"'Space Mono',monospace", textTransform:'uppercase', marginBottom:'0.5rem' }}>✦ Your Details</div>
-                      {[
-                        { label:'Name', val: form.name },
-                        { label:'Email', val: form.email },
-                        { label:'WhatsApp', val: form.phone || '—' },
-                        { label:'Company', val: form.company || '—' },
-                        { label:'Industry', val: INDUSTRIES.find(i => i.value === form.industry)?.label || form.industry || '—' },
-                        { label:'Service', val: SERVICES.find(s => s.value === form.service_interest)?.label || form.service_interest || '—' },
-                      ].map(({ label, val }) => (
-                        <div key={label} style={{ display:'flex', justifyContent:'space-between', alignItems:'baseline', marginBottom:'0.22rem' }}>
-                          <span style={{ fontSize:'0.6rem', color:'#9CA3AF', fontFamily:"'Space Mono',monospace", minWidth:60 }}>{label}</span>
-                          <span style={{ fontSize:'0.75rem', color:'#111827', fontFamily:"'DM Sans',sans-serif", fontWeight:500, textAlign:'right', maxWidth:160, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{val}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* POPIA consent */}
-                    <label style={{ display:'flex', gap:'0.5rem', cursor:'pointer', alignItems:'flex-start', marginBottom:'0.75rem' }}>
-                      <div onClick={() => setConsent(c => !c)} style={{
-                        width:16, height:16, flexShrink:0, marginTop:1,
-                        border:`2px solid ${consent ? C.gold : '#D1D5DB'}`,
-                        borderRadius:'4px',
-                        background: consent ? `linear-gradient(135deg, ${C.gold}, ${C.orange})` : '#FFFFFF',
-                        display:'flex', alignItems:'center', justifyContent:'center',
-                        transition:'all 0.2s', cursor:'pointer',
-                        boxShadow: consent ? `0 0 8px rgba(244,185,66,0.35)` : 'none',
-                      }}>
-                        {consent && <span style={{ color:'#fff', fontSize:'9px', lineHeight:1, fontWeight:900 }}>✓</span>}
-                      </div>
-                      <span style={{ fontSize:'0.64rem', color:'#6B7280', lineHeight:1.55, fontFamily:"'DM Sans',sans-serif" }}>
-                        I consent to Inkanyezi Technologies contacting me in accordance with{' '}
-                        <span style={{ color: C.gold, fontWeight:600 }}>POPIA</span>. <span style={{ color:C.orange }}>*</span>
-                      </span>
-                    </label>
-
-                    <div style={{ display:'flex', gap:'0.5rem' }}>
-                      <button type="button" onClick={() => setStep(1)} style={{
-                        flex:'0 0 auto', padding:'0.62rem 0.9rem',
-                        background:'#F8F9FB', border:'1.5px solid #E5E7EB',
-                        borderRadius:'8px', color:'#6B7280',
-                        fontFamily:"'Space Mono',monospace", fontSize:'0.6rem',
-                        fontWeight:700, cursor:'pointer', transition:'all 0.2s',
-                      }}>← Edit</button>
-                      <button type="submit" disabled={submitting || !consent} style={{
-                        flex:1, padding:'0.62rem',
-                        background: submitting || !consent
-                          ? '#F3F4F6'
-                          : `linear-gradient(90deg, ${C.gold}, ${C.orange})`,
-                        border:'none', borderRadius:'8px',
-                        color: submitting || !consent ? '#D1D5DB' : C.midnight,
-                        fontFamily:"'Space Mono',monospace", fontSize:'0.65rem',
-                        fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase',
-                        cursor: submitting || !consent ? 'not-allowed' : 'pointer',
-                        transition:'all 0.25s',
-                        boxShadow: !submitting && consent ? `0 4px 14px rgba(244,185,66,0.35)` : 'none',
-                      }}>
-                        {submitting ? '⟳ Transmitting...' : '✦ Lock In Signal'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Bottom tagline */}
-                <p style={{
-                  textAlign:'center', fontSize:'0.54rem',
-                  color:'#D1D5DB', margin:'0.6rem 0 0',
-                  fontFamily:"'Space Mono',monospace",
-                  letterSpacing:'0.05em',
-                }}>
-                  Durban, KZN 🇿🇦 · We are the signal in the noise.
-                </p>
+                  <span style={{ fontSize:'0.63rem', color:'rgba(255,255,255,0.32)', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif" }}>
+                    I consent to Inkanyezi Technologies contacting me per <span style={{color:C.gold}}>POPIA</span>. <span style={{color:C.orange}}>*</span>
+                  </span>
+                </label>
+                <button type="submit" disabled={submitting||!consent} style={{ width:'100%', padding:'0.6rem', background:submitting||!consent?'rgba(244,185,66,0.1)':`linear-gradient(90deg, ${C.gold}, ${C.orange})`, border:'none', borderRadius:'6px', color:submitting||!consent?'rgba(255,255,255,0.2)':C.midnight, fontFamily:"'Space Mono',monospace", fontSize:'0.65rem', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', cursor:submitting||!consent?'not-allowed':'pointer', transition:'all 0.25s' }}>
+                  {submitting ? 'Transmitting...' : '✦ Send My Details'}
+                </button>
+                <p style={{ textAlign:'center', fontSize:'0.56rem', color:'rgba(255,255,255,0.18)', margin:'0.5rem 0 0', fontFamily:"'Space Mono',monospace" }}>Durban, KZN 🇿🇦 · We are the signal in the noise.</p>
               </form>
             </>
           )}
@@ -572,18 +271,12 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting }: an
   );
 }
 
-// ── FORMAT MESSAGE — strips leaked JSON context ───────────────────────
+// ── FORMAT MESSAGE ───────────────────────────────────────────────────
 function formatMessage(text: string) {
   if (!text) return '';
-  // FIX: strip any leaked <context> or <response> tags from AI output
-  const clean = text
-    .replace(/<context>[\s\S]*?<\/context>/gi, '')
-    .replace(/<response>|<\/response>/gi, '')
-    .trim();
-  return clean
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\n/g, '<br/>');
+  return text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>');
 }
+
 
 // ════════════════════════════════════════════════════════════════════
 // INKANYEZI DOOR — Pure tech, holographic, plasma energy
@@ -603,25 +296,26 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     const isL = side === 'left';
     ctx.clearRect(0, 0, W, H);
 
-    // Base — warm void, NOT cold navy
-    ctx.fillStyle = '#0E0A04'; ctx.fillRect(0,0,W,H);
-    // Amber radial warmth — fire from the centre seam
+    // Base — void black
+    ctx.fillStyle = '#0a1628'; ctx.fillRect(0,0,W,H);
+    // Radial brightness boost — centre lit, edges dark like a real door
     const radial=ctx.createRadialGradient(W*0.5,H*0.5,0,W*0.5,H*0.5,W*0.9);
-    radial.addColorStop(0,'rgba(80,50,10,0.65)');
-    radial.addColorStop(0.5,'rgba(40,25,5,0.35)');
+    radial.addColorStop(0,'rgba(30,60,110,0.55)');
+    radial.addColorStop(0.6,'rgba(15,35,70,0.3)');
     radial.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=radial; ctx.fillRect(0,0,W,H);
 
-    // Fine grid — warm gold constellation weave
-    ctx.strokeStyle = 'rgba(244,185,66,0.10)'; ctx.lineWidth = 0.5;
+    // Fine grid — holographic blueprint
+    ctx.strokeStyle = 'rgba(120,180,255,0.14)'; ctx.lineWidth = 0.5;
     for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
-    // Coarser accent grid — orange counter feel
-    ctx.strokeStyle = 'rgba(255,107,53,0.07)'; ctx.lineWidth = 1;
+    // Coarser accent grid
+    ctx.strokeStyle = 'rgba(120,180,255,0.08)'; ctx.lineWidth = 1;
     for(let x=0;x<W;x+=100){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<H;y+=100){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
+    // Hexagonal microchip pattern
     const hr = 15, hw = hr*Math.sqrt(3);
     ctx.strokeStyle = 'rgba(244,185,66,0.14)'; ctx.lineWidth = 0.7;
     for(let row=-1;row<H/(hr*1.5)+1;row++){
@@ -633,18 +327,20 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       }
     }
 
+    // Vertical data streams — falling code
     const cols = isL ? [W*0.18,W*0.38,W*0.62,W*0.82] : [W*0.18,W*0.38,W*0.62,W*0.82];
     cols.forEach((sx,ci) => {
       const chars=['01','10','AI','∑','λ','π','∞','⟨⟩','11','00','NN','ML'];
       for(let i=0;i<7;i++){
         const yPos=((tk*55*(0.7+ci*0.2)+i*(H/7))%H);
         const alpha=(0.08+0.1*Math.sin(tk+i+ci*2))*Math.max(0,1-op*2);
-        ctx.fillStyle=`rgba(255,185,80,${alpha})`;
+        ctx.fillStyle=`rgba(140,200,255,${alpha})`;
         ctx.font=`${7+i%2}px monospace`; ctx.textAlign='center';
         ctx.fillText(chars[(Math.floor(tk*2+i+ci*5))%chars.length],sx,yPos);
       }
     });
 
+    // Horizontal circuit traces with pulse
     [H*0.15,H*0.3,H*0.5,H*0.7,H*0.85].forEach((y,i)=>{
       const p=0.4+0.5*Math.sin(tk*2+i*1.3);
       ctx.strokeStyle=`rgba(244,185,66,${0.18+p*0.22})`; ctx.lineWidth=1;
@@ -653,22 +349,24 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       ctx.moveTo(0,y);
       ctx.lineTo(mid-30,y); ctx.lineTo(mid-18,y-9); ctx.lineTo(mid+18,y-9); ctx.lineTo(mid+30,y);
       ctx.lineTo(W,y); ctx.stroke();
+      // Junction nodes
       [W*0.1, mid, W*0.9].forEach(nx=>{
         ctx.beginPath(); ctx.arc(nx,y,2,0,Math.PI*2);
         ctx.fillStyle=`rgba(244,185,66,${0.35+p*0.55})`; ctx.fill();
       });
     });
 
-    // Amber scan sweep — warm system initialising
+    // Scan line — system initialising
     const scanY=((tk*40)%(H+80))-40;
     const sg=ctx.createLinearGradient(0,scanY-25,0,scanY+25);
-    sg.addColorStop(0,'rgba(244,185,66,0)');
-    sg.addColorStop(0.4,`rgba(255,160,40,${0.06+op*0.03})`);
-    sg.addColorStop(0.5,`rgba(255,200,80,${0.22+op*0.1})`);
-    sg.addColorStop(0.6,`rgba(255,160,40,${0.06+op*0.03})`);
-    sg.addColorStop(1,'rgba(244,185,66,0)');
+    sg.addColorStop(0,'rgba(100,160,255,0)');
+    sg.addColorStop(0.4,`rgba(100,200,255,${0.05+op*0.03})`);
+    sg.addColorStop(0.5,`rgba(180,220,255,${0.18+op*0.1})`);
+    sg.addColorStop(0.6,`rgba(100,200,255,${0.05+op*0.03})`);
+    sg.addColorStop(1,'rgba(100,160,255,0)');
     ctx.fillStyle=sg; ctx.fillRect(0,scanY-25,W,50);
 
+    // Plasma energy conduit — fades to zero as door opens (eliminates trace line)
     const conduitAlpha = Math.max(0, 1 - op * 3);
     if (conduitAlpha > 0) {
       const cg=ctx.createLinearGradient(0,0,0,H);
@@ -680,6 +378,8 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       ctx.fillStyle=cg; ctx.fillRect(isL?W-4:0,0,4,H);
     }
 
+    // Edge bloom as doors open
+    // Edge bloom — fades away completely as door opens to leave clean reveal
     const bloomAlpha = Math.max(0, 1 - op * 2.5);
     const eg=ctx.createLinearGradient(isL?W:0,0,isL?W-80:80,0);
     eg.addColorStop(0,`rgba(255,107,53,${(0.12+op*0.3)*bloomAlpha})`);
@@ -687,12 +387,13 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     eg.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=eg; ctx.fillRect(isL?W-80:0,0,80,H);
 
+    // Precision frame — double line
     ctx.strokeStyle='rgba(244,185,66,0.35)'; ctx.lineWidth=1;
     ctx.strokeRect(5,5,W-10,H-10);
-    // Inner precision line — warm amber ghost
-    ctx.strokeStyle='rgba(255,140,40,0.10)'; ctx.lineWidth=0.5;
+    ctx.strokeStyle='rgba(100,160,255,0.08)'; ctx.lineWidth=0.5;
     ctx.strokeRect(11,11,W-22,H-22);
 
+    // Corner brackets — engineering precision
     const b=18;
     [[5,5],[5,H-5],[W-5,5],[W-5,H-5]].forEach(([bx,by])=>{
       ctx.strokeStyle='rgba(244,185,66,0.75)'; ctx.lineWidth=2;
@@ -700,24 +401,32 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       ctx.beginPath(); ctx.moveTo(bx+mx,by); ctx.lineTo(bx,by); ctx.lineTo(bx,by+my); ctx.stroke();
     });
 
+    // Panel ID — bottom
     ctx.font='7px monospace'; ctx.textAlign='center';
-    ctx.fillStyle=`rgba(255,185,80,${0.5+0.15*Math.sin(tk*4)})`;
+    ctx.fillStyle=`rgba(140,190,255,${0.5+0.15*Math.sin(tk*4)})`;
     ctx.fillText(isL?'◈ INK-L':'◈ INK-R',W/2,H-16);
     ctx.fillStyle='rgba(244,185,66,0.45)';
     ctx.fillText(isL?'UNIT·ALPHA':'UNIT·SIGMA',W/2,H-8);
 
+    // ── LETTER — A on left panel (right side near seam), I on right panel (left side near seam)
+    // Only appears during opening phase, fades out as doors slide away
     if(op > 0) {
       const letter = isL ? 'A' : 'I';
+      // Position: near the inner seam edge of each panel
+      // Left panel: letter on right side (near center seam) — x = rightmost quarter
+      // Right panel: letter on left side (near center seam) — x = leftmost quarter
       const lx = isL ? W * 0.78 : W * 0.22;
       const ly = H * 0.5;
       const letterAlpha = Math.min(op * 3, 1) * Math.max(0, 1 - op * 1.2);
       if(letterAlpha > 0) {
+        // Glow halo behind letter
         const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, 55);
         lg.addColorStop(0, `rgba(244,185,66,${letterAlpha * 0.25})`);
         lg.addColorStop(0.5, `rgba(255,107,53,${letterAlpha * 0.1})`);
         lg.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.beginPath(); ctx.arc(lx, ly, 55, 0, Math.PI*2);
         ctx.fillStyle = lg; ctx.fill();
+        // Letter itself
         ctx.save();
         ctx.font = 'bold 72px Arial';
         ctx.textAlign = 'center';
@@ -727,6 +436,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
         ctx.fillStyle = `rgba(255,255,255,${letterAlpha})`;
         ctx.fillText(letter, lx, ly);
         ctx.restore();
+        // Underline accent — tech style
         const uw = letter === 'I' ? 28 : 44;
         const ug = ctx.createLinearGradient(lx-uw/2, ly+44, lx+uw/2, ly+44);
         ug.addColorStop(0, 'rgba(244,185,66,0)');
@@ -749,6 +459,7 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     loop(); return ()=>cancelAnimationFrame(raf);
   },[phase,doorPct]);
 
+  // Brain / AI loading canvas
   useEffect(()=>{
     const canvas=brainRef.current; if(!canvas) return;
     const ctx=canvas.getContext('2d')!;
@@ -824,27 +535,30 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div style={{position:'absolute',inset:0,display:'flex',overflow:'hidden',borderRadius:20}}>
+      {/* LEFT DOOR */}
       <div style={{position:'absolute',top:0,left:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(-${slide}%)`,overflow:'hidden'}}>
         <canvas ref={leftRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
+
       </div>
+      {/* RIGHT DOOR */}
       <div style={{position:'absolute',top:0,right:0,bottom:0,width:'50%',zIndex:6,transform:`translateX(${slide}%)`,overflow:'hidden'}}>
         <canvas ref={rightRef} width={185} height={580} style={{display:'block',width:'100%',height:'100%'}}/>
+
       </div>
+      {/* BRAIN */}
       <div style={{position:'absolute',inset:0,zIndex:7,opacity:brainFade,pointerEvents:'none',display:'flex',alignItems:'center',justifyContent:'center'}}>
         <canvas ref={brainRef} style={{width:280,height:220}}/>
       </div>
+      {/* No center seam — panel plasma conduits provide the visual separation */}
     </div>
   );
 }
-
-// ════════════════════════════════════════════════════════════════════
-// MAIN WIDGET
 // ════════════════════════════════════════════════════════════════════
 function InkanyeziBotWidget() {
   const [isOpen, setIsOpen]   = useState(false);
   const [messages, setMessages] = useState([{
     role:'assistant',
-    content:"Sawubona! 👋 I'm InkanyeziBot — your guide to AI automation for South African businesses. Tell me what your business does and I'll show you exactly where automation can make a difference.",
+    content:"Sawubona! 👋 I'm InkanyeziBot — your AI guide to automation for South African businesses.\n\nBy chatting, you agree to our POPIA-compliant data policy.\n\nWhat does your business do, and what's the biggest challenge slowing you down right now?",
   }]);
   const [input, setInput]             = useState('');
   const [isLoading, setIsLoading]     = useState(false);
@@ -858,7 +572,6 @@ function InkanyeziBotWidget() {
   const [greetingVisible, setGreetingVisible] = useState(false);
   const [showDoor, setShowDoor]               = useState(false);
   const [openKey, setOpenKey]                 = useState(0);
-  const [isFullscreen, setIsFullscreen]       = useState(false);
 
   const [isListening, setIsListening]   = useState(false);
   const [micSupported, setMicSupported] = useState(false);
@@ -885,14 +598,11 @@ function InkanyeziBotWidget() {
           .map((r: any) => r[0].transcript)
           .join('');
         setInput(transcript);
-        if (e.results[e.results.length - 1].isFinal) {
-          setIsListening(false);
-        }
+        if (e.results[e.results.length - 1].isFinal) setIsListening(false);
       };
       recognition.onerror = () => setIsListening(false);
       recognition.onend   = () => setIsListening(false);
       recognitionRef.current = recognition;
-      // Show onboarding hint 3s after opening, only if not seen before
       if (!localStorage.getItem('ink_mic_seen')) {
         setTimeout(() => setShowMicHint(true), 3000);
       }
@@ -901,6 +611,8 @@ function InkanyeziBotWidget() {
 
   const toggleListening = () => {
     if (!recognitionRef.current) return;
+    localStorage.setItem('ink_mic_seen', '1');
+    setShowMicHint(false);
     if (isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
@@ -910,18 +622,34 @@ function InkanyeziBotWidget() {
       setIsListening(true);
     }
   };
+
+  // ════════════════════════════════════════════════════════════════════
+  // MODERN SESSION MANAGEMENT
+  // Best practices: sessionStorage, Visibility API, scroll depth,
+  // returning visitor detection, active-time-only inactivity timer
+  // ════════════════════════════════════════════════════════════════════
+
+  useEffect(() => {
     const STORAGE_KEY = 'inkanyezi_chat_session';
     const VISITOR_KEY = 'inkanyezi_visitor';
-    const INACTIVITY_MS = 20 * 60 * 1000;
-    const GREETING_SCROLL = 0.35;
+    const INACTIVITY_MS = 20 * 60 * 1000;  // 20min of ACTIVE time
+    const GREETING_SCROLL = 0.35;           // trigger greeting at 35% scroll depth
 
+    // ── 1. RETURNING VISITOR DETECTION ─────────────────────────────
+    // localStorage persists across sessions — detects returning visitors
     const visitCount = parseInt(localStorage.getItem(VISITOR_KEY) || '0') + 1;
     localStorage.setItem(VISITOR_KEY, String(visitCount));
+
+    // Returning visitor gets a more personalised proactive greeting
     if (visitCount > 1) {
       const savedName = localStorage.getItem('inkanyezi_name');
+      // Will be used by the greeting popup to personalise the message
       (window as any).__inkanyezi_returning = { count: visitCount, name: savedName };
     }
 
+    // ── 2. SESSION STATE PERSISTENCE (sessionStorage) ──────────────
+    // sessionStorage clears when the tab is closed — ideal for chat
+    // Restore any in-progress conversation if user refreshed the page
     try {
       const saved = sessionStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -930,52 +658,85 @@ function InkanyeziBotWidget() {
           setMessages(parsed.messages);
           setShowChips(false);
           if (parsed.sessionContext) setSessionContext(parsed.sessionContext);
+          // Don't auto-reopen — user can click the bubble to continue
         }
       }
     } catch {}
 
+    // ── 3. ACTIVE-TIME-ONLY INACTIVITY TIMER ───────────────────────
+    // Only count time when the page is VISIBLE and FOCUSED
+    // Prevents resetting just because user left the tab open overnight
     let inactivityTimer: ReturnType<typeof setTimeout> | null = null;
     let isPageVisible = !document.hidden;
     let isPageFocused = document.hasFocus();
 
     const doReset = () => {
-      setIsOpen(false); setShowDoor(false); setShowGreeting(false); setGreetingVisible(false);
-      setIsFullscreen(false);
-      setMessages([{ role:'assistant', content:"Sawubona! 👋 I'm InkanyeziBot — your guide to AI automation for South African businesses. Tell me what your business does and I'll show you exactly where automation can make a difference." }]);
-      setInput(''); setShowLeadForm(false); setLeadFormSubmitted(false);
-      setShowChips(true); setSessionContext(null);
+      setIsOpen(false);
+      setShowDoor(false);
+      setShowGreeting(false);
+      setGreetingVisible(false);
+      setMessages([{
+        role: 'assistant',
+        content: "Sawubona! 👋 I'm InkanyeziBot — your AI guide to automation for South African businesses.\n\nBy chatting, you agree to our POPIA-compliant data policy.\n\nWhat does your business do, and what's the biggest challenge slowing you down right now?",
+      }]);
+      setInput('');
+      setShowLeadForm(false);
+      setLeadFormSubmitted(false);
+      setShowChips(true);
+      setSessionContext(null);
       hasTriggered.current = false;
       sessionStorage.removeItem(STORAGE_KEY);
     };
 
     const startTimer = () => {
       if (inactivityTimer) clearTimeout(inactivityTimer);
-      if (isPageVisible && isPageFocused) inactivityTimer = setTimeout(doReset, INACTIVITY_MS);
+      if (isPageVisible && isPageFocused) {
+        inactivityTimer = setTimeout(doReset, INACTIVITY_MS);
+      }
     };
-    const stopTimer = () => { if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; } };
+
+    const stopTimer = () => {
+      if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; }
+    };
+
+    // Activity events — restart the timer on any interaction
     const onActivity = () => { if (isPageVisible && isPageFocused) startTimer(); };
     const activityEvents = ['mousedown','keydown','touchstart','scroll','click'];
-    activityEvents.forEach(e => window.addEventListener(e, onActivity, { passive:true }));
+    activityEvents.forEach(e => window.addEventListener(e, onActivity, { passive: true }));
 
+    // ── 4. VISIBILITY API — pause timer when tab is hidden ─────────
     const onVisibilityChange = () => {
       isPageVisible = !document.hidden;
-      if (isPageVisible && isPageFocused) startTimer(); else stopTimer();
+      if (isPageVisible && isPageFocused) startTimer();
+      else stopTimer();
     };
     document.addEventListener('visibilitychange', onVisibilityChange);
 
+    // ── 5. WINDOW FOCUS/BLUR — pause when window loses focus ───────
     const onFocus = () => { isPageFocused = true; startTimer(); };
     const onBlur  = () => { isPageFocused = false; stopTimer(); };
     window.addEventListener('focus', onFocus);
     window.addEventListener('blur', onBlur);
 
+    // ── 6. SCROLL DEPTH TRIGGER — smarter than time-only ───────────
+    // Trigger proactive greeting when user scrolls 35% of page
+    // Shows genuine interest — more relevant than just time on page
     let greetingFired = false;
     const onScroll = () => {
       if (greetingFired) return;
       const scrolled = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-      if (scrolled >= GREETING_SCROLL) { greetingFired = true; }
+      if (scrolled >= GREETING_SCROLL) {
+        greetingFired = true;
+        // Only show if chat isn't already open
+        // (The existing 8s timer will handle this via setShowGreeting)
+      }
     };
-    window.addEventListener('scroll', onScroll, { passive:true });
-    startTimer();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // ── 7. SAVE SESSION ON MESSAGE CHANGE ──────────────────────────
+    // Will be called from a separate effect below
+
+    startTimer(); // Begin tracking
 
     return () => {
       stopTimer();
@@ -987,14 +748,24 @@ function InkanyeziBotWidget() {
     };
   }, []);
 
+  // ── SAVE CONVERSATION TO sessionStorage on every message ─────────
+  // Allows page refresh to restore the conversation seamlessly
   useEffect(() => {
-    if (messages.length <= 1) return;
+    if (messages.length <= 1) return; // Don't save just the greeting
     try {
-      sessionStorage.setItem('inkanyezi_chat_session', JSON.stringify({ messages:messages.slice(-20), sessionContext, savedAt:Date.now() }));
-      if (sessionContext?.name) localStorage.setItem('inkanyezi_name', sessionContext.name);
+      sessionStorage.setItem('inkanyezi_chat_session', JSON.stringify({
+        messages: messages.slice(-20), // Keep last 20 messages only
+        sessionContext,
+        savedAt: Date.now(),
+      }));
+      // Save customer name to localStorage for returning visitor greeting
+      if (sessionContext?.name) {
+        localStorage.setItem('inkanyezi_name', sessionContext.name);
+      }
     } catch {}
   }, [messages, sessionContext]);
 
+  // Proactive greeting after 8s
   useEffect(() => {
     const show = setTimeout(() => { if (!isOpen) { setShowGreeting(true); setTimeout(() => setGreetingVisible(true), 50); } }, 8000);
     const hide = setTimeout(() => { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }, 20000);
@@ -1005,19 +776,21 @@ function InkanyeziBotWidget() {
     if (isOpen) { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }
   }, [isOpen]);
 
-  // ── LEAD FORM TRIGGER — shows after first user message ──────────────
-  // Strategy: form captures contact details early, then conversation
-  // continues using that context. No interrogation needed.
+  // Lead form trigger
   useEffect(() => {
-    if (hasTriggered.current || leadFormSubmitted) return;
-    const userMsgs = messages.filter(m => m.role === 'user');
-    // Show form after the bot has responded to the first user message
-    // i.e. when there are ≥1 user messages AND ≥2 total messages (bot replied)
-    if (userMsgs.length >= 1 && messages.length >= 2 && !isLoading) {
+    if (hasTriggered.current || leadFormSubmitted || !sessionContext) return;
+    const userMsgs = messages.filter(m => m.role==='user');
+    const lastMsg  = userMsgs[userMsgs.length-1]?.content||'';
+    const { shouldShow } = scoreConversation(sessionContext, userMsgs.length, lastMsg);
+    // Primary trigger — score threshold met
+    if (shouldShow) { hasTriggered.current = true; setTimeout(() => setShowLeadForm(true), 1200); return; }
+    // Backup trigger — after 5 user messages always show form regardless of score
+    // Never let a long engaged conversation end without capturing the lead
+    if (userMsgs.length >= 5 && !hasTriggered.current) {
       hasTriggered.current = true;
-      setTimeout(() => setShowLeadForm(true), 800);
+      setTimeout(() => setShowLeadForm(true), 1200);
     }
-  }, [messages, leadFormSubmitted, isLoading]);
+  }, [messages, sessionContext, leadFormSubmitted]);
 
   const sendMessage = async (text?: string) => {
     const content = (text||input).trim();
@@ -1031,28 +804,11 @@ function InkanyeziBotWidget() {
     try {
       const res  = await fetch('https://inkanyezibot-v2.vercel.app/api/chat', {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({ messages:newMessages, sessionId, context:sessionContext }),
+        body:JSON.stringify({ messages:newMessages, sessionId }),
       });
       const data = await res.json();
-      // Strip any leaked context/response tags
-      const cleanMessage = (data.message || '')
-        .replace(/<context>[\s\S]*?<\/context>/gi, '')
-        .replace(/<response>|<\/response>/gi, '')
-        .trim();
-      setMessages([...newMessages, { role:'assistant', content: cleanMessage }]);
-      if (data.context) {
-        setSessionContext(data.context);
-        // If conversation is now marked complete, start a 5-minute quiet close timer
-        // After 5 minutes of no user input post-completion, gently close the session
-        if (data.context.conversation_complete && !sessionContext?.conversation_complete) {
-          setTimeout(() => {
-            setMessages(prev => [
-              ...prev,
-              { role:'assistant', content:`Your reference is ${data.context.referenceNumber}. Sanele will be in touch within 24 hours — feel free to reach out on WhatsApp (+27 65 880 4122) anytime. Sharp! 🇿🇦` }
-            ]);
-          }, 1500);
-        }
-      }
+      setMessages([...newMessages, { role:'assistant', content:data.message }]);
+      if (data.context) setSessionContext(data.context);
     } catch {
       setMessages([...newMessages, { role:'assistant', content:'Something went wrong — please try again.' }]);
     } finally { setIsLoading(false); }
@@ -1087,9 +843,8 @@ function InkanyeziBotWidget() {
         timestamp:           new Date().toISOString(),
         sast_time:           new Date().toLocaleString('en-ZA',{timeZone:'Africa/Johannesburg'}),
       };
-      await fetch('https://hook.eu1.make.com/f4g89bwx1cor5euqad24pknn2iqbrmum', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
-      });
+      const url = 'https://hook.eu1.make.com/f4g89bwx1cor5euqad24pknn2iqbrmum';
+      await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
       setLeadFormSubmitted(true); setShowLeadForm(false);
       setTimeout(() => {
         setMessages(prev => [...prev, { role:'assistant', content:`✦ Signal locked in${formData.name?`, ${formData.name.split(' ')[0]}`:''}! Sanele will personally reach out within 24 hours.\n\nIs there anything else you'd like to know about how we can transform ${formData.company||'your business'}?` }]);
@@ -1118,115 +873,23 @@ function InkanyeziBotWidget() {
         @keyframes thinkPulse { 0%,80%,100%{opacity:0.15;transform:scale(0.8);} 40%{opacity:1;transform:scale(1);} }
         @keyframes chipAppear { from{opacity:0;transform:translateX(-6px);} to{opacity:1;transform:translateX(0);} }
         @keyframes rocketGlow { 0%,100%{box-shadow:0 0 14px rgba(249,115,22,0.5);} 50%{box-shadow:0 0 22px rgba(249,115,22,0.8),0 0 40px rgba(249,115,22,0.3);} }
-        @keyframes greetingPop { from{opacity:0;transform:translateY(10px) scale(0.95);} to{opacity:1;transform:translateY(0) scale(1);} }
-        @keyframes stepSlide { from{opacity:0;transform:translateX(10px);} to{opacity:1;transform:translateX(0);} }
+        @keyframes micPulse { 0%,100%{box-shadow:0 0 0 0 rgba(244,185,66,0.6);} 50%{box-shadow:0 0 0 10px rgba(244,185,66,0);} }
         @keyframes micHintPop { from{opacity:0;transform:translateX(-50%) translateY(4px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
-        @keyframes micHintFade { 0%,70%{opacity:1;} 100%{opacity:0;} }
+        @keyframes greetingPop { from{opacity:0;transform:translateY(10px) scale(0.95);} to{opacity:1;transform:translateY(0) scale(1);} }
         .ink-msg { animation: msgFadeUp 0.3s ease forwards; }
-
-        /* ── CHIPS ── */
         .ink-chip { animation: chipAppear 0.3s ease forwards; transition: all 0.2s !important; }
         .ink-chip:hover { background: rgba(244,185,66,0.12) !important; border-color: #F4B942 !important; color: #1a1a2e !important; transform: translateX(2px); }
-
-        /* ── SEND BUTTON ── */
         .ink-rocket { animation: rocketGlow 2s ease infinite; }
         .ink-rocket:hover:not(:disabled) { transform: scale(1.08) rotate(-5deg) !important; box-shadow: 0 0 30px rgba(249,115,22,0.9) !important; }
-
-        /* ── SCROLLBAR — webkit ── */
         .ink-msgs::-webkit-scrollbar { width: 3px; }
         .ink-msgs::-webkit-scrollbar-track { background: transparent; }
         .ink-msgs::-webkit-scrollbar-thumb { background: rgba(244,185,66,0.4); border-radius: 2px; }
-
-        /* ── TEXTAREA — cross-device ── */
-        .ink-textarea {
-          -webkit-appearance: none;
-          appearance: none;
-          /* Prevent iOS Safari zoom on focus (font-size must be >= 16px on iOS) */
-          font-size: 16px !important;
-          /* Smooth native scrolling on iOS */
-          -webkit-overflow-scrolling: touch;
-          /* Kill tap highlight on Android Chrome / Samsung */
-          -webkit-tap-highlight-color: transparent;
-          tap-highlight-color: transparent;
-          /* Prevent callout menu on long-press (iOS) */
-          -webkit-touch-callout: none;
-          /* Disable text selection flash on mobile */
-          -webkit-user-select: text;
-          user-select: text;
-        }
         .ink-textarea::placeholder { color: rgba(100,110,130,0.5) !important; }
-        /* Remove inner padding on Firefox */
-        .ink-textarea::-moz-focus-inner { padding: 0; border: 0; }
-        /* Samsung Internet / older Android input fix */
-        .ink-textarea:focus { outline: none !important; -webkit-tap-highlight-color: transparent; }
-
-        /* ── CLOSE PULSE ── */
         @keyframes closePulse {
           0%   { box-shadow: 0 0 0 0 rgba(229,62,62,0.6), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1); }
           50%  { box-shadow: 0 0 0 10px rgba(229,62,62,0), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1.06); }
           100% { box-shadow: 0 0 0 0 rgba(229,62,62,0), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1); }
         }
-
-        /* ── MOBILE KEYBOARD — prevent layout shift when keyboard opens ── */
-        /* Use dvh (dynamic viewport height) which shrinks with the keyboard on mobile */
-        @supports (height: 100dvh) {
-          .ink-widget-container {
-            height: min(580px, calc(100dvh - 120px)) !important;
-          }
-          .ink-widget-container.ink-fullscreen {
-            height: 100dvh !important;
-          }
-        }
-
-        /* ── TOUCH TARGETS — minimum 44×44pt per Apple HIG / Android guidelines ── */
-        .ink-rocket { min-width: 44px; min-height: 44px; }
-        .ink-chip { min-height: 44px; display: flex !important; align-items: center; padding: 10px 14px !important; }
-
-        /* ── FLOATING BUBBLE — safe area inset for notched phones ── */
-        .ink-bubble {
-          bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
-          right:  calc(24px + env(safe-area-inset-right, 0px)) !important;
-        }
-
-        /* ── INPUT BAR — account for home bar on iPhone X+ ── */
-        .ink-mic {
-          width:44px; height:44px; border-radius:50%; flex-shrink:0;
-          border:none; cursor:pointer; display:flex; align-items:center;
-          justify-content:center; font-size:18px; transition:all 0.2s;
-          touch-action:manipulation; -webkit-tap-highlight-color:transparent;
-          position:relative;
-        }
-        .ink-mic.listening {
-          animation: mic-pulse 1.2s ease-in-out infinite;
-        }
-        @keyframes mic-pulse {
-          0%,100% { box-shadow: 0 0 0 0 rgba(244,185,66,0.5); }
-          50%      { box-shadow: 0 0 0 10px rgba(244,185,66,0); }
-        }
-        .ink-mic-tooltip {
-          position:absolute; bottom:52px; left:50%; transform:translateX(-50%);
-          background:#0A1628; color:#F4B942; font-size:11px; white-space:nowrap;
-          padding:4px 10px; border-radius:6px; pointer-events:none;
-          opacity:0; transition:opacity 0.2s;
-          font-family:"'Space Mono',monospace";
-          border:1px solid rgba(244,185,66,0.3);
-        }
-        .ink-mic:hover .ink-mic-tooltip { opacity:1; }
-          padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
-        }
-
-        /* ── FULLSCREEN on mobile — no bottom safe area bleed ── */
-        .ink-widget-container.ink-fullscreen .ink-input-bar {
-          padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-        }
-
-        /* ── PREVENT double-tap zoom on buttons (iOS Safari) ── */
-        button, .ink-chip, .ink-rocket {
-          touch-action: manipulation;
-        }
-
-        /* ── WIDGET — hide floating bubble when fullscreen ── */
-        .ink-bubble-hidden { opacity: 0 !important; pointer-events: none !important; }
       `}</style>
 
       {/* ── PROACTIVE GREETING ── */}
@@ -1246,9 +909,13 @@ function InkanyeziBotWidget() {
             <p style={{ margin:0, fontSize:'0.78rem', color:'rgba(255,255,255,0.85)', lineHeight:1.55, fontFamily:"'DM Sans',sans-serif" }}>
               {(() => {
                 const r = (window as any).__inkanyezi_returning;
-                if (r?.count > 1 && r?.name) return <>Welcome back, <span style={{color:'#F4B942',fontWeight:600}}>{r.name}</span>! 👋 Ready to continue where we left off?</>;
-                if (r?.count > 1) return <>Welcome back! 👋 <span style={{color:'#F4B942',fontWeight:600}}>Shall we continue exploring AI for your business?</span></>;
-                return <>Sawubona! 👋 Automating a South African business?{' '}<span style={{color:'#F4B942',fontWeight:600}}>I can show you how in 3 minutes.</span></>;
+                if (r?.count > 1 && r?.name) {
+                  return <>Welcome back, <span style={{color:'#F4B942',fontWeight:600}}>{r.name}</span>! 👋 Ready to continue where we left off?</>;
+                } else if (r?.count > 1) {
+                  return <>Welcome back! 👋 <span style={{color:'#F4B942',fontWeight:600}}>Shall we continue exploring AI for your business?</span></>;
+                } else {
+                  return <>Sawubona! 👋 Automating a South African business?{' '}<span style={{color:'#F4B942',fontWeight:600}}>I can show you how in 3 minutes.</span></>;
+                }
               })()}
             </p>
             <div style={{ marginTop:8, display:'flex', alignItems:'center', gap:4, fontSize:'0.65rem', color:'rgba(255,255,255,0.4)', fontFamily:"'Space Mono',monospace" }}>
@@ -1261,260 +928,215 @@ function InkanyeziBotWidget() {
 
       {/* ── FLOATING BUBBLE ── */}
       <button
-        className={`ink-bubble${isFullscreen ? ' ink-bubble-hidden' : ''}`}
-        onClick={()=>{ if(!isOpen){ setShowDoor(true); setOpenKey(k=>k+1); } else { setIsOpen(false); setIsFullscreen(false); } }}
+        onClick={()=>{ if(!isOpen){ setShowDoor(true); setOpenKey(k=>k+1); } else { setIsOpen(false); } }}
         aria-label={isOpen?'Close InkanyeziBot':'Open InkanyeziBot'}
         style={{
           position:'fixed', bottom:24, right:24, zIndex:99999,
           width:64, height:64, borderRadius:'50%',
-          background: isOpen ? 'linear-gradient(135deg, #e53e3e, #c53030)' : 'linear-gradient(135deg, #FF6B35, #c2410c)',
-          border: isOpen ? '2.5px solid rgba(229,62,62,0.6)' : '2px solid rgba(249,115,22,0.45)',
+          background: isOpen
+            ? 'linear-gradient(135deg, #e53e3e, #c53030)'
+            : 'linear-gradient(135deg, #FF6B35, #c2410c)',
+          border: isOpen
+            ? '2.5px solid rgba(229,62,62,0.6)'
+            : '2px solid rgba(249,115,22,0.45)',
           cursor:'pointer', fontSize: isOpen ? 22 : 26,
           animation: isOpen ? 'closePulse 1.8s ease-in-out infinite' : 'floatBubble 3s ease-in-out infinite',
           display:'flex', alignItems:'center', justifyContent:'center',
           transition:'background 0.3s, border 0.3s',
-          boxShadow: isOpen ? '0 0 0 0 rgba(229,62,62,0.4), 0 4px 20px rgba(229,62,62,0.4)' : '0 0 30px rgba(249,115,22,0.55)',
+          boxShadow: isOpen
+            ? '0 0 0 0 rgba(229,62,62,0.4), 0 4px 20px rgba(229,62,62,0.4)'
+            : '0 0 30px rgba(249,115,22,0.55)',
         }}>
+        {/* Orbit ring — only when closed */}
         {!isOpen && !showDoor && (
           <div style={{ position:'absolute', width:64, height:64, animation:'orbitRing 4s linear infinite', pointerEvents:'none' }}>
             <div style={{ position:'absolute', top:-3, left:'50%', width:7, height:7, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 10px ${C.gold}` }} />
           </div>
         )}
+        {/* Close X — animated spinning lines */}
         {isOpen ? (
           <div style={{ position:'relative', width:24, height:24 }}>
-            <div style={{ position:'absolute', top:'50%', left:0, right:0, height:2.5, background:'#fff', borderRadius:2, transform:'translateY(-50%) rotate(45deg)', boxShadow:'0 0 6px rgba(255,255,255,0.8)' }}/>
-            <div style={{ position:'absolute', top:'50%', left:0, right:0, height:2.5, background:'#fff', borderRadius:2, transform:'translateY(-50%) rotate(-45deg)', boxShadow:'0 0 6px rgba(255,255,255,0.8)' }}/>
+            <div style={{
+              position:'absolute', top:'50%', left:0, right:0, height:2.5,
+              background:'#fff', borderRadius:2,
+              transform:'translateY(-50%) rotate(45deg)',
+              boxShadow:'0 0 6px rgba(255,255,255,0.8)',
+            }}/>
+            <div style={{
+              position:'absolute', top:'50%', left:0, right:0, height:2.5,
+              background:'#fff', borderRadius:2,
+              transform:'translateY(-50%) rotate(-45deg)',
+              boxShadow:'0 0 6px rgba(255,255,255,0.8)',
+            }}/>
           </div>
         ) : (
           <span style={{ position:'relative', zIndex:1 }}>⭐</span>
         )}
+        {/* Close label — appears above button */}
         {isOpen && (
-          <div style={{ position:'absolute', bottom:'calc(100% + 8px)', left:'50%', transform:'translateX(-50%)', background:'rgba(229,62,62,0.9)', color:'#fff', fontSize:'0.55rem', fontFamily:"'Space Mono',monospace", letterSpacing:'0.1em', padding:'3px 8px', borderRadius:4, whiteSpace:'nowrap', pointerEvents:'none', boxShadow:'0 2px 8px rgba(229,62,62,0.4)' }}>CLOSE</div>
+          <div style={{
+            position:'absolute', bottom:'calc(100% + 8px)', left:'50%',
+            transform:'translateX(-50%)',
+            background:'rgba(229,62,62,0.9)',
+            color:'#fff', fontSize:'0.55rem', fontFamily:"'Space Mono',monospace",
+            letterSpacing:'0.1em', padding:'3px 8px', borderRadius:4,
+            whiteSpace:'nowrap', pointerEvents:'none',
+            boxShadow:'0 2px 8px rgba(229,62,62,0.4)',
+          }}>CLOSE</div>
         )}
       </button>
 
-      {/* ── UNIFIED CONTAINER — supports fullscreen toggle ── */}
+      {/* ── UNIFIED CONTAINER — door + chat always together, no gap ── */}
       {(showDoor || isOpen) && (
-        <div className={`ink-widget-container${isFullscreen ? ' ink-fullscreen' : ''}`} style={{
-          position: 'fixed',
-          bottom:   isFullscreen ? 0 : 100,
-          right:    isFullscreen ? 0 : 24,
-          left:     isFullscreen ? 0 : 'auto',
-          top:      isFullscreen ? 0 : 'auto',
-          width:    isFullscreen ? '100vw' : 'min(370px, calc(100vw - 32px))',
-          height:   isFullscreen ? '100vh' : 'min(580px, calc(100vh - 120px))',
-          zIndex: 99998,
-          borderRadius: isFullscreen ? 0 : 20,
-          overflow: 'hidden',
-          boxShadow: isFullscreen ? 'none' : '0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)',
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        <div style={{
+          position:'fixed', bottom:100, right:24, width:370, height:580,
+          zIndex:99998, borderRadius:20, overflow:'hidden',
+          boxShadow:'0 0 0 1px rgba(244,185,66,0.15), 0 8px 40px rgba(0,0,0,0.25)',
         }}>
 
-          <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', borderRadius: isFullscreen ? 0 : 20, overflow:'hidden', background:'#FAFBFC' }}>
+          {/* CHAT — fills container, always present, door sits on top */}
+          <div style={{
+            position:'absolute', inset:0,
+            display:'flex', flexDirection:'column',
+            borderRadius:20, overflow:'hidden',
+            background:'#FAFBFC',
+          }}>
 
-            {/* Header */}
-            <div style={{ position:'relative', zIndex:2, flexShrink:0, background:'linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%)', borderBottom:'1px solid rgba(244,185,66,0.3)', boxShadow:'0 1px 8px rgba(0,0,0,0.06)', padding:'12px 16px', display:'flex', alignItems:'center', gap:12 }}>
-              <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`, backgroundSize:'200% 100%', animation:'headerShimmer 3s linear infinite' }} />
-              <div style={{ position:'relative', flexShrink:0 }}>
-                <div style={{ width:42, height:42, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, boxShadow:'0 0 16px rgba(249,115,22,0.6)' }}>⭐</div>
-                <div style={{ position:'absolute', inset:-4, animation:'orbitRing 5s linear infinite', pointerEvents:'none' }}>
-                  <div style={{ position:'absolute', top:0, left:'50%', width:5, height:5, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 6px ${C.gold}` }} />
-                </div>
-              </div>
-              <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:15, color:'#1a1a2e', letterSpacing:'-0.01em' }}>InkanyeziBot <span style={{ fontSize:11, color:C.gold, fontFamily:"'Space Mono',monospace", fontWeight:400 }}>✦</span></div>
-                <div style={{ fontSize:11, color:'#F4B942', display:'flex', alignItems:'center', gap:5, fontFamily:"'DM Sans',sans-serif" }}>
-                  <SignalDot /><span>Online · AI Automation · Durban, ZA</span>
-                </div>
-              </div>
-              {/* Right side — expand toggle + heritage strip */}
-              <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
-                {/* Fullscreen expand/collapse button */}
-                <button
-                  onClick={() => setIsFullscreen(f => !f)}
-                  title={isFullscreen ? 'Minimise' : 'Expand to fullscreen'}
-                  style={{
-                    width:28, height:28, borderRadius:6,
-                    background:'rgba(244,185,66,0.08)',
-                    border:'1px solid rgba(244,185,66,0.25)',
-                    display:'flex', alignItems:'center', justifyContent:'center',
-                    cursor:'pointer', fontSize:12, color:'#6B4F10',
-                    transition:'all 0.2s', flexShrink:0,
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.18)'; (e.currentTarget as HTMLButtonElement).style.borderColor='rgba(244,185,66,0.5)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.08)'; (e.currentTarget as HTMLButtonElement).style.borderColor='rgba(244,185,66,0.25)'; }}
-                >
-                  {isFullscreen ? '⊡' : '⤢'}
-                </button>
-                <div style={{ textAlign:'right' }}>
-                  <div style={{ fontSize:10, color:'rgba(100,80,20,0.5)', fontFamily:"'Space Mono',monospace" }}>🇿🇦 SA AI</div>
-                  <HeritageStrip style={{ justifyContent:'flex-end', marginTop:3 }} />
-                </div>
+          {/* Header */}
+          <div style={{
+            position:'relative', zIndex:2, flexShrink:0,
+            background:'linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%)',
+            borderBottom:'1px solid rgba(244,185,66,0.3)',
+            boxShadow:'0 1px 8px rgba(0,0,0,0.06)',
+            padding:'12px 16px', display:'flex', alignItems:'center', gap:12,
+          }}>
+            <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`, backgroundSize:'200% 100%', animation:'headerShimmer 3s linear infinite' }} />
+            <div style={{ position:'relative', flexShrink:0 }}>
+              <div style={{ width:42, height:42, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, boxShadow:'0 0 16px rgba(249,115,22,0.6)' }}>⭐</div>
+              <div style={{ position:'absolute', inset:-4, animation:'orbitRing 5s linear infinite', pointerEvents:'none' }}>
+                <div style={{ position:'absolute', top:0, left:'50%', width:5, height:5, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 6px ${C.gold}` }} />
               </div>
             </div>
-
-            {/* Messages */}
-            <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'#F5F7FA' }}>
-              {messages.map((msg,i) => (
-                <div key={i} className="ink-msg" style={{ display:'flex', justifyContent:msg.role==='user'?'flex-end':'flex-start', alignItems:'flex-end', gap:6, animationDelay:`${i*0.03}s` }}>
-                  {msg.role==='assistant' && (
-                    <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, boxShadow:'0 0 8px rgba(249,115,22,0.4)' }}>⭐</div>
-                  )}
-                  <div style={{ maxWidth: isFullscreen ? '60%' : '78%', padding:'10px 13px', borderRadius:14, fontSize: isFullscreen ? 15 : 13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'#FFFFFF', color:'#1a1a2e', border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.3)', boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.25)':'0 1px 4px rgba(0,0,0,0.06)', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
-                    dangerouslySetInnerHTML={{ __html: formatMessage(msg.content) }} />
-                </div>
-              ))}
-
-              {/* Quick chips */}
-              {showChips && messages.length===1 && (
-                <div style={{ display:'flex', flexDirection:'column', gap:6, marginTop:4 }}>
-                  <div style={{ fontSize:'0.6rem', color:'rgba(100,110,130,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.1em', textAlign:'center', marginBottom:2 }}>Quick questions:</div>
-                  {CHIPS.map((chip,i) => (
-                    <button key={i} className="ink-chip" onClick={()=>sendMessage(chip.msg)}
-                      style={{ background:'#FFFFFF', border:'1px solid rgba(244,185,66,0.35)', borderRadius:8, padding:'8px 12px', color:'#1a1a2e', fontSize:12, cursor:'pointer', textAlign:'left', fontFamily:"'DM Sans',sans-serif", animationDelay:`${i*0.08}s`, opacity:0 }}>
-                      {chip.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Lead form */}
-              {showLeadForm && !leadFormSubmitted && (
-                <ChatLeadForm onSubmit={handleLeadSubmit} onDismiss={()=>setShowLeadForm(false)} sessionContext={sessionContext} submitting={leadSubmitting} />
-              )}
-
-              {/* Thinking */}
-              {isLoading && (
-                <div style={{ display:'flex', alignItems:'flex-end', gap:6 }}>
-                  <div style={{ width:24, height:24, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, flexShrink:0 }}>⭐</div>
-                  <div style={{ background:'#FFFFFF', padding:'12px 16px', borderRadius:14, borderBottomLeftRadius:3, border:'1px solid rgba(244,185,66,0.25)', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', display:'flex', alignItems:'center', gap:5 }}>
-                    {[0,1,2].map(i => <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'#F4B942', opacity:0.4, animation:'thinkPulse 1.2s ease-in-out infinite', animationDelay:`${i*0.2}s` }} />)}
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEnd} />
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:15, color:'#1a1a2e', letterSpacing:'-0.01em' }}>InkanyeziBot <span style={{ fontSize:11, color:C.gold, fontFamily:"'Space Mono',monospace", fontWeight:400 }}>✦</span></div>
+              <div style={{ fontSize:11, color:'#F4B942', display:'flex', alignItems:'center', gap:5, fontFamily:"'DM Sans',sans-serif" }}>
+                <SignalDot /><span>Online · AI Automation · Durban, ZA</span>
+              </div>
             </div>
-
-            {/* Input — cross-device compatible */}
-            <div className="ink-input-bar" style={{ flexShrink:0, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#FFFFFF' }}>
-              <div style={{ display:'flex', gap:8, alignItems:'flex-end' }}>
-                <textarea
-                  ref={textareaRef}
-                  value={input}
-                  className="ink-textarea"
-                  onChange={e => {
-                    setInput(e.target.value);
-                    e.target.style.height = 'auto';
-                    e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
-                  }}
-                  onKeyDown={e => {
-                    // Desktop: Enter sends. Mobile: Enter = new line (no send on mobile keyboards)
-                    if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) {
-                      e.preventDefault();
-                      sendMessage();
-                    }
-                  }}
-                  placeholder={isListening ? '🎙 Listening… speak now' : 'Type a message or tap 🎙 to speak'}
-                  rows={1}
-                  autoComplete="off"
-                  autoCorrect="on"
-                  autoCapitalize="sentences"
-                  spellCheck={true}
-                  inputMode="text"
-                  style={{
-                    flex:1,
-                    padding:'11px 14px',
-                    borderRadius:14,
-                    background:'#F5F7FA',
-                    border:'1px solid rgba(244,185,66,0.3)',
-                    color:'#1a1a2e',
-                    outline:'none',
-                    fontSize:16, /* 16px prevents iOS Safari zoom */
-                    resize:'none',
-                    lineHeight:1.5,
-                    wordBreak:'break-word',
-                    overflowY:'auto',
-                    maxHeight:120,
-                    fontFamily:"'DM Sans',sans-serif",
-                    transition:'border-color 0.2s',
-                    WebkitAppearance:'none',
-                    touchAction:'manipulation',
-                  }}
-                  onFocus={e => e.target.style.borderColor = '#F4B942'}
-                  onBlur={e => e.target.style.borderColor = 'rgba(244,185,66,0.3)'}
-                />
-                {/* Mic button — speech to text */}
-                {micSupported && (
-                  <div style={{ position:'relative', flexShrink:0 }}>
-                    {/* First-open onboarding hint — shows once then hides */}
-                    {showMicHint && !isListening && (
-                      <div style={{
-                        position:'absolute', bottom:52, left:'50%',
-                        transform:'translateX(-50%)',
-                        background:'#0A1628', color:'#F4B942',
-                        fontSize:11, whiteSpace:'nowrap',
-                        padding:'6px 12px', borderRadius:8,
-                        border:'1px solid rgba(244,185,66,0.4)',
-                        fontFamily:"'Space Mono',monospace",
-                        pointerEvents:'none', zIndex:10,
-                        animation:'micHintPop 0.3s ease',
-                      }}>
-                        🎙 Tap to speak
-                        <div style={{ position:'absolute', bottom:-5, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'5px solid #0A1628' }} />
-                      </div>
-                    )}
-                    <button
-                      className={`ink-mic${isListening ? ' listening' : ''}`}
-                      onPointerUp={() => { setShowMicHint(false); toggleListening(); }}
-                      aria-label={isListening ? 'Stop recording' : 'Speak your message'}
-                      style={{
-                        background: isListening
-                          ? 'linear-gradient(135deg, #F4B942, #FF6B35)'
-                          : 'rgba(244,185,66,0.15)',
-                        border: isListening
-                          ? '2px solid #F4B942'
-                          : '1.5px solid rgba(244,185,66,0.5)',
-                        color: isListening ? '#0A1628' : '#F4B942',
-                        WebkitTapHighlightColor:'transparent',
-                      }}>
-                      {isListening ? '⏹' : '🎙'}
-                    </button>
-                  </div>
-                )}
-                {/* Send button — tap-friendly 44×44 touch target */}
-                <button
-                  className="ink-rocket"
-                  onPointerUp={() => sendMessage()} /* pointerUp works on all devices */
-                  disabled={isLoading || !input.trim()}
-                  aria-label="Send message"
-                  style={{
-                    width:44, height:44,
-                    borderRadius:'50%', flexShrink:0,
-                    background: isLoading || !input.trim()
-                      ? 'rgba(249,115,22,0.3)'
-                      : 'linear-gradient(135deg, #FF6B35, #c2410c)',
-                    border:'none',
-                    cursor: isLoading || !input.trim() ? 'not-allowed' : 'pointer',
-                    color: C.white, fontSize:18,
-                    display:'flex', alignItems:'center', justifyContent:'center',
-                    transition:'all 0.2s',
-                    opacity: isLoading || !input.trim() ? 0.5 : 1,
-                    touchAction:'manipulation',
-                    WebkitTapHighlightColor:'transparent',
-                  }}>
-                  🚀
-                </button>
-              </div>
-              <div style={{ marginTop:6, textAlign:'center', fontSize:10, color:'rgba(150,120,60,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.05em' }}>
-                ✦ INKANYEZI TECHNOLOGIES · WE ARE THE SIGNAL IN THE NOISE ✦
-              </div>
+            <div style={{ textAlign:'right', flexShrink:0 }}>
+              <div style={{ fontSize:10, color:'rgba(100,80,20,0.5)', fontFamily:"'Space Mono',monospace" }}>🇿🇦 SA AI</div>
+              <HeritageStrip style={{ justifyContent:'flex-end', marginTop:3 }} />
             </div>
           </div>
 
-          {/* DOOR */}
+          {/* Messages */}
+          <div className="ink-msgs" style={{ flex:1, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'#F5F7FA' }}>
+            {messages.map((msg,i) => (
+              <div key={i} className="ink-msg" style={{ display:'flex', justifyContent:msg.role==='user'?'flex-end':'flex-start', alignItems:'flex-end', gap:6, animationDelay:`${i*0.03}s` }}>
+                {msg.role==='assistant' && (
+                  <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, boxShadow:'0 0 8px rgba(249,115,22,0.4)' }}>⭐</div>
+                )}
+                <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'#FFFFFF', color:'#1a1a2e', border:msg.role==='user'?'none':'1px solid rgba(244,185,66,0.3)', boxShadow:msg.role==='user'?'0 2px 12px rgba(244,185,66,0.25)':'0 1px 4px rgba(0,0,0,0.06)', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
+                  dangerouslySetInnerHTML={{ __html:formatMessage(msg.content) }} />
+              </div>
+            ))}
+
+            {/* Quick chips */}
+            {showChips && messages.length===1 && (
+              <div style={{ display:'flex', flexDirection:'column', gap:6, marginTop:4 }}>
+                <div style={{ fontSize:'0.6rem', color:'rgba(100,110,130,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.1em', textAlign:'center', marginBottom:2 }}>Quick questions:</div>
+                {CHIPS.map((chip,i) => (
+                  <button key={i} className="ink-chip" onClick={()=>sendMessage(chip.msg)}
+                    style={{ background:'#FFFFFF', border:'1px solid rgba(244,185,66,0.35)', borderRadius:8, padding:'8px 12px', color:'#1a1a2e', fontSize:12, cursor:'pointer', textAlign:'left', fontFamily:"'DM Sans',sans-serif", animationDelay:`${i*0.08}s`, opacity:0 }}>
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Lead form */}
+            {showLeadForm && !leadFormSubmitted && (
+              <ChatLeadForm onSubmit={handleLeadSubmit} onDismiss={()=>setShowLeadForm(false)} sessionContext={sessionContext} submitting={leadSubmitting} />
+            )}
+
+            {/* Thinking */}
+            {isLoading && (
+              <div style={{ display:'flex', alignItems:'flex-end', gap:6 }}>
+                <div style={{ width:24, height:24, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, flexShrink:0 }}>⭐</div>
+                <div style={{ background:'#FFFFFF', padding:'12px 16px', borderRadius:14, borderBottomLeftRadius:3, border:'1px solid rgba(244,185,66,0.25)', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', display:'flex', alignItems:'center', gap:5 }}>
+                  {[0,1,2].map(i => <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'#F4B942', opacity:0.4, animation:'thinkPulse 1.2s ease-in-out infinite', animationDelay:`${i*0.2}s` }} />)}
+                </div>
+              </div>
+            )}
+            <div ref={messagesEnd} />
+          </div>
+
+          {/* Input */}
+          <div style={{ flexShrink:0, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#FFFFFF' }}>
+            <div style={{ display:'flex', gap:8, alignItems:'flex-end' }}>
+              <textarea ref={textareaRef} value={input} className="ink-textarea"
+                onChange={e => { setInput(e.target.value); e.target.style.height='auto'; e.target.style.height=Math.min(e.target.scrollHeight,96)+'px'; }}
+                onKeyDown={e => { if (e.key==='Enter'&&!e.shiftKey&&!('ontouchstart' in window)) { e.preventDefault(); sendMessage(); } }}
+                placeholder={isListening ? '🎙 Listening… speak now' : 'Type or tap 🎙 to speak...'} rows={1}
+                style={{ flex:1, padding:'9px 13px', borderRadius:14, background:'#F5F7FA', border:`1px solid ${isListening ? '#F4B942' : 'rgba(244,185,66,0.3)'}`, color:'#1a1a2e', outline:'none', fontSize:16, resize:'none', lineHeight:1.5, wordBreak:'break-word', overflowY:'auto', maxHeight:96, fontFamily:"'DM Sans',sans-serif", transition:'border-color 0.2s', WebkitAppearance:'none' }}
+                onFocus={e=>e.target.style.borderColor='#F4B942'}
+                onBlur={e=>e.target.style.borderColor=isListening?'#F4B942':'rgba(244,185,66,0.3)'}
+              />
+              {/* Mic button — speech to text */}
+              {micSupported && (
+                <div style={{ position:'relative', flexShrink:0 }}>
+                  {showMicHint && !isListening && (
+                    <div style={{
+                      position:'absolute', bottom:50, left:'50%', transform:'translateX(-50%)',
+                      background:'#0A1628', color:'#F4B942', fontSize:11, whiteSpace:'nowrap',
+                      padding:'6px 12px', borderRadius:8, border:'1px solid rgba(244,185,66,0.4)',
+                      fontFamily:"'Space Mono',monospace", pointerEvents:'none', zIndex:10,
+                      animation:'micHintPop 0.3s ease',
+                    }}>
+                      🎙 Tap to speak
+                      <div style={{ position:'absolute', bottom:-5, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'5px solid #0A1628' }} />
+                    </div>
+                  )}
+                  <button
+                    onPointerUp={toggleListening}
+                    aria-label={isListening ? 'Stop recording' : 'Speak your message'}
+                    style={{
+                      width:42, height:42, borderRadius:'50%', flexShrink:0,
+                      background: isListening ? 'linear-gradient(135deg,#F4B942,#FF6B35)' : 'rgba(244,185,66,0.15)',
+                      border: isListening ? '2px solid #F4B942' : '1.5px solid rgba(244,185,66,0.5)',
+                      color: isListening ? '#0A1628' : '#F4B942',
+                      fontSize:18, cursor:'pointer',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      transition:'all 0.2s',
+                      animation: isListening ? 'micPulse 1.2s ease-in-out infinite' : 'none',
+                      WebkitTapHighlightColor:'transparent',
+                      touchAction:'manipulation',
+                    }}>
+                    {isListening ? '⏹' : '🎙'}
+                  </button>
+                </div>
+              )}
+              <button className="ink-rocket" onPointerUp={()=>sendMessage()} disabled={isLoading||!input.trim()}
+                style={{ width:42, height:42, borderRadius:'50%', flexShrink:0, background:isLoading||!input.trim()?'rgba(249,115,22,0.3)':'linear-gradient(135deg, #FF6B35, #c2410c)', border:'none', cursor:isLoading||!input.trim()?'not-allowed':'pointer', color:C.white, fontSize:18, display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', opacity:isLoading||!input.trim()?0.5:1, touchAction:'manipulation', WebkitTapHighlightColor:'transparent' }}>
+                🚀
+              </button>
+            </div>
+            <div style={{ marginTop:6, textAlign:'center', fontSize:10, color:'rgba(150,120,60,0.6)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.05em' }}>
+              ✦ INKANYEZI TECHNOLOGIES · WE ARE THE SIGNAL IN THE NOISE ✦
+            </div>
+          </div>
+          </div>
+
+          {/* DOOR — sits on top of chat as absolute overlay */}
           {showDoor && (
-            <div key={openKey} style={{ position:'absolute', inset:0, zIndex:10, borderRadius:20, overflow:'hidden' }}>
-              <DoorAnimationInline onComplete={() => { setShowDoor(false); setIsOpen(true); }} />
+            <div key={openKey} style={{
+              position:'absolute', inset:0, zIndex:10,
+              borderRadius:20, overflow:'hidden',
+            }}>
+              <DoorAnimationInline onComplete={() => {
+                setShowDoor(false);
+                setIsOpen(true);
+              }} />
             </div>
           )}
         </div>
@@ -1582,6 +1204,7 @@ const Index = () => {
         </main>
         <Footer />
       </div>
+      {/* Native React widgets — no iframe, fully interactive */}
       <InkanyeziBotWidget />
       <WhatsAppWidget />
     </div>
