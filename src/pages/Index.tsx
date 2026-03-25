@@ -274,7 +274,13 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting }: an
 // ── FORMAT MESSAGE ───────────────────────────────────────────────────
 function formatMessage(text: string) {
   if (!text) return '';
-  return text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br/>');
+  const clean = text
+    .replace(/<context>[\s\S]*?<\/context>/gi, '')
+    .replace(/<response>|<\/response>/gi, '')
+    .trim();
+  return clean
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br/>');
 }
 
 
@@ -296,26 +302,25 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     const isL = side === 'left';
     ctx.clearRect(0, 0, W, H);
 
-    // Base — void black
-    ctx.fillStyle = '#0a1628'; ctx.fillRect(0,0,W,H);
-    // Radial brightness boost — centre lit, edges dark like a real door
+    // Base — warm void, NOT cold navy
+    ctx.fillStyle = '#0E0A04'; ctx.fillRect(0,0,W,H);
+    // Amber radial warmth — fire from the centre seam
     const radial=ctx.createRadialGradient(W*0.5,H*0.5,0,W*0.5,H*0.5,W*0.9);
-    radial.addColorStop(0,'rgba(30,60,110,0.55)');
-    radial.addColorStop(0.6,'rgba(15,35,70,0.3)');
+    radial.addColorStop(0,'rgba(80,50,10,0.65)');
+    radial.addColorStop(0.5,'rgba(40,25,5,0.35)');
     radial.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=radial; ctx.fillRect(0,0,W,H);
 
-    // Fine grid — holographic blueprint
-    ctx.strokeStyle = 'rgba(120,180,255,0.14)'; ctx.lineWidth = 0.5;
+    // Fine grid — warm gold constellation weave
+    ctx.strokeStyle = 'rgba(244,185,66,0.10)'; ctx.lineWidth = 0.5;
     for(let x=0;x<W;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<H;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
-    // Coarser accent grid
-    ctx.strokeStyle = 'rgba(120,180,255,0.08)'; ctx.lineWidth = 1;
+    // Coarser accent grid — orange counter feel
+    ctx.strokeStyle = 'rgba(255,107,53,0.07)'; ctx.lineWidth = 1;
     for(let x=0;x<W;x+=100){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<H;y+=100){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
 
-    // Hexagonal microchip pattern
     const hr = 15, hw = hr*Math.sqrt(3);
     ctx.strokeStyle = 'rgba(244,185,66,0.14)'; ctx.lineWidth = 0.7;
     for(let row=-1;row<H/(hr*1.5)+1;row++){
@@ -327,20 +332,18 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       }
     }
 
-    // Vertical data streams — falling code
     const cols = isL ? [W*0.18,W*0.38,W*0.62,W*0.82] : [W*0.18,W*0.38,W*0.62,W*0.82];
     cols.forEach((sx,ci) => {
       const chars=['01','10','AI','∑','λ','π','∞','⟨⟩','11','00','NN','ML'];
       for(let i=0;i<7;i++){
         const yPos=((tk*55*(0.7+ci*0.2)+i*(H/7))%H);
         const alpha=(0.08+0.1*Math.sin(tk+i+ci*2))*Math.max(0,1-op*2);
-        ctx.fillStyle=`rgba(140,200,255,${alpha})`;
+        ctx.fillStyle=`rgba(255,185,80,${alpha})`;
         ctx.font=`${7+i%2}px monospace`; ctx.textAlign='center';
         ctx.fillText(chars[(Math.floor(tk*2+i+ci*5))%chars.length],sx,yPos);
       }
     });
 
-    // Horizontal circuit traces with pulse
     [H*0.15,H*0.3,H*0.5,H*0.7,H*0.85].forEach((y,i)=>{
       const p=0.4+0.5*Math.sin(tk*2+i*1.3);
       ctx.strokeStyle=`rgba(244,185,66,${0.18+p*0.22})`; ctx.lineWidth=1;
@@ -349,24 +352,22 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       ctx.moveTo(0,y);
       ctx.lineTo(mid-30,y); ctx.lineTo(mid-18,y-9); ctx.lineTo(mid+18,y-9); ctx.lineTo(mid+30,y);
       ctx.lineTo(W,y); ctx.stroke();
-      // Junction nodes
       [W*0.1, mid, W*0.9].forEach(nx=>{
         ctx.beginPath(); ctx.arc(nx,y,2,0,Math.PI*2);
         ctx.fillStyle=`rgba(244,185,66,${0.35+p*0.55})`; ctx.fill();
       });
     });
 
-    // Scan line — system initialising
+    // Amber scan sweep — warm system initialising
     const scanY=((tk*40)%(H+80))-40;
     const sg=ctx.createLinearGradient(0,scanY-25,0,scanY+25);
-    sg.addColorStop(0,'rgba(100,160,255,0)');
-    sg.addColorStop(0.4,`rgba(100,200,255,${0.05+op*0.03})`);
-    sg.addColorStop(0.5,`rgba(180,220,255,${0.18+op*0.1})`);
-    sg.addColorStop(0.6,`rgba(100,200,255,${0.05+op*0.03})`);
-    sg.addColorStop(1,'rgba(100,160,255,0)');
+    sg.addColorStop(0,'rgba(244,185,66,0)');
+    sg.addColorStop(0.4,`rgba(255,160,40,${0.06+op*0.03})`);
+    sg.addColorStop(0.5,`rgba(255,200,80,${0.22+op*0.1})`);
+    sg.addColorStop(0.6,`rgba(255,160,40,${0.06+op*0.03})`);
+    sg.addColorStop(1,'rgba(244,185,66,0)');
     ctx.fillStyle=sg; ctx.fillRect(0,scanY-25,W,50);
 
-    // Plasma energy conduit — fades to zero as door opens (eliminates trace line)
     const conduitAlpha = Math.max(0, 1 - op * 3);
     if (conduitAlpha > 0) {
       const cg=ctx.createLinearGradient(0,0,0,H);
@@ -378,8 +379,6 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       ctx.fillStyle=cg; ctx.fillRect(isL?W-4:0,0,4,H);
     }
 
-    // Edge bloom as doors open
-    // Edge bloom — fades away completely as door opens to leave clean reveal
     const bloomAlpha = Math.max(0, 1 - op * 2.5);
     const eg=ctx.createLinearGradient(isL?W:0,0,isL?W-80:80,0);
     eg.addColorStop(0,`rgba(255,107,53,${(0.12+op*0.3)*bloomAlpha})`);
@@ -387,13 +386,12 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
     eg.addColorStop(1,'rgba(0,0,0,0)');
     ctx.fillStyle=eg; ctx.fillRect(isL?W-80:0,0,80,H);
 
-    // Precision frame — double line
     ctx.strokeStyle='rgba(244,185,66,0.35)'; ctx.lineWidth=1;
     ctx.strokeRect(5,5,W-10,H-10);
-    ctx.strokeStyle='rgba(100,160,255,0.08)'; ctx.lineWidth=0.5;
+    // Inner precision line — warm amber ghost
+    ctx.strokeStyle='rgba(255,140,40,0.10)'; ctx.lineWidth=0.5;
     ctx.strokeRect(11,11,W-22,H-22);
 
-    // Corner brackets — engineering precision
     const b=18;
     [[5,5],[5,H-5],[W-5,5],[W-5,H-5]].forEach(([bx,by])=>{
       ctx.strokeStyle='rgba(244,185,66,0.75)'; ctx.lineWidth=2;
@@ -401,32 +399,24 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
       ctx.beginPath(); ctx.moveTo(bx+mx,by); ctx.lineTo(bx,by); ctx.lineTo(bx,by+my); ctx.stroke();
     });
 
-    // Panel ID — bottom
     ctx.font='7px monospace'; ctx.textAlign='center';
-    ctx.fillStyle=`rgba(140,190,255,${0.5+0.15*Math.sin(tk*4)})`;
+    ctx.fillStyle=`rgba(255,185,80,${0.5+0.15*Math.sin(tk*4)})`;
     ctx.fillText(isL?'◈ INK-L':'◈ INK-R',W/2,H-16);
     ctx.fillStyle='rgba(244,185,66,0.45)';
     ctx.fillText(isL?'UNIT·ALPHA':'UNIT·SIGMA',W/2,H-8);
 
-    // ── LETTER — A on left panel (right side near seam), I on right panel (left side near seam)
-    // Only appears during opening phase, fades out as doors slide away
     if(op > 0) {
       const letter = isL ? 'A' : 'I';
-      // Position: near the inner seam edge of each panel
-      // Left panel: letter on right side (near center seam) — x = rightmost quarter
-      // Right panel: letter on left side (near center seam) — x = leftmost quarter
       const lx = isL ? W * 0.78 : W * 0.22;
       const ly = H * 0.5;
       const letterAlpha = Math.min(op * 3, 1) * Math.max(0, 1 - op * 1.2);
       if(letterAlpha > 0) {
-        // Glow halo behind letter
         const lg = ctx.createRadialGradient(lx, ly, 0, lx, ly, 55);
         lg.addColorStop(0, `rgba(244,185,66,${letterAlpha * 0.25})`);
         lg.addColorStop(0.5, `rgba(255,107,53,${letterAlpha * 0.1})`);
         lg.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.beginPath(); ctx.arc(lx, ly, 55, 0, Math.PI*2);
         ctx.fillStyle = lg; ctx.fill();
-        // Letter itself
         ctx.save();
         ctx.font = 'bold 72px Arial';
         ctx.textAlign = 'center';
@@ -436,7 +426,6 @@ function DoorAnimationInline({ onComplete }: { onComplete: () => void }) {
         ctx.fillStyle = `rgba(255,255,255,${letterAlpha})`;
         ctx.fillText(letter, lx, ly);
         ctx.restore();
-        // Underline accent — tech style
         const uw = letter === 'I' ? 28 : 44;
         const ug = ctx.createLinearGradient(lx-uw/2, ly+44, lx+uw/2, ly+44);
         ug.addColorStop(0, 'rgba(244,185,66,0)');
@@ -776,21 +765,15 @@ function InkanyeziBotWidget() {
     if (isOpen) { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }
   }, [isOpen]);
 
-  // Lead form trigger
+  // Lead form trigger — show after first bot reply so contact is captured early
   useEffect(() => {
-    if (hasTriggered.current || leadFormSubmitted || !sessionContext) return;
-    const userMsgs = messages.filter(m => m.role==='user');
-    const lastMsg  = userMsgs[userMsgs.length-1]?.content||'';
-    const { shouldShow } = scoreConversation(sessionContext, userMsgs.length, lastMsg);
-    // Primary trigger — score threshold met
-    if (shouldShow) { hasTriggered.current = true; setTimeout(() => setShowLeadForm(true), 1200); return; }
-    // Backup trigger — after 5 user messages always show form regardless of score
-    // Never let a long engaged conversation end without capturing the lead
-    if (userMsgs.length >= 5 && !hasTriggered.current) {
+    if (hasTriggered.current || leadFormSubmitted) return;
+    const userMsgs = messages.filter(m => m.role === 'user');
+    if (userMsgs.length >= 1 && messages.length >= 2 && !isLoading) {
       hasTriggered.current = true;
-      setTimeout(() => setShowLeadForm(true), 1200);
+      setTimeout(() => setShowLeadForm(true), 800);
     }
-  }, [messages, sessionContext, leadFormSubmitted]);
+  }, [messages, leadFormSubmitted, isLoading]);
 
   const sendMessage = async (text?: string) => {
     const content = (text||input).trim();
@@ -807,8 +790,19 @@ function InkanyeziBotWidget() {
         body:JSON.stringify({ messages:newMessages, sessionId }),
       });
       const data = await res.json();
-      setMessages([...newMessages, { role:'assistant', content:data.message }]);
-      if (data.context) setSessionContext(data.context);
+      const cleanMessage = (data.message || '')
+        .replace(/<context>[\s\S]*?<\/context>/gi, '')
+        .replace(/<response>|<\/response>/gi, '')
+        .trim();
+      setMessages([...newMessages, { role:'assistant', content: cleanMessage }]);
+      if (data.context) {
+        setSessionContext(data.context);
+        if (data.context.conversation_complete && !sessionContext?.conversation_complete) {
+          setTimeout(() => {
+            setMessages(prev => [...prev, { role:'assistant', content:`Your reference is ${data.context.referenceNumber}. Sanele will be in touch within 24 hours — feel free to reach out on WhatsApp (+27 65 880 4122) anytime. Sharp! 🇿🇦` }]);
+          }, 1500);
+        }
+      }
     } catch {
       setMessages([...newMessages, { role:'assistant', content:'Something went wrong — please try again.' }]);
     } finally { setIsLoading(false); }
