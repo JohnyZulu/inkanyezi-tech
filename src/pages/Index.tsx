@@ -40,40 +40,40 @@ function CosmosCanvas({ width, height }: { width: number; height: number }) {
     let raf: number;
     let tick = 0;
 
-    // Distant background stars — many, tiny, slow drift
-    const bgStars = Array.from({ length: 220 }, () => ({
+    // Distant background stars — brighter, faster
+    const bgStars = Array.from({ length: 260 }, () => ({
       x: Math.random() * W, y: Math.random() * H,
-      r: Math.random() * 0.8 + 0.1,
-      op: Math.random() * 0.6 + 0.1,
+      r: Math.random() * 1.2 + 0.3,
+      op: Math.random() * 0.7 + 0.25,
       pulse: Math.random() * Math.PI * 2,
-      speed: Math.random() * 0.006 + 0.001,
-      driftX: (Math.random() - 0.5) * 0.015,
-      driftY: Math.random() * 0.008 + 0.002,
+      speed: Math.random() * 0.018 + 0.006,
+      driftX: (Math.random() - 0.5) * 0.04,
+      driftY: Math.random() * 0.022 + 0.008,
     }));
 
-    // Brighter foreground stars — gold + white, cross-flare
-    const fgStars = Array.from({ length: 40 }, () => ({
+    // Bright foreground stars — larger, vivid, clear cross-flare
+    const fgStars = Array.from({ length: 55 }, () => ({
       x: Math.random() * W, y: Math.random() * H,
-      r: Math.random() * 1.6 + 0.5,
+      r: Math.random() * 2.2 + 0.9,
       pulse: Math.random() * Math.PI * 2,
-      speed: Math.random() * 0.012 + 0.004,
-      driftX: (Math.random() - 0.5) * 0.025,
-      driftY: Math.random() * 0.012 + 0.004,
-      gold: Math.random() > 0.5,
+      speed: Math.random() * 0.022 + 0.008,
+      driftX: (Math.random() - 0.5) * 0.05,
+      driftY: Math.random() * 0.025 + 0.01,
+      gold: Math.random() > 0.45,
     }));
 
-    // Milky Way band — dense micro-stars along a diagonal
-    const milkyWay = Array.from({ length: 180 }, () => {
+    // Milky Way band — dense, bright, clearly visible diagonal river
+    const milkyWay = Array.from({ length: 220 }, () => {
       const t = Math.random();
       return {
-        x: W * 0.08 + t * W * 0.84 + (Math.random() - 0.5) * W * 0.36,
-        y: H * 0.62 - t * H * 0.42 + (Math.random() - 0.5) * H * 0.30,
-        r: Math.random() * 1.1 + 0.15,
-        op: Math.random() * 0.55 + 0.05,
+        x: W * 0.08 + t * W * 0.84 + (Math.random() - 0.5) * W * 0.32,
+        y: H * 0.62 - t * H * 0.42 + (Math.random() - 0.5) * H * 0.26,
+        r: Math.random() * 1.5 + 0.3,
+        op: Math.random() * 0.75 + 0.15,
         pulse: Math.random() * Math.PI * 2,
-        speed: Math.random() * 0.007 + 0.002,
-        driftX: (Math.random() - 0.5) * 0.008,
-        driftY: -Math.random() * 0.005,
+        speed: Math.random() * 0.018 + 0.007,
+        driftX: (Math.random() - 0.5) * 0.022,
+        driftY: -Math.random() * 0.012 - 0.003,
       };
     });
 
@@ -108,12 +108,12 @@ function CosmosCanvas({ width, height }: { width: number; height: number }) {
       neb3.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = neb3; ctx.fillRect(0, 0, W, H);
 
-      // Milky Way diffuse band — diagonal glow
+      // Milky Way diffuse band — strong visible diagonal glow
       const mwGrad = ctx.createLinearGradient(W*0.04, H*0.68, W*0.96, H*0.12);
       mwGrad.addColorStop(0, 'rgba(0,0,0,0)');
-      mwGrad.addColorStop(0.18, 'rgba(200,185,255,0.055)');
-      mwGrad.addColorStop(0.5, 'rgba(220,210,255,0.11)');
-      mwGrad.addColorStop(0.82, 'rgba(200,185,255,0.055)');
+      mwGrad.addColorStop(0.18, 'rgba(200,185,255,0.13)');
+      mwGrad.addColorStop(0.5, 'rgba(220,210,255,0.22)');
+      mwGrad.addColorStop(0.82, 'rgba(200,185,255,0.13)');
       mwGrad.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = mwGrad; ctx.fillRect(0, 0, W, H);
 
@@ -123,10 +123,11 @@ function CosmosCanvas({ width, height }: { width: number; height: number }) {
         if (s.y < -2) { s.y = H + 2; s.x = Math.random() * W; }
         if (s.x < -2) s.x = W + 2; if (s.x > W + 2) s.x = -2;
         const op = s.op * (0.4 + 0.6 * Math.sin(s.pulse));
-        const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 2.5);
-        g.addColorStop(0, `rgba(205,215,255,${op})`);
+        const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 3);
+        g.addColorStop(0, `rgba(220,230,255,${op})`);
+        g.addColorStop(0.4, `rgba(200,215,255,${op * 0.6})`);
         g.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 1.5, 0, Math.PI * 2);
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 2, 0, Math.PI * 2);
         ctx.fillStyle = g; ctx.fill();
       });
 
@@ -137,7 +138,7 @@ function CosmosCanvas({ width, height }: { width: number; height: number }) {
         if (s.x < -2) s.x = W + 2; if (s.x > W + 2) s.x = -2;
         const op = s.op * (0.5 + 0.5 * Math.sin(s.pulse));
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(210,225,255,${op})`; ctx.fill();
+        ctx.fillStyle = `rgba(230,240,255,${op})`; ctx.fill();
       });
 
       // Foreground bright stars — gold + white, cross-flare on bright ones
@@ -151,7 +152,7 @@ function CosmosCanvas({ width, height }: { width: number; height: number }) {
         g.addColorStop(0, color); g.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 1.8, 0, Math.PI * 2);
         ctx.fillStyle = g; ctx.fill();
-        if (op > 0.72 && s.r > 1.2) {
+        if (op > 0.55 && s.r > 0.9) {
           ctx.strokeStyle = s.gold ? `rgba(244,185,66,${op * 0.28})` : `rgba(255,255,255,${op * 0.18})`;
           ctx.lineWidth = 0.4;
           ctx.beginPath(); ctx.moveTo(s.x - s.r*2.8, s.y); ctx.lineTo(s.x + s.r*2.8, s.y); ctx.stroke();
@@ -884,16 +885,42 @@ function InkanyeziBotWidget() {
     if (isOpen) { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }
   }, [isOpen]);
 
-  // Lead form trigger — show after 2nd user message for natural flow
+  // Lead form trigger — fires on intent keywords OR after 4 exchanges
+  // Bot sends a warm transition message first, then form slides in 1.5s later
   useEffect(() => {
-    if (hasTriggered.current || leadFormSubmitted) return;
+    if (hasTriggered.current || leadFormSubmitted || isLoading) return;
     const userMsgs = messages.filter(m => m.role === 'user');
-    // Wait for 2 user exchanges so conversation feels natural before asking for details
-    if (userMsgs.length >= 2 && !isLoading) {
+    const lastBotMsg = [...messages].reverse().find(m => m.role === 'assistant')?.content || '';
+    const allText = messages.map(m => m.content).join(' ').toLowerCase();
+
+    // Intent keywords — client signals they want to connect or share details
+    const intentKeywords = [
+      'contact','details','reach out','get in touch','sign up','sign me up',
+      'interested','let's do it','ready','book','schedule','call me','whatsapp me',
+      'my number','my email','send me','how do i start','how much','pricing','quote',
+      'get started','i want','i'd like to','sounds good','let's go','yes please',
+    ];
+    const hasIntent = intentKeywords.some(kw => allText.includes(kw));
+
+    // Trigger on: intent detected after 1+ exchanges, OR naturally after 4 exchanges
+    const shouldTrigger = (hasIntent && userMsgs.length >= 1) || userMsgs.length >= 4;
+
+    if (shouldTrigger) {
       hasTriggered.current = true;
-      setTimeout(() => setShowLeadForm(true), 1200);
+      // Bot sends a warm, short bridge message, then form appears
+      const bridgeMsg = sessionContext?.name
+        ? `Perfect${sessionContext.name ? `, ${sessionContext.name.split(' ')[0]}` : ''}. Let me get your details so Sanele can follow up personally — takes 30 seconds. 👇`
+        : `Great — let me grab a few details so Sanele can follow up with you directly. Takes about 30 seconds. 👇`;
+      // Only add the bridge if the last bot message didn't already invite details
+      const alreadyInvited = lastBotMsg.toLowerCase().includes('detail') || lastBotMsg.toLowerCase().includes('follow up') || lastBotMsg.toLowerCase().includes('reach');
+      if (!alreadyInvited) {
+        setTimeout(() => {
+          setMessages(prev => [...prev, { role:'assistant', content: bridgeMsg }]);
+        }, 400);
+      }
+      setTimeout(() => setShowLeadForm(true), alreadyInvited ? 800 : 2000);
     }
-  }, [messages, leadFormSubmitted, isLoading]);
+  }, [messages, leadFormSubmitted, isLoading, sessionContext]);
 
   const sendMessage = async (text?: string) => {
     const content = (text||input).trim();
@@ -961,7 +988,11 @@ function InkanyeziBotWidget() {
       await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
       setLeadFormSubmitted(true); setShowLeadForm(false);
       setTimeout(() => {
-        setMessages(prev => [...prev, { role:'assistant', content:`✦ Signal locked in${formData.name?`, ${formData.name.split(' ')[0]}`:''}! Sanele will personally reach out within 24 hours.\n\nIs there anything else you'd like to know about how we can transform ${formData.company||'your business'}?` }]);
+        const firstName = formData.name?.split(' ')[0] || sessionContext?.name?.split(' ')[0] || '';
+        const biz = formData.company || sessionContext?.business || 'your business';
+        const industry = formData.industry || sessionContext?.industry || '';
+        const industryLine = industry ? ` in the ${industry} space` : '';
+        setMessages(prev => [...prev, { role:'assistant', content:`✦ All locked in${firstName ? `, ${firstName}` : ''}! Sanele will personally reach out to you about ${biz}${industryLine} within 24 hours.\n\nIn the meantime — is there anything specific about how we automate ${biz} that you'd like me to explain?` }]);
       }, 700);
       return { success:true };
     } catch { return { success:false }; }
@@ -1054,54 +1085,28 @@ function InkanyeziBotWidget() {
         </div>
       )}
 
-      {/* ── FLOATING BUBBLE ── */}
-      <button
-        onClick={()=>{ if(!isOpen){ setShowDoor(true); setOpenKey(k=>k+1); } else { setIsOpen(false); } }}
-        aria-label={isOpen?'Close InkanyeziBot':'Open InkanyeziBot'}
-        style={{
-          position:'fixed', bottom:24, right:24, zIndex:99999,
-          width:52, height:52, borderRadius:'50%',
-          background: isOpen
-            ? 'linear-gradient(135deg, #e53e3e, #c53030)'
-            : 'linear-gradient(135deg, #FF6B35, #c2410c)',
-          border: isOpen
-            ? '2.5px solid rgba(229,62,62,0.6)'
-            : '2px solid rgba(249,115,22,0.45)',
-          cursor:'pointer', fontSize: isOpen ? 22 : 26,
-          animation: isOpen ? 'closePulse 1.8s ease-in-out infinite' : 'floatBubble 3s ease-in-out infinite',
-          display:'flex', alignItems:'center', justifyContent:'center',
-          transition:'background 0.3s, border 0.3s',
-          boxShadow: isOpen
-            ? '0 0 0 0 rgba(229,62,62,0.4), 0 4px 20px rgba(229,62,62,0.4)'
-            : '0 0 30px rgba(249,115,22,0.55)',
-        }}>
-        {/* Orbit ring — only when closed */}
-        {!isOpen && !showDoor && (
+      {/* ── FLOATING BUBBLE — only when chat is closed, never overlaps input bar ── */}
+      {!isOpen && !showDoor && (
+        <button
+          onClick={()=>{ setShowDoor(true); setOpenKey(k=>k+1); }}
+          aria-label="Open InkanyeziBot"
+          style={{
+            position:'fixed', bottom:24, right:24, zIndex:99999,
+            width:52, height:52, borderRadius:'50%',
+            background:'linear-gradient(135deg, #FF6B35, #c2410c)',
+            border:'2px solid rgba(249,115,22,0.45)',
+            cursor:'pointer', fontSize:26,
+            animation:'floatBubble 3s ease-in-out infinite',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            transition:'background 0.3s',
+            boxShadow:'0 0 30px rgba(249,115,22,0.55)',
+          }}>
           <div style={{ position:'absolute', width:52, height:52, animation:'orbitRing 4s linear infinite', pointerEvents:'none' }}>
             <div style={{ position:'absolute', top:-3, left:'50%', width:7, height:7, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 10px ${C.gold}` }} />
           </div>
-        )}
-        {/* Close X — animated spinning lines */}
-        {isOpen ? (
-          <div style={{ position:'relative', width:24, height:24 }}>
-            <div style={{
-              position:'absolute', top:'50%', left:0, right:0, height:2.5,
-              background:'#fff', borderRadius:2,
-              transform:'translateY(-50%) rotate(45deg)',
-              boxShadow:'0 0 6px rgba(255,255,255,0.8)',
-            }}/>
-            <div style={{
-              position:'absolute', top:'50%', left:0, right:0, height:2.5,
-              background:'#fff', borderRadius:2,
-              transform:'translateY(-50%) rotate(-45deg)',
-              boxShadow:'0 0 6px rgba(255,255,255,0.8)',
-            }}/>
-          </div>
-        ) : (
           <span style={{ position:'relative', zIndex:1 }}>⭐</span>
-        )}
-
-      </button>
+        </button>
+      )}
 
       {/* ── UNIFIED CONTAINER — door + chat always together, no gap ── */}
       {(showDoor || isOpen) && (
@@ -1156,6 +1161,14 @@ function InkanyeziBotWidget() {
                 onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.2)';}}
                 onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.08)';}}
               >{isFullscreen ? '⊡' : '⤢'}</button>
+              {/* Close button — lives in header, never covers input bar */}
+              <button
+                onClick={() => { setIsOpen(false); setIsFullscreen(false); }}
+                title="Close chat"
+                style={{ width:28, height:28, borderRadius:6, background:'rgba(229,62,62,0.08)', border:'1px solid rgba(229,62,62,0.25)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:13, color:'#c53030', transition:'all 0.2s', flexShrink:0 }}
+                onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(229,62,62,0.2)';}}
+                onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(229,62,62,0.08)';}}
+              >✕</button>
               <div style={{ textAlign:'right' }}>
                 <div style={{ fontSize:10, color:'rgba(100,80,20,0.5)', fontFamily:"'Space Mono',monospace" }}>🇿🇦 SA AI</div>
                 <HeritageStrip style={{ justifyContent:'flex-end', marginTop:3 }} />
