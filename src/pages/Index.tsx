@@ -896,9 +896,9 @@ function InkanyeziBotWidget() {
     // Intent keywords — client signals they want to connect or share details
     const intentKeywords = [
       'contact','details','reach out','get in touch','sign up','sign me up',
-      'interested','let's do it','ready','book','schedule','call me','whatsapp me',
+      'interested','ready','book','schedule','call me','whatsapp me',
       'my number','my email','send me','how do i start','how much','pricing','quote',
-      'get started','i want','i'd like to','sounds good','let's go','yes please',
+      'get started','i want','sounds good','yes please',
     ];
     const hasIntent = intentKeywords.some(kw => allText.includes(kw));
 
