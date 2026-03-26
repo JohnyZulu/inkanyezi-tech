@@ -29,7 +29,7 @@ const C = {
   saBlue:   '#002395',
 };
 
-// ── GALAXY CANVAS — Milky Way + Nebula + Drifting Stars ──────────────
+// ── ANDROMEDA GALAXY CANVAS — spinning spiral with warm core ──────────
 function CosmosCanvas({ width, height }: { width: number; height: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
@@ -38,125 +38,151 @@ function CosmosCanvas({ width, height }: { width: number; height: number }) {
     canvas.width = width; canvas.height = height;
     const W = width, H = height;
     let raf: number;
-    let tick = 0;
+    let angle = 0;
 
-    // Distant background stars — brighter, faster
-    const bgStars = Array.from({ length: 260 }, () => ({
+    // Background field stars — static scatter
+    const fieldStars = Array.from({ length: 280 }, () => ({
       x: Math.random() * W, y: Math.random() * H,
-      r: Math.random() * 1.2 + 0.3,
-      op: Math.random() * 0.7 + 0.25,
+      r: Math.random() * 1.1 + 0.15,
+      op: Math.random() * 0.65 + 0.2,
       pulse: Math.random() * Math.PI * 2,
-      speed: Math.random() * 0.018 + 0.006,
-      driftX: (Math.random() - 0.5) * 0.04,
-      driftY: Math.random() * 0.022 + 0.008,
+      speed: Math.random() * 0.012 + 0.004,
+      gold: Math.random() > 0.75,
     }));
 
-    // Bright foreground stars — larger, vivid, clear cross-flare
-    const fgStars = Array.from({ length: 55 }, () => ({
-      x: Math.random() * W, y: Math.random() * H,
-      r: Math.random() * 2.2 + 0.9,
-      pulse: Math.random() * Math.PI * 2,
-      speed: Math.random() * 0.022 + 0.008,
-      driftX: (Math.random() - 0.5) * 0.05,
-      driftY: Math.random() * 0.025 + 0.01,
-      gold: Math.random() > 0.45,
-    }));
-
-    // Milky Way band — dense, bright, clearly visible diagonal river
-    const milkyWay = Array.from({ length: 220 }, () => {
-      const t = Math.random();
+    // Spiral arm particles — two arms of Andromeda
+    const armCount = 2;
+    const armParticles = Array.from({ length: 320 }, (_, i) => {
+      const arm = i % armCount;
+      const t = (i / 320);
+      const spread = (Math.random() - 0.5) * 0.38;
+      const armAngle = arm * Math.PI + t * Math.PI * 3.2 + spread;
+      const dist = t * 0.46 + 0.08 + Math.random() * 0.04;
       return {
-        x: W * 0.08 + t * W * 0.84 + (Math.random() - 0.5) * W * 0.32,
-        y: H * 0.62 - t * H * 0.42 + (Math.random() - 0.5) * H * 0.26,
-        r: Math.random() * 1.5 + 0.3,
-        op: Math.random() * 0.75 + 0.15,
+        // Stored as polar relative to centre, converted each frame
+        baseAngle: armAngle,
+        dist: dist,
+        spread: spread,
+        r: Math.random() * 1.4 + 0.25,
+        op: Math.random() * 0.7 + 0.2,
         pulse: Math.random() * Math.PI * 2,
-        speed: Math.random() * 0.018 + 0.007,
-        driftX: (Math.random() - 0.5) * 0.022,
-        driftY: -Math.random() * 0.012 - 0.003,
+        speed: Math.random() * 0.008 + 0.003,
+        // Warmer colour near core, bluer further out
+        warm: dist < 0.22,
       };
     });
 
+    // Dust lane particles — dark brownish streaks across the disc
+    const dustLanes = Array.from({ length: 60 }, (_, i) => {
+      const arm = i % armCount;
+      const t = 0.15 + (i / 60) * 0.65;
+      const armAngle = arm * Math.PI + t * Math.PI * 3.0 + (Math.random() - 0.5) * 0.2;
+      const dist = t * 0.38 + 0.1;
+      return { baseAngle: armAngle, dist: dist, r: Math.random() * 2.8 + 1.2, op: Math.random() * 0.38 + 0.12 };
+    });
+
+    const CX = W * 0.5, CY = H * 0.52;
+    const SCALE = Math.min(W, H) * 0.46;
+
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
-      tick += 0.008;
+      angle += 0.0006; // Very slow rotation — galaxy timescale
 
-      // Deep space base gradient
-      const bg = ctx.createLinearGradient(0, 0, 0, H);
-      bg.addColorStop(0, 'rgba(2,4,14,0.97)');
-      bg.addColorStop(0.45, 'rgba(4,8,24,0.95)');
-      bg.addColorStop(1, 'rgba(8,4,20,0.97)');
+      // Deep space background
+      const bg = ctx.createRadialGradient(CX, CY, 0, CX, CY, Math.max(W, H));
+      bg.addColorStop(0, 'rgba(6,4,18,1)');
+      bg.addColorStop(0.5, 'rgba(3,2,12,1)');
+      bg.addColorStop(1, 'rgba(1,1,6,1)');
       ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-      // Purple/blue nebula haze — left
-      const neb1 = ctx.createRadialGradient(W*0.22, H*0.32, 0, W*0.22, H*0.32, W*0.58);
-      neb1.addColorStop(0, 'rgba(90,45,170,0.11)');
-      neb1.addColorStop(0.5, 'rgba(45,22,110,0.05)');
-      neb1.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = neb1; ctx.fillRect(0, 0, W, H);
+      // Outer halo glow — faint blue-white
+      const halo = ctx.createRadialGradient(CX, CY, SCALE * 0.3, CX, CY, SCALE * 1.1);
+      halo.addColorStop(0, 'rgba(180,190,255,0.0)');
+      halo.addColorStop(0.5, 'rgba(160,175,255,0.045)');
+      halo.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = halo; ctx.fillRect(0, 0, W, H);
 
-      // Blue nebula haze — right
-      const neb2 = ctx.createRadialGradient(W*0.78, H*0.68, 0, W*0.78, H*0.68, W*0.48);
-      neb2.addColorStop(0, 'rgba(22,65,130,0.10)');
-      neb2.addColorStop(0.5, 'rgba(10,32,85,0.04)');
-      neb2.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = neb2; ctx.fillRect(0, 0, W, H);
+      // Disc glow — elliptical warm haze
+      ctx.save();
+      ctx.translate(CX, CY);
+      ctx.rotate(angle + 0.4);
+      ctx.scale(1, 0.42);
+      const disc = ctx.createRadialGradient(0, 0, 0, 0, 0, SCALE * 0.88);
+      disc.addColorStop(0, 'rgba(255,200,140,0.0)');
+      disc.addColorStop(0.18, 'rgba(240,185,120,0.06)');
+      disc.addColorStop(0.45, 'rgba(200,165,100,0.035)');
+      disc.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = disc; ctx.fillRect(-SCALE, -SCALE * 2.5, SCALE * 2, SCALE * 5);
+      ctx.restore();
 
-      // Gold Inkanyezi nebula glint — breathes slowly
-      const neb3 = ctx.createRadialGradient(W*0.56, H*0.18, 0, W*0.56, H*0.18, W*0.32);
-      neb3.addColorStop(0, `rgba(244,185,66,${0.045 + 0.022*Math.sin(tick)})`);
-      neb3.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = neb3; ctx.fillRect(0, 0, W, H);
-
-      // Milky Way diffuse band — strong visible diagonal glow
-      const mwGrad = ctx.createLinearGradient(W*0.04, H*0.68, W*0.96, H*0.12);
-      mwGrad.addColorStop(0, 'rgba(0,0,0,0)');
-      mwGrad.addColorStop(0.18, 'rgba(200,185,255,0.13)');
-      mwGrad.addColorStop(0.5, 'rgba(220,210,255,0.22)');
-      mwGrad.addColorStop(0.82, 'rgba(200,185,255,0.13)');
-      mwGrad.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = mwGrad; ctx.fillRect(0, 0, W, H);
-
-      // Milky Way micro-star particles
-      milkyWay.forEach(s => {
-        s.pulse += s.speed; s.x += s.driftX; s.y += s.driftY;
-        if (s.y < -2) { s.y = H + 2; s.x = Math.random() * W; }
-        if (s.x < -2) s.x = W + 2; if (s.x > W + 2) s.x = -2;
-        const op = s.op * (0.4 + 0.6 * Math.sin(s.pulse));
-        const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 3);
-        g.addColorStop(0, `rgba(220,230,255,${op})`);
-        g.addColorStop(0.4, `rgba(200,215,255,${op * 0.6})`);
+      // Draw dust lanes first (darkest, behind everything)
+      dustLanes.forEach(p => {
+        const a = p.baseAngle + angle * 0.8;
+        const x = CX + Math.cos(a) * p.dist * SCALE;
+        const y = CY + Math.sin(a) * p.dist * SCALE * 0.42;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, p.r * 3.5);
+        g.addColorStop(0, `rgba(8,4,2,${p.op})`);
         g.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 2, 0, Math.PI * 2);
+        ctx.beginPath(); ctx.arc(x, y, p.r * 3.5, 0, Math.PI * 2);
         ctx.fillStyle = g; ctx.fill();
       });
 
-      // Background stars — drift slowly upward
-      bgStars.forEach(s => {
-        s.pulse += s.speed; s.x += s.driftX; s.y += s.driftY;
-        if (s.y > H + 2) { s.y = -2; s.x = Math.random() * W; }
-        if (s.x < -2) s.x = W + 2; if (s.x > W + 2) s.x = -2;
-        const op = s.op * (0.5 + 0.5 * Math.sin(s.pulse));
+      // Draw spiral arm stars
+      armParticles.forEach(p => {
+        p.pulse += p.speed;
+        const a = p.baseAngle + angle;
+        const x = CX + Math.cos(a) * p.dist * SCALE;
+        const y = CY + Math.sin(a) * p.dist * SCALE * 0.42;
+        const brightness = 0.45 + 0.55 * Math.sin(p.pulse);
+        const op = p.op * brightness;
+        // Warm golden near core, blue-white in arms
+        const col = p.warm
+          ? `rgba(255,210,150,${op})`
+          : `rgba(200,220,255,${op})`;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, p.r * 2.8);
+        g.addColorStop(0, col);
+        g.addColorStop(0.4, p.warm ? `rgba(255,185,100,${op * 0.4})` : `rgba(180,205,255,${op * 0.4})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(x, y, p.r * 2, 0, Math.PI * 2);
+        ctx.fillStyle = g; ctx.fill();
+      });
+
+      // Bright core — multi-layer warm glow
+      const core1 = ctx.createRadialGradient(CX, CY, 0, CX, CY, SCALE * 0.18);
+      core1.addColorStop(0, 'rgba(255,245,220,0.95)');
+      core1.addColorStop(0.12, 'rgba(255,220,160,0.7)');
+      core1.addColorStop(0.35, 'rgba(240,180,100,0.3)');
+      core1.addColorStop(0.7, 'rgba(200,140,70,0.08)');
+      core1.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = core1; ctx.fillRect(0, 0, W, H);
+
+      // Core inner point — very bright centre
+      const core2 = ctx.createRadialGradient(CX, CY, 0, CX, CY, SCALE * 0.06);
+      core2.addColorStop(0, 'rgba(255,252,240,1)');
+      core2.addColorStop(0.3, 'rgba(255,240,200,0.8)');
+      core2.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = core2; ctx.fillRect(0, 0, W, H);
+
+      // Companion galaxy (M32) — small bright smudge top-left
+      const comp = ctx.createRadialGradient(CX - SCALE * 0.62, CY - SCALE * 0.38, 0, CX - SCALE * 0.62, CY - SCALE * 0.38, SCALE * 0.07);
+      comp.addColorStop(0, 'rgba(255,240,200,0.7)');
+      comp.addColorStop(0.4, 'rgba(240,220,170,0.25)');
+      comp.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = comp; ctx.fillRect(0, 0, W, H);
+
+      // Background field stars — twinkle, stationary
+      fieldStars.forEach(s => {
+        s.pulse += s.speed;
+        const op = s.op * (0.45 + 0.55 * Math.sin(s.pulse));
+        const col = s.gold ? `rgba(255,215,120,${op})` : `rgba(225,235,255,${op})`;
         ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(230,240,255,${op})`; ctx.fill();
-      });
-
-      // Foreground bright stars — gold + white, cross-flare on bright ones
-      fgStars.forEach(s => {
-        s.pulse += s.speed; s.x += s.driftX; s.y += s.driftY;
-        if (s.y > H + 2) { s.y = -2; s.x = Math.random() * W; }
-        if (s.x < -2) s.x = W + 2; if (s.x > W + 2) s.x = -2;
-        const op = 0.5 + 0.5 * Math.sin(s.pulse);
-        const color = s.gold ? `rgba(244,185,66,${op * 0.9})` : `rgba(255,255,255,${op * 0.75})`;
-        const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 3);
-        g.addColorStop(0, color); g.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 1.8, 0, Math.PI * 2);
-        ctx.fillStyle = g; ctx.fill();
-        if (op > 0.55 && s.r > 0.9) {
-          ctx.strokeStyle = s.gold ? `rgba(244,185,66,${op * 0.28})` : `rgba(255,255,255,${op * 0.18})`;
+        ctx.fillStyle = col; ctx.fill();
+        // Cross-flare on brightest
+        if (op > 0.7 && s.r > 0.8) {
+          ctx.strokeStyle = s.gold ? `rgba(255,200,80,${op * 0.22})` : `rgba(200,215,255,${op * 0.15})`;
           ctx.lineWidth = 0.4;
-          ctx.beginPath(); ctx.moveTo(s.x - s.r*2.8, s.y); ctx.lineTo(s.x + s.r*2.8, s.y); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(s.x, s.y - s.r*2.8); ctx.lineTo(s.x, s.y + s.r*2.8); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(s.x - s.r * 2.5, s.y); ctx.lineTo(s.x + s.r * 2.5, s.y); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(s.x, s.y - s.r * 2.5); ctx.lineTo(s.x, s.y + s.r * 2.5); ctx.stroke();
         }
       });
 
@@ -246,11 +272,11 @@ function LeadField({ label, name, type='text', placeholder, value, onChange, req
   const [focused, setFocused] = useState(false);
   return (
     <div style={{ flex:1, minWidth:0 }}>
-      <label style={{ display:'block', fontSize:'0.56rem', letterSpacing:'0.14em', textTransform:'uppercase', fontFamily:"'Space Mono',monospace", color:focused?C.gold:'rgba(255,255,255,0.35)', marginBottom:'0.25rem', transition:'color 0.2s' }}>
+      <label style={{ display:'block', fontSize:'0.58rem', letterSpacing:'0.1em', textTransform:'uppercase', fontFamily:"'Space Mono',monospace", color:focused?C.gold:'#6B7280', marginBottom:'0.28rem', fontWeight:600, transition:'color 0.2s' }}>
         {label}{required&&<span style={{color:C.orange}}> *</span>}
       </label>
       <input type={type} name={name} value={value} onChange={onChange} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)} placeholder={placeholder} required={required}
-        style={{ width:'100%', boxSizing:'border-box', background:focused?'rgba(255,255,255,0.28)':'rgba(255,255,255,0.16)', border:`1px solid ${focused?'rgba(244,185,66,0.75)':'rgba(255,255,255,0.35)'}`, borderRadius:'5px', padding:'0.48rem 0.65rem', color:'#fff', fontSize:'0.8rem', fontFamily:"'DM Sans',sans-serif", outline:'none', transition:'all 0.2s', boxShadow:focused?'0 0 0 2px rgba(244,185,66,0.12), inset 0 1px 0 rgba(255,255,255,0.08)':'inset 0 1px 0 rgba(255,255,255,0.05)' }} />
+        style={{ width:'100%', boxSizing:'border-box', background:'#FFFFFF', border:`1.5px solid ${focused?C.gold:'#D1D5DB'}`, borderRadius:'6px', padding:'0.5rem 0.7rem', color:'#111827', fontSize:'0.82rem', fontFamily:"'DM Sans',sans-serif", outline:'none', transition:'all 0.2s', boxShadow:focused?`0 0 0 3px rgba(244,185,66,0.18)`:'none' }} />
     </div>
   );
 }
@@ -259,16 +285,16 @@ function LeadSelect({ label, name, value, onChange, options, required }: any) {
   const [focused, setFocused] = useState(false);
   return (
     <div style={{ flex:1, minWidth:0, position:'relative' }}>
-      <label style={{ display:'block', fontSize:'0.56rem', letterSpacing:'0.14em', textTransform:'uppercase', fontFamily:"'Space Mono',monospace", color:focused?C.gold:'rgba(255,255,255,0.35)', marginBottom:'0.25rem', transition:'color 0.2s' }}>
+      <label style={{ display:'block', fontSize:'0.58rem', letterSpacing:'0.1em', textTransform:'uppercase', fontFamily:"'Space Mono',monospace", color:focused?C.gold:'#6B7280', marginBottom:'0.28rem', fontWeight:600, transition:'color 0.2s' }}>
         {label}{required&&<span style={{color:C.orange}}> *</span>}
       </label>
       <div style={{ position:'relative' }}>
         <select name={name} value={value} onChange={onChange} required={required} onFocus={()=>setFocused(true)} onBlur={()=>setFocused(false)}
-          style={{ width:'100%', appearance:'none', boxSizing:'border-box', background:focused?'rgba(255,255,255,0.28)':'rgba(255,255,255,0.16)', border:`1px solid ${focused?'rgba(244,185,66,0.75)':'rgba(255,255,255,0.35)'}`, borderRadius:'5px', padding:'0.48rem 1.8rem 0.48rem 0.65rem', color:value?'#fff':'rgba(255,255,255,0.45)', fontSize:'0.8rem', fontFamily:"'DM Sans',sans-serif", outline:'none', cursor:'pointer', transition:'all 0.2s', boxShadow:focused?'0 0 0 2px rgba(244,185,66,0.12), inset 0 1px 0 rgba(255,255,255,0.08)':'inset 0 1px 0 rgba(255,255,255,0.05)' }}>
-          <option value="" disabled style={{background:'#0A1628'}}>Select...</option>
-          {options.map((o: any) => <option key={o.value} value={o.value} style={{background:'#0A1628',color:'#fff'}}>{o.label}</option>)}
+          style={{ width:'100%', appearance:'none', boxSizing:'border-box', background:'#FFFFFF', border:`1.5px solid ${focused?C.gold:'#D1D5DB'}`, borderRadius:'6px', padding:'0.5rem 1.8rem 0.5rem 0.7rem', color:value?'#111827':'#9CA3AF', fontSize:'0.82rem', fontFamily:"'DM Sans',sans-serif", outline:'none', cursor:'pointer', transition:'all 0.2s', boxShadow:focused?`0 0 0 3px rgba(244,185,66,0.18)`:'none' }}>
+          <option value="" disabled style={{background:'#fff',color:'#9CA3AF'}}>Select...</option>
+          {options.map((o: any) => <option key={o.value} value={o.value} style={{background:'#fff',color:'#111827'}}>{o.label}</option>)}
         </select>
-        <span style={{ position:'absolute', right:'0.55rem', top:'50%', transform:'translateY(-50%)', fontSize:'0.5rem', color:'rgba(255,255,255,0.3)', pointerEvents:'none' }}>▼</span>
+        <span style={{ position:'absolute', right:'0.55rem', top:'50%', transform:'translateY(-50%)', fontSize:'0.5rem', color:'#9CA3AF', pointerEvents:'none' }}>▼</span>
       </div>
     </div>
   );
@@ -304,69 +330,78 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting, onVo
         <div style={{ width:20, height:20, borderRadius:'50%', background:`linear-gradient(135deg, ${C.gold}, ${C.orange})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.6rem', color:C.midnight }}>✦</div>
         <span style={{ fontSize:'0.58rem', color:'rgba(255,255,255,0.28)', fontFamily:"'Space Mono',monospace", letterSpacing:'0.08em' }}>InkanyeziBot</span>
       </div>
-      <div style={{ width:'100%', position:'relative', overflow:'hidden', background:'linear-gradient(145deg, rgba(10,22,40,0.96), rgba(4,8,15,0.98))', border:'1px solid rgba(244,185,66,0.18)', borderRadius:'14px', borderTopLeftRadius:'3px', boxShadow:'0 8px 32px rgba(0,0,0,0.6)' }}>
-        <CosmosCanvas width={340} height={280} />
-        <div style={{ height:'2px', position:'relative', zIndex:2, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`, backgroundSize:'200% 100%', animation:'shimmerBar 3s linear infinite' }} />
-        {onDismiss && !submitted && (
-          <button onClick={onDismiss} style={{ position:'absolute', top:'0.55rem', right:'0.55rem', zIndex:10, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:'4px', padding:'2px 6px', color:'rgba(255,255,255,0.3)', fontSize:'0.6rem', cursor:'pointer', fontFamily:"'Space Mono',monospace" }}>✕</button>
-        )}
-        <div style={{ padding:'0.9rem 1rem 1rem', position:'relative', zIndex:1 }}>
+      {/* Form card: dark brand header + clean light body */}
+      <div style={{ width:'100%', borderRadius:'14px', borderTopLeftRadius:'3px', overflow:'hidden', boxShadow:'0 8px 32px rgba(0,0,0,0.55)', border:'1px solid rgba(244,185,66,0.25)' }}>
+
+        {/* ── Dark header band ── */}
+        <div style={{ background:`linear-gradient(135deg, ${C.midnight} 0%, ${C.deep} 100%)`, padding:'0.8rem 1rem 0.75rem', position:'relative' }}>
+          {/* Gold shimmer top edge */}
+          <div style={{ position:'absolute', top:0, left:0, right:0, height:'2px', background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`, backgroundSize:'200% 100%', animation:'shimmerBar 3s linear infinite' }} />
+          <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between' }}>
+            <div>
+              <div style={{ fontSize:'0.48rem', letterSpacing:'0.26em', textTransform:'uppercase', color:C.gold, fontFamily:"'Space Mono',monospace", marginBottom:'0.2rem', opacity:0.9 }}>Inkanyezi Technologies</div>
+              <h3 style={{ margin:0, fontFamily:"'Syne',sans-serif", fontSize:'0.9rem', fontWeight:800, color:'#FFFFFF', lineHeight:1.2 }}>
+                Let's make this{' '}
+                <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>official</span>
+              </h3>
+              <p style={{ margin:'0.2rem 0 0', fontSize:'0.65rem', color:'rgba(255,255,255,0.45)', lineHeight:1.4, fontFamily:"'DM Sans',sans-serif" }}>Sanele follows up personally within 24 hours.</p>
+            </div>
+            {onDismiss && !submitted && (
+              <button onClick={onDismiss} style={{ background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:'4px', padding:'3px 8px', color:'rgba(255,255,255,0.45)', fontSize:'0.6rem', cursor:'pointer', fontFamily:"'Space Mono',monospace", flexShrink:0, marginLeft:8 }}>✕</button>
+            )}
+          </div>
+          <HeritageStrip style={{ marginTop:'0.55rem' }} />
+        </div>
+
+        {/* ── Light body ── */}
+        <div style={{ background:'#F8F9FA', padding:'0.85rem 1rem 1rem' }}>
           {submitted ? (
-            <div style={{ textAlign:'center', padding:'0.75rem 0 0.25rem' }}>
-              <div style={{ width:44, height:44, borderRadius:'50%', margin:'0 auto 0.65rem', background:'rgba(244,185,66,0.1)', border:'1px solid rgba(244,185,66,0.3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.2rem' }}>✦</div>
-              <p style={{ fontFamily:"'Syne',sans-serif", fontSize:'1rem', fontWeight:800, color:'#fff', margin:'0 0 0.35rem', lineHeight:1.2 }}>
-                Signal received,{' '}
-                <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>{form.name?.split(' ')[0]||'friend'}</span>
+            <div style={{ textAlign:'center', padding:'0.6rem 0 0.2rem' }}>
+              <div style={{ width:46, height:46, borderRadius:'50%', margin:'0 auto 0.6rem', background:`linear-gradient(135deg, ${C.gold}, ${C.orange})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'1.3rem', color:C.midnight, boxShadow:`0 0 20px rgba(244,185,66,0.35)` }}>✓</div>
+              <p style={{ fontFamily:"'Syne',sans-serif", fontSize:'0.95rem', fontWeight:800, color:'#111827', margin:'0 0 0.3rem', lineHeight:1.2 }}>
+                Details received,{' '}
+                <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>{form.name?.split(' ')[0]||'friend'}</span>!
               </p>
-              <p style={{ fontSize:'0.75rem', color:'rgba(255,255,255,0.4)', margin:'0 0 0.75rem', lineHeight:1.55, fontFamily:"'DM Sans',sans-serif" }}>
+              <p style={{ fontSize:'0.72rem', color:'#6B7280', margin:'0 0 0.6rem', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif" }}>
                 {form.company ? `Sanele will reach out to ${form.company} within 24 hours.` : 'Sanele will be in touch within 24 hours.'}
               </p>
-              <HeritageStrip style={{ justifyContent:'center' }} />
+              <p style={{ fontSize:'0.56rem', color:'#9CA3AF', margin:0, fontFamily:"'Space Mono',monospace" }}>Durban, KZN 🇿🇦 · We are the signal in the noise.</p>
             </div>
           ) : (
-            <>
-              <div style={{ marginBottom:'0.8rem' }}>
-                <div style={{ fontSize:'0.52rem', letterSpacing:'0.22em', textTransform:'uppercase', color:C.gold, fontFamily:"'Space Mono',monospace", marginBottom:'0.22rem' }}>✦ Inkanyezi Technologies</div>
-                <h3 style={{ margin:0, fontFamily:"'Syne',sans-serif", fontSize:'0.95rem', fontWeight:800, color:'#fff', lineHeight:1.2 }}>
-                  Let's make this{' '}
-                  <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>official</span>
-                </h3>
-                <p style={{ margin:'0.22rem 0 0', fontSize:'0.7rem', color:'rgba(255,255,255,0.35)', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif" }}>Sanele will personally follow up within 24 hours.</p>
-                <HeritageStrip style={{ marginTop:'0.5rem' }} />
+            <form onSubmit={submit}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.45rem', marginBottom:'0.45rem' }}>
+                <div style={{position:'relative'}}>
+                  <LeadField label="Your Name" name="name" placeholder="e.g. Sipho" value={form.name} onChange={handle} required />
+                  {onVoiceField && <button type="button" onPointerUp={()=>onVoiceField(setField('name'))} style={{position:'absolute',right:6,bottom:7,width:20,height:20,borderRadius:'50%',background:'rgba(244,185,66,0.12)',border:'1px solid rgba(244,185,66,0.4)',color:C.gold,fontSize:10,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}} title="Speak your name">🎙</button>}
+                </div>
+                <div style={{position:'relative'}}>
+                  <LeadField label="Business" name="company" placeholder="Company name" value={form.company} onChange={handle} />
+                  {onVoiceField && <button type="button" onPointerUp={()=>onVoiceField(setField('company'))} style={{position:'absolute',right:6,bottom:7,width:20,height:20,borderRadius:'50%',background:'rgba(244,185,66,0.12)',border:'1px solid rgba(244,185,66,0.4)',color:C.gold,fontSize:10,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}} title="Speak company name">🎙</button>}
+                </div>
               </div>
-              <form onSubmit={submit}>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.48rem' }}>
-                  <div style={{position:'relative'}}>
-                    <LeadField label="Your Name" name="name" placeholder="e.g. Sipho" value={form.name} onChange={handle} required />
-                    {onVoiceField && <button type="button" onPointerUp={()=>onVoiceField(setField('name'))} style={{position:'absolute',right:6,bottom:6,width:22,height:22,borderRadius:'50%',background:'rgba(244,185,66,0.15)',border:'1px solid rgba(244,185,66,0.4)',color:'#F4B942',fontSize:11,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}} title="Speak your name">🎙</button>}
-                  </div>
-                  <div style={{position:'relative'}}>
-                    <LeadField label="Business" name="company" placeholder="Company name" value={form.company} onChange={handle} />
-                    {onVoiceField && <button type="button" onPointerUp={()=>onVoiceField(setField('company'))} style={{position:'absolute',right:6,bottom:6,width:22,height:22,borderRadius:'50%',background:'rgba(244,185,66,0.15)',border:'1px solid rgba(244,185,66,0.4)',color:'#F4B942',fontSize:11,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}} title="Speak company name">🎙</button>}
-                  </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.45rem', marginBottom:'0.45rem' }}>
+                <LeadField label="Email" name="email" type="email" placeholder="you@business.co.za" value={form.email} onChange={handle} required />
+                <LeadField label="WhatsApp" name="phone" type="tel" placeholder="+27 82..." value={form.phone} onChange={handle} />
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.45rem', marginBottom:'0.6rem' }}>
+                <LeadSelect label="Industry" name="industry" value={form.industry} onChange={handle} options={INDUSTRIES} required />
+                <LeadSelect label="How we help" name="service_interest" value={form.service_interest} onChange={handle} options={SERVICES} required />
+              </div>
+              {/* POPIA consent — dark text on light bg */}
+              <label style={{ display:'flex', gap:'0.45rem', cursor:'pointer', alignItems:'flex-start', marginBottom:'0.6rem' }}>
+                <div onClick={()=>setConsent(cv=>!cv)} style={{ width:15, height:15, flexShrink:0, marginTop:1, border:`1.5px solid ${consent?C.gold:'#D1D5DB'}`, borderRadius:'3px', background:consent?`linear-gradient(135deg,${C.gold},${C.orange})`:'#FFFFFF', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', cursor:'pointer', boxShadow:consent?`0 0 0 2px rgba(244,185,66,0.2)`:'none' }}>
+                  {consent && <span style={{ color:'#fff', fontSize:'9px', lineHeight:1, fontWeight:700 }}>✓</span>}
                 </div>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.48rem' }}>
-                  <LeadField label="Email" name="email" type="email" placeholder="you@business.co.za" value={form.email} onChange={handle} required />
-                  <LeadField label="WhatsApp" name="phone" type="tel" placeholder="+27 82..." value={form.phone} onChange={handle} />
-                </div>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'0.5rem', marginBottom:'0.48rem' }}>
-                  <LeadSelect label="Industry" name="industry" value={form.industry} onChange={handle} options={INDUSTRIES} required />
-                  <LeadSelect label="How we help" name="service_interest" value={form.service_interest} onChange={handle} options={SERVICES} required />
-                </div>
-                <label style={{ display:'flex', gap:'0.5rem', cursor:'pointer', alignItems:'flex-start', marginBottom:'0.65rem' }}>
-                  <div onClick={()=>setConsent(c=>!c)} style={{ width:14, height:14, flexShrink:0, marginTop:2, border:`1px solid ${consent?C.gold:'rgba(255,255,255,0.2)'}`, borderRadius:'3px', background:consent?'rgba(244,185,66,0.12)':'transparent', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', cursor:'pointer' }}>
-                    {consent && <span style={{ color:C.gold, fontSize:'9px', lineHeight:1 }}>✓</span>}
-                  </div>
-                  <span style={{ fontSize:'0.63rem', color:'rgba(255,255,255,0.32)', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif" }}>
-                    I consent to Inkanyezi Technologies contacting me per <span style={{color:C.gold}}>POPIA</span>. <span style={{color:C.orange}}>*</span>
-                  </span>
-                </label>
-                <button type="submit" disabled={submitting||!consent} style={{ width:'100%', padding:'0.6rem', background:submitting||!consent?'rgba(244,185,66,0.1)':`linear-gradient(90deg, ${C.gold}, ${C.orange})`, border:'none', borderRadius:'6px', color:submitting||!consent?'rgba(255,255,255,0.2)':C.midnight, fontFamily:"'Space Mono',monospace", fontSize:'0.65rem', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', cursor:submitting||!consent?'not-allowed':'pointer', transition:'all 0.25s' }}>
-                  {submitting ? 'Transmitting...' : '✦ Send My Details'}
-                </button>
-                <p style={{ textAlign:'center', fontSize:'0.56rem', color:'rgba(255,255,255,0.18)', margin:'0.5rem 0 0', fontFamily:"'Space Mono',monospace" }}>Durban, KZN 🇿🇦 · We are the signal in the noise.</p>
-              </form>
-            </>
+                <span style={{ fontSize:'0.62rem', color:'#6B7280', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif" }}>
+                  I consent to Inkanyezi Technologies contacting me per <span style={{color:C.gold,fontWeight:600}}>POPIA</span>. <span style={{color:C.orange}}>*</span>
+                </span>
+              </label>
+              <button type="submit" disabled={submitting||!consent}
+                style={{ width:'100%', padding:'0.62rem', background:submitting||!consent?'#E5E7EB':`linear-gradient(90deg, ${C.gold}, ${C.orange})`, border:'none', borderRadius:'6px', color:submitting||!consent?'#9CA3AF':C.midnight, fontFamily:"'Space Mono',monospace", fontSize:'0.65rem', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', cursor:submitting||!consent?'not-allowed':'pointer', transition:'all 0.25s', boxShadow:!submitting&&consent?`0 4px 14px rgba(244,185,66,0.35)`:'none' }}>
+                {submitting ? 'Sending...' : 'Send My Details →'}
+              </button>
+              <p style={{ textAlign:'center', fontSize:'0.54rem', color:'#9CA3AF', margin:'0.5rem 0 0', fontFamily:"'Space Mono',monospace" }}>Durban, KZN 🇿🇦 · We are the signal in the noise.</p>
+            </form>
           )}
         </div>
       </div>
@@ -701,16 +736,38 @@ function InkanyeziBotWidget() {
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
       recognition.lang = 'en-ZA';
       recognition.onresult = (e: any) => {
         const transcript = Array.from(e.results)
           .map((r: any) => r[0].transcript)
           .join('');
         setInput(transcript);
-        if (e.results[e.results.length - 1].isFinal) setIsListening(false);
+        if (e.results[e.results.length - 1].isFinal) {
+          setIsListening(false);
+        }
       };
-      recognition.onerror = () => setIsListening(false);
-      recognition.onend   = () => setIsListening(false);
+      recognition.onerror = (e: any) => {
+        // 'no-speech' means silence — just restart automatically
+        if (e.error === 'no-speech') {
+          try { recognition.stop(); } catch {}
+          setTimeout(() => {
+            try { recognition.start(); } catch {}
+          }, 200);
+        } else {
+          setIsListening(false);
+        }
+      };
+      recognition.onend = () => {
+        // If still listening (didn't get final result), restart
+        setIsListening(prev => {
+          if (prev) {
+            setTimeout(() => { try { recognition.start(); } catch {} }, 100);
+            return true;
+          }
+          return false;
+        });
+      };
       recognitionRef.current = recognition;
       if (!localStorage.getItem('ink_mic_seen')) {
         setTimeout(() => setShowMicHint(true), 3000);
@@ -1216,7 +1273,7 @@ function InkanyeziBotWidget() {
                 onKeyDown={e => { if (e.key==='Enter'&&!e.shiftKey&&!('ontouchstart' in window)) { e.preventDefault(); sendMessage(); } }}
                 placeholder={isListening ? '🎙 Listening… speak now' : 'Type or tap 🎙 to speak...'} rows={1}
                 autoComplete="on" autoCorrect="on" autoCapitalize="sentences" spellCheck={true}
-                style={{ flex:1, padding:'9px 13px', borderRadius:14, background:'#F5F7FA', border:`1px solid ${isListening ? '#F4B942' : 'rgba(244,185,66,0.3)'}`, color:'#1a1a2e', outline:'none', fontSize:16, resize:'none', lineHeight:1.5, wordBreak:'break-word', overflowY:'auto', maxHeight:96, fontFamily:"'DM Sans',sans-serif", transition:'border-color 0.2s', WebkitAppearance:'none' }}
+                style={{ flex:1, padding:'9px 13px', borderRadius:14, background:'#F5F7FA', border:`1px solid ${isListening ? '#F4B942' : 'rgba(244,185,66,0.3)'}`, color:'#1a1a2e', outline:'none', fontSize:16, resize:'none', lineHeight:1.5, wordBreak:'break-word', overflowWrap:'break-word', whiteSpace:'pre-wrap', overflowX:'hidden', overflowY:'auto', maxHeight:120, width:'100%', boxSizing:'border-box', fontFamily:"'DM Sans',sans-serif", transition:'border-color 0.2s', WebkitAppearance:'none' }}
                 onFocus={e=>e.target.style.borderColor='#F4B942'}
                 onBlur={e=>e.target.style.borderColor=isListening?'#F4B942':'rgba(244,185,66,0.3)'}
               />
@@ -1300,7 +1357,7 @@ function WhatsAppWidget() {
         .wa-btn:hover { transform: scale(1.1) !important; box-shadow: 0 8px 30px rgba(37,211,102,0.6) !important; animation: none !important; }
         .wa-tip { animation: waFade 0.2s ease forwards; }
       `}</style>
-      <div style={{ position:'fixed', bottom:96, right:28, zIndex:10002, display:'flex', alignItems:'center', gap:10, opacity:visible?1:0, transform:visible?'scale(1)':'scale(0.8)', transition:'opacity 0.4s ease, transform 0.4s ease' }}>
+      <div style={{ position:'fixed', bottom:88, right:24, zIndex:10002, display:'flex', alignItems:'center', gap:10, opacity:visible?1:0, transform:visible?'scale(1)':'scale(0.8)', transition:'opacity 0.4s ease, transform 0.4s ease' }}>
         {hovered && (
           <div className="wa-tip" style={{ background:'linear-gradient(135deg, rgba(10,22,40,0.98), rgba(4,8,15,0.98))', border:'1px solid rgba(37,211,102,0.3)', borderRadius:10, padding:'8px 14px', whiteSpace:'nowrap', boxShadow:'0 4px 20px rgba(0,0,0,0.5)', position:'relative' }}>
             <div style={{ fontSize:12, fontWeight:700, color:'#fff', fontFamily:"'Syne',sans-serif", marginBottom:2 }}>Chat with Sanele</div>
