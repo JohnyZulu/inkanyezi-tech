@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import * as QRCode from "qrcode";
+import QRCode from "qrcode";
 
 const C = {
   midnight: '#0A1628', deep: '#0D1E35', navy: '#0F2240',
@@ -271,12 +271,12 @@ export default function Meet() {
         {/* Body */}
         <div style={{ background:bodyBg, border:`1px solid ${bodyBord}`, borderTop:'none', borderRadius:'0 0 20px 20px', padding:'22px 20px 26px', transition:'background 0.4s ease' }}>
           <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:20 }}>
-            <ActionBtn dark={dark} icon="💾" label="Save Contact" sub="Download vCard to your phone" onClick={downloadVCard} accent={C.gold} />
-            <ActionBtn dark={dark} icon="💬" label="WhatsApp Me" sub="+27 65 880 4122" onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${WA_MSG}`,'_blank')} accent="#25D366" />
-            <ActionBtn dark={dark} icon="🤖" label="Chat with InkanyeziBot" sub="AI automation demo — live now" onClick={() => window.open(CHATBOT,'_blank')} accent={C.orange} />
-            <ActionBtn dark={dark} icon="🌐" label="Visit Website" sub="inkanyezi-tech.lovable.app" onClick={() => window.open('https://inkanyezi-tech.lovable.app','_blank')} accent={C.gold} />
-            <ActionBtn dark={dark} icon="✉️" label="Send Email" sub={EMAIL} onClick={() => window.open(`mailto:${EMAIL}`)} accent="#60a5fa" />
-            <ActionBtn dark={dark} icon="💼" label="LinkedIn" sub="Connect professionally" onClick={() => window.open(LINKEDIN,'_blank')} accent="#0A66C2" />
+            <ActionBtn icon="💾" label="Save Contact" sub="Download vCard to your phone" onClick={downloadVCard} accent={C.gold} />
+            <ActionBtn icon="💬" label="WhatsApp Me" sub="+27 65 880 4122" onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${WA_MSG}`,'_blank')} accent="#25D366" />
+            <ActionBtn icon="🤖" label="Chat with InkanyeziBot" sub="AI automation demo — live now" onClick={() => window.open(CHATBOT,'_blank')} accent={C.orange} />
+            <ActionBtn icon="🌐" label="Visit Website" sub="inkanyezi-tech.lovable.app" onClick={() => window.open('https://inkanyezi-tech.lovable.app','_blank')} accent={C.gold} />
+            <ActionBtn icon="✉️" label="Send Email" sub={EMAIL} onClick={() => window.open(`mailto:${EMAIL}`)} accent="#60a5fa" />
+            <ActionBtn icon="💼" label="LinkedIn" sub="Connect professionally" onClick={() => window.open(LINKEDIN,'_blank')} accent="#0A66C2" />
           </div>
           <div style={{ height:1, background:divCol, marginBottom:20 }} />
           <div style={{ textAlign:'center' }}>
