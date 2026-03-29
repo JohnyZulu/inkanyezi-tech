@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-// @ts-ignore — qrcode is installed in the Lovable project
+// @ts-expect-error — qrcode is installed in the Lovable project
 import QRCode from "qrcode";
 
 const C = {
@@ -266,7 +266,7 @@ export default function Meet() {
           <p style={{ margin:'0 0 5px', fontSize:'0.88rem', color:C.gold, fontWeight:700, letterSpacing:'0.05em', textTransform:'uppercase', lineHeight:1.3 }}>Founder &amp; AI Automation Consultant</p>
           <p style={{ margin:'0 0 14px', fontSize:'0.8rem', color:'rgba(255,255,255,0.5)' }}>Inkanyezi Technologies · Durban, KZN</p>
           <HeritageStrip />
-          <p style={{ margin:'14px 0 0', fontSize:'0.72rem', color:'rgba(255,255,255,0.25)', fontStyle:'italic' }}>"We are the signal in the noise"</p>
+          <p style={{ margin:'14px 0 0', fontSize:'0.72rem', color:'rgba(255,255,255,0.25)', fontStyle:'italic' }}>&quot;We are the signal in the noise&quot;</p>
         </div>
 
         {/* Body */}
