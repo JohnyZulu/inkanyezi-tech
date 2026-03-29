@@ -239,12 +239,6 @@ function scoreConversation(ctx: any, userCount: number, lastMsg: string) {
   return { score, shouldShow: score >= THRESHOLD && userCount >= MIN_MSGS };
 }
 
-const CHIPS = [
-  { label:'📊 Calculate my ROI',         msg:'Calculate my ROI' },
-  { label:"🚀 Show me what you've built", msg:"Show me what you've built" },
-  { label:'📅 Book a free demo',          msg:'Book a free demo' },
-  { label:'💬 Automate my WhatsApp',      msg:'Automate my WhatsApp' },
-];
 
 const INDUSTRIES = [
   { value:'plumbing',      label:'🔧 Plumbing & Trade' },
@@ -694,7 +688,6 @@ function InkanyeziBotWidget() {
   const [showLeadForm, setShowLeadForm]           = useState(false);
   const [leadFormSubmitted, setLeadFormSubmitted] = useState(false);
   const [leadSubmitting, setLeadSubmitting]       = useState(false);
-  const [showChips, setShowChips]   = useState(true);
   const [showGreeting, setShowGreeting]       = useState(false);
   const [greetingVisible, setGreetingVisible] = useState(false);
   const [showDoor, setShowDoor]               = useState(false);
@@ -822,7 +815,6 @@ function InkanyeziBotWidget() {
         const parsed = JSON.parse(saved);
         if (parsed.messages?.length > 1) {
           setMessages(parsed.messages);
-          setShowChips(false);
           if (parsed.sessionContext) setSessionContext(parsed.sessionContext);
           // Don't auto-reopen — user can click the bubble to continue
         }
@@ -848,7 +840,6 @@ function InkanyeziBotWidget() {
       setInput('');
       setShowLeadForm(false);
       setLeadFormSubmitted(false);
-      setShowChips(true);
       setSessionContext(null);
       hasTriggered.current = false;
       sessionStorage.removeItem(STORAGE_KEY);
@@ -982,7 +973,6 @@ function InkanyeziBotWidget() {
   const sendMessage = async (text?: string) => {
     const content = (text||input).trim();
     if (!content||isLoading) return;
-    setShowChips(false);
     const userMessage  = { role:'user', content };
     const newMessages  = [...messages, userMessage];
     setMessages(newMessages); setInput('');
