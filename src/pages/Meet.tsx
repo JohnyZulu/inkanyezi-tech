@@ -131,8 +131,8 @@ function ActionBtn({ icon, label, sub, onClick, accent, dark = true }: any) {
     ? (hov ? `${accent}18` : 'rgba(255,255,255,0.07)')
     : (hov ? `${accent}10` : '#FFFFFF');
   const border = dark
-    ? `1.5px solid ${hov ? accent : `${accent}50`}`
-    : `1.5px solid ${hov ? accent : '#D1D5DB'}`;
+    ? ('1.5px solid ' + (hov ? accent : accent + '50'))
+    : ('1.5px solid ' + (hov ? accent : '#D1D5DB'));
   const labelCol = dark ? '#FFFFFF' : '#0A1628';
   const subCol   = dark ? 'rgba(255,255,255,0.55)' : '#4B5563';
   return (
@@ -151,7 +151,7 @@ function ActionBtn({ icon, label, sub, onClick, accent, dark = true }: any) {
       {/* Solid filled icon circle — always fully visible */}
       <div style={{
         width:50, height:50, borderRadius:'50%', flexShrink:0,
-        background: `linear-gradient(135deg, ${accent}, ${accent}cc)`,
+        background: `linear-gradient(135deg, ${accent}ee, ${accent}bb)`,
         border: `2px solid ${accent}`,
         display:'flex', alignItems:'center', justifyContent:'center',
         fontSize:22, transition:'all 0.22s',
