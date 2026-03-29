@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, CSSProperties } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import ProblemSection from "@/components/ProblemSection";
@@ -195,7 +195,7 @@ function CosmosCanvas({ width, height }: { width: number; height: number }) {
 }
 
 // ── SA HERITAGE STRIP ────────────────────────────────────────────────
-function HeritageStrip({ style }: { style?: React.CSSProperties }) {
+function HeritageStrip({ style }: { style?: CSSProperties }) {
   return (
     <div style={{ display:'flex', gap:3, alignItems:'center', ...style }}>
       {[C.saGreen,C.saGold,C.saRed,C.saBlue,C.white].map((c,i) => (
@@ -335,7 +335,7 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting, onVo
             <div>
               <div style={{ fontSize:'0.48rem', letterSpacing:'0.26em', textTransform:'uppercase', color:C.gold, fontFamily:"'Space Mono',monospace", marginBottom:'0.2rem', opacity:0.9 }}>Inkanyezi Technologies</div>
               <h3 style={{ margin:0, fontFamily:"'Syne',sans-serif", fontSize:'0.9rem', fontWeight:800, color:'#FFFFFF', lineHeight:1.2 }}>
-                Let's make this{' '}
+                {"Let's make this"}{' '}
                 <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>official</span>
               </h3>
               <p style={{ margin:'0.2rem 0 0', fontSize:'0.65rem', color:'rgba(255,255,255,0.45)', lineHeight:1.4, fontFamily:"'DM Sans',sans-serif" }}>Sanele follows up personally within 24 hours.</p>
@@ -743,9 +743,9 @@ function InkanyeziBotWidget() {
       recognition.onerror = (e: any) => {
         // 'no-speech' means silence — just restart automatically
         if (e.error === 'no-speech') {
-          try { recognition.stop(); } catch {}
+          try { recognition.stop(); } catch (_e) { /* suppress */ }
           setTimeout(() => {
-            try { recognition.start(); } catch {}
+            try { recognition.start(); } catch (_e) { /* suppress */ }
           }, 200);
         } else {
           setIsListening(false);
@@ -755,7 +755,7 @@ function InkanyeziBotWidget() {
         // If still listening (didn't get final result), restart
         setIsListening(prev => {
           if (prev) {
-            setTimeout(() => { try { recognition.start(); } catch {} }, 100);
+            setTimeout(() => { try { recognition.start(); } catch (_e) { /* suppress */ } }, 100);
             return true;
           }
           return false;
@@ -819,7 +819,7 @@ function InkanyeziBotWidget() {
           // Don't auto-reopen — user can click the bubble to continue
         }
       }
-    } catch {}
+    } catch (_e) { /* suppress */ }
 
     // ── 3. ACTIVE-TIME-ONLY INACTIVITY TIMER ───────────────────────
     // Only count time when the page is VISIBLE and FOCUSED
@@ -919,7 +919,7 @@ function InkanyeziBotWidget() {
       if (sessionContext?.name) {
         localStorage.setItem('inkanyezi_name', sessionContext.name);
       }
-    } catch {}
+    } catch (_e) { /* suppress */ }
   }, [messages, sessionContext]);
 
   // Proactive greeting after 8s
@@ -927,7 +927,7 @@ function InkanyeziBotWidget() {
     const show = setTimeout(() => { if (!isOpen) { setShowGreeting(true); setTimeout(() => setGreetingVisible(true), 50); } }, 8000);
     const hide = setTimeout(() => { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }, 20000);
     return () => { clearTimeout(show); clearTimeout(hide); };
-  }, []);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }
@@ -1386,8 +1386,7 @@ function SiteThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => vo
     }, 4000);
     return () => clearTimeout(t);
   }, []);
-
-  const handleToggle = () => {
+ const handleToggle = () => {
     onToggle();
     if (toastTimer.current) clearTimeout(toastTimer.current);
     setToastMsg(dark ? 'Light mode activated' : 'Dark mode activated');
@@ -1424,7 +1423,7 @@ function SiteThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => vo
             : '0 0 0 1.5px rgba(10,22,40,0.15), 0 4px 20px rgba(0,0,0,0.15)',
           transition: 'all 0.3s ease', backdropFilter: 'blur(10px)',
         }}>
-        {dark ? '\u2600\ufe0f' : '\U0001F319'}
+        {dark ? '☀️' : '🌙'}
       </button>
     </>
   );
@@ -1434,9 +1433,9 @@ function SiteThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => vo
 // MAIN PAGE
 // ════════════════════════════════════════════════════════════════════
 const Index = () => {
-  const [siteDark, setSiteDark] = React.useState(true);
+  const [siteDark, setSiteDark] = useState(true);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (localStorage.getItem('ink_site_theme') === 'light') setSiteDark(false);
   }, []);
 
@@ -1444,7 +1443,7 @@ const Index = () => {
     setSiteDark(d => { localStorage.setItem('ink_site_theme', d ? 'light' : 'dark'); return !d; });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const r = document.documentElement;
     if (siteDark) {
       r.classList.add('dark'); r.setAttribute('data-theme','dark'); r.style.colorScheme='dark';
