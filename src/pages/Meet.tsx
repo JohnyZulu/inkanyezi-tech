@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+// @ts-ignore — qrcode is installed in the Lovable project
 import QRCode from "qrcode";
 
 const C = {
@@ -77,7 +78,7 @@ function QRPanel() {
       width: 180, margin: 1,
       color: { dark: '#F4B942', light: '#0A1628' },
       errorCorrectionLevel: 'H',
-    }, (err) => { if (!err) setReady(true); });
+    }, (err: Error | null) => { if (!err) setReady(true); });
   }, []);
   const download = () => {
     if (!ref.current || !ready) return;
@@ -125,7 +126,7 @@ function HeritageStrip() {
   );
 }
 
-function ActionBtn({ icon, label, sub, onClick, accent, dark = true }: any) {
+function ActionBtn({ icon, label, sub, onClick, accent }: any) {
   const [hov, setHov] = useState(false);
   const bdr = hov ? accent : (accent + '55');
   const bgc = hov ? (accent + '18') : 'rgba(255,255,255,0.06)';
