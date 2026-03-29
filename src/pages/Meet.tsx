@@ -106,7 +106,7 @@ function QRPanel() {
       <div style={{ padding:12, background:C.midnight, borderRadius:12, border:`2px solid ${C.gold}`, boxShadow:`0 0 24px rgba(244,185,66,0.25)` }}>
         <canvas ref={ref} style={{ display:'block', borderRadius:6 }} />
       </div>
-      <p style={{ fontSize:'0.72rem', color:'rgba(255,255,255,0.45)', fontFamily:'monospace', textAlign:'center', margin:0 }}>Scan to open this card</p>
+      <p style={{ fontSize:'0.6rem', color:'rgba(255,255,255,0.3)', fontFamily:'monospace', textAlign:'center', margin:0 }}>Scan to open this card</p>
       <button onClick={download} disabled={!ready}
         style={{ padding:'8px 22px', borderRadius:8, border:'none', cursor:ready?'pointer':'not-allowed', background:ready?`linear-gradient(90deg,${C.gold},${C.orange})`:'rgba(244,185,66,0.15)', color:ready?C.midnight:'rgba(255,255,255,0.3)', fontWeight:700, fontSize:'0.7rem', fontFamily:'monospace', letterSpacing:'0.1em', textTransform:'uppercase', transition:'all 0.2s', boxShadow:ready?`0 4px 14px rgba(244,185,66,0.35)`:'none' }}>
         {ready ? '⬇ Download QR' : 'Generating…'}
@@ -127,50 +127,42 @@ function HeritageStrip() {
 
 function ActionBtn({ icon, label, sub, onClick, accent, dark = true }: any) {
   const [hov, setHov] = useState(false);
-  const bg = dark
-    ? (hov ? `${accent}18` : 'rgba(255,255,255,0.07)')
-    : (hov ? `${accent}10` : '#FFFFFF');
-  const border = dark
-    ? ('1.5px solid ' + (hov ? accent : accent + '50'))
-    : ('1.5px solid ' + (hov ? accent : '#D1D5DB'));
-  const labelCol = dark ? '#FFFFFF' : '#0A1628';
-  const subCol   = dark ? 'rgba(255,255,255,0.55)' : '#4B5563';
+  const bdr = hov ? accent : (accent + '55');
+  const bgc = hov ? (accent + '18') : 'rgba(255,255,255,0.06)';
+  const shd = hov ? ('0 6px 22px ' + accent + '40') : ('inset 3px 0 0 ' + accent + '60');
+  const icoBg = 'linear-gradient(135deg,' + accent + 'ee,' + accent + 'aa)';
+  const icoShd = hov ? ('0 0 18px ' + accent + '70') : ('0 0 10px ' + accent + '35');
+  const arrBg = hov ? accent : (accent + '20');
+  const arrBd = accent + '60';
+  const arrCol = hov ? '#0A1628' : accent;
   return (
-    <button onClick={onClick}
-      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+    <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
       style={{
-        width:'100%', display:'flex', alignItems:'center', gap:16,
-        padding:'16px 18px 16px 14px',
-        borderRadius:14, border, background: bg,
-        cursor:'pointer', transition:'all 0.22s', textAlign:'left',
+        width:'100%', display:'flex', alignItems:'center', gap:14,
+        padding:'15px 18px', borderRadius:14, cursor:'pointer', textAlign:'left',
+        transition:'all 0.22s',
+        border: '1.5px solid ' + bdr,
+        background: bgc,
         transform: hov ? 'translateY(-2px)' : 'translateY(0)',
-        boxShadow: hov
-          ? `0 6px 22px ${accent}40`
-          : dark ? `inset 3px 0 0 ${accent}60` : '0 1px 4px rgba(0,0,0,0.08)',
+        boxShadow: shd,
       }}>
-      {/* Solid filled icon circle — always fully visible */}
       <div style={{
         width:50, height:50, borderRadius:'50%', flexShrink:0,
-        background: `linear-gradient(135deg, ${accent}ee, ${accent}bb)`,
-        border: `2px solid ${accent}`,
+        background: icoBg, border: '2px solid ' + accent,
         display:'flex', alignItems:'center', justifyContent:'center',
-        fontSize:22, transition:'all 0.22s',
-        boxShadow: hov ? `0 0 18px ${accent}70` : `0 0 10px ${accent}35`,
+        fontSize:22, transition:'all 0.22s', boxShadow: icoShd,
       }}>{icon}</div>
       <div style={{ flex:1, minWidth:0 }}>
-        <div style={{ fontSize:'1rem', fontWeight:700, color:labelCol, lineHeight:1.25, fontFamily:"'DM Sans',sans-serif" }}>{label}</div>
-        {sub && <div style={{ fontSize:'0.78rem', color:subCol, marginTop:4, fontFamily:"'DM Sans',sans-serif", lineHeight:1.3 }}>{sub}</div>}
+        <div style={{ fontSize:'1rem', fontWeight:700, color:'#fff', lineHeight:1.25 }}>{label}</div>
+        {sub && <div style={{ fontSize:'0.78rem', color:'rgba(255,255,255,0.55)', marginTop:4 }}>{sub}</div>}
       </div>
-      {/* Arrow badge — always visible */}
       <div style={{
         width:30, height:30, borderRadius:'50%', flexShrink:0,
-        background: hov ? accent : `${accent}20`,
-        border: `1.5px solid ${accent}60`,
+        background: arrBg, border: '1.5px solid ' + arrBd,
         display:'flex', alignItems:'center', justifyContent:'center',
-        fontSize:16, color: hov ? (dark ? C.midnight : '#fff') : accent,
-        fontWeight:700, transition:'all 0.22s',
-        transform: hov ? 'translateX(2px)' : 'translateX(0)',
-      }}>›</div>
+        fontSize:15, color: arrCol, fontWeight:700,
+        transition:'all 0.22s', transform: hov ? 'translateX(2px)' : 'translateX(0)',
+      }}>{'>'}</div>
     </button>
   );
 }
@@ -266,24 +258,19 @@ export default function Meet() {
       <div style={{ position:'relative', zIndex:1, width:'100%', maxWidth:440 }}>
 
         {/* Header */}
-        <div style={{ background:`linear-gradient(135deg, ${C.midnight} 0%, ${C.navy} 100%)`, border:`1px solid rgba(244,185,66,0.2)`, borderRadius:'20px 20px 0 0', padding:'32px 24px 26px', textAlign:'center', position:'relative', overflow:'hidden' }}>
+        <div style={{ background:`linear-gradient(135deg, ${C.midnight} 0%, ${C.navy} 100%)`, border:`1px solid rgba(244,185,66,0.2)`, borderRadius:'20px 20px 0 0', padding:'28px 24px 22px', textAlign:'center', position:'relative', overflow:'hidden' }}>
           <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)` }} />
-          {/* Avatar */}
-          <div style={{ width:96, height:96, borderRadius:'50%', margin:'0 auto 18px', background:`linear-gradient(135deg, ${C.gold}, ${C.orange})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:40, boxShadow:`0 0 32px rgba(244,185,66,0.4), 0 0 0 4px rgba(244,185,66,0.18)` }}>⭐</div>
-          {/* Name — largest, most prominent */}
-          <h1 style={{ margin:'0 0 6px', fontSize:'1.9rem', fontWeight:800, color:C.white, letterSpacing:'-0.02em', fontFamily:"'Syne', sans-serif", lineHeight:1.1 }}>Sanele Sishange</h1>
-          {/* Title */}
-          <p style={{ margin:'0 0 5px', fontSize:'1rem', color:C.gold, fontWeight:700, letterSpacing:'0.04em', textTransform:'uppercase', lineHeight:1.3 }}>Founder &amp; AI Automation Consultant</p>
-          {/* Company + location */}
-          <p style={{ margin:'0 0 18px', fontSize:'0.9rem', color:'rgba(255,255,255,0.6)', letterSpacing:'0.02em' }}>Inkanyezi Technologies · Durban, KZN 🇿🇦</p>
+          <div style={{ width:80, height:80, borderRadius:'50%', margin:'0 auto 14px', background:`linear-gradient(135deg, ${C.gold}, ${C.orange})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:36, boxShadow:`0 0 28px rgba(244,185,66,0.35), 0 0 0 3px rgba(244,185,66,0.15)` }}>⭐</div>
+          <h1 style={{ margin:'0 0 5px', fontSize:'1.65rem', fontWeight:800, color:C.white, letterSpacing:'-0.02em', fontFamily:"'Syne', sans-serif", lineHeight:1.1 }}>Sanele Sishange</h1>
+          <p style={{ margin:'0 0 5px', fontSize:'0.88rem', color:C.gold, fontWeight:700, letterSpacing:'0.05em', textTransform:'uppercase', lineHeight:1.3 }}>Founder &amp; AI Automation Consultant</p>
+          <p style={{ margin:'0 0 14px', fontSize:'0.8rem', color:'rgba(255,255,255,0.5)' }}>Inkanyezi Technologies · Durban, KZN</p>
           <HeritageStrip />
-          {/* Tagline */}
-          <p style={{ margin:'16px 0 0', fontSize:'0.88rem', color:'rgba(255,255,255,0.5)', fontStyle:'italic', letterSpacing:'0.02em' }}>"We are the signal in the noise"</p>
+          <p style={{ margin:'14px 0 0', fontSize:'0.72rem', color:'rgba(255,255,255,0.25)', fontStyle:'italic' }}>"We are the signal in the noise"</p>
         </div>
 
         {/* Body */}
         <div style={{ background:bodyBg, border:`1px solid ${bodyBord}`, borderTop:'none', borderRadius:'0 0 20px 20px', padding:'22px 20px 26px', transition:'background 0.4s ease' }}>
-          <div style={{ display:'flex', flexDirection:'column', gap:12, marginBottom:20 }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:20 }}>
             <ActionBtn dark={dark} icon="💾" label="Save Contact" sub="Download vCard to your phone" onClick={downloadVCard} accent={C.gold} />
             <ActionBtn dark={dark} icon="💬" label="WhatsApp Me" sub="+27 65 880 4122" onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${WA_MSG}`,'_blank')} accent="#25D366" />
             <ActionBtn dark={dark} icon="🤖" label="Chat with InkanyeziBot" sub="AI automation demo — live now" onClick={() => window.open(CHATBOT,'_blank')} accent={C.orange} />
@@ -293,12 +280,12 @@ export default function Meet() {
           </div>
           <div style={{ height:1, background:divCol, marginBottom:20 }} />
           <div style={{ textAlign:'center' }}>
-            <p style={{ margin:'0 0 14px', fontSize:'0.8rem', letterSpacing:'0.12em', textTransform:'uppercase', color: dark ? 'rgba(255,255,255,0.45)' : '#6B7280', fontFamily:'monospace', fontWeight:600 }}>Share This Card</p>
+            <p style={{ margin:'0 0 14px', fontSize:'0.65rem', letterSpacing:'0.16em', textTransform:'uppercase', color: dark ? 'rgba(255,255,255,0.3)' : '#9CA3AF', fontFamily:'monospace' }}>Share This Card</p>
             <QRPanel />
           </div>
         </div>
 
-        <p style={{ textAlign:'center', marginTop:18, fontSize:'0.68rem', color:footnote, letterSpacing:'0.08em', fontFamily:'monospace' }}>
+        <p style={{ textAlign:'center', marginTop:18, fontSize:'0.6rem', color:footnote, letterSpacing:'0.08em', fontFamily:'monospace' }}>
           INKANYEZI TECHNOLOGIES · 🇿🇦 · {new Date().getFullYear()}
         </p>
       </div>
