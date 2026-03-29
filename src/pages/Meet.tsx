@@ -1,331 +1,305 @@
-// src/pages/Meet.tsx
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import QRCode from "qrcode";
 
-const VCARD = `BEGIN:VCARD
-VERSION:3.0
-FN:Sanele Sishange
-N:Sishange;Sanele;;;
-ORG:Inkanyezi Technologies
-TITLE:Founder & AI Automation Consultant
-TEL:+27658804122
-EMAIL:inkanyeziaisolutions3@gmail.com
-URL:https://inkanyezi-tech.lovable.app
-END:VCARD`;
-
-const downloadVCard = () => {
-  const blob = new Blob([VCARD], { type: "text/vcard" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = "sanele-inkanyezi.vcf"; a.click();
-  URL.revokeObjectURL(url);
+const C = {
+  midnight: '#0A1628', deep: '#0D1E35', navy: '#0F2240',
+  gold: '#F4B942', orange: '#FF6B35', white: '#FFFFFF',
+  saGreen: '#007A4D', saGold: '#FFB612', saRed: '#DE3831', saBlue: '#002395',
 };
 
-const CosmicRadar = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+const CARD_URL  = 'https://inkanyezi-tech.lovable.app/meet';
+const WA_NUMBER = '27658804122';
+const WA_MSG    = encodeURIComponent('Sawubona! I scanned your card and would like to know more about Inkanyezi Technologies.');
+const EMAIL     = 'sishangesanele@gmail.com';
+const LINKEDIN  = 'https://www.linkedin.com/in/sanele-sishange';
+const CHATBOT   = 'https://inkanyezi-tech.lovable.app/#chat';
+
+function downloadVCard() {
+  const vcard = [
+    'BEGIN:VCARD','VERSION:3.0','FN:Sanele Sishange',
+    'ORG:Inkanyezi Technologies',
+    'TITLE:Founder & AI Automation Consultant',
+    `TEL;TYPE=CELL:+${WA_NUMBER}`,
+    `EMAIL:${EMAIL}`,`URL:${CARD_URL}`,
+    'ADR;TYPE=WORK:;;Durban;;KwaZulu-Natal;;ZA',
+    'NOTE:We are the signal in the noise.',
+    'END:VCARD',
+  ].join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([vcard],{type:'text/vcard'}));
+  a.download = 'Sanele_Inkanyezi.vcf'; a.click();
+}
+
+function StarCanvas() {
+  const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
-    let angle = 0, raf: number;
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+    let raf: number;
+    const resize = () => { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; };
+    resize(); window.addEventListener('resize', resize);
+    const stars = Array.from({ length: 160 }, () => ({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() * 1.2 + 0.2, op: Math.random() * 0.55 + 0.15,
+      pulse: Math.random() * Math.PI * 2, speed: Math.random() * 0.01 + 0.003,
+      gold: Math.random() > 0.8,
+    }));
     const draw = () => {
-      ctx.clearRect(0, 0, 120, 120);
-      const cx = 60, cy = 60;
-      ([[50,"rgba(244,185,66,0.15)",1.5],[38,"rgba(255,107,53,0.12)",0.8],[26,"rgba(244,185,66,0.18)",0.6],[14,"rgba(0,229,255,0.15)",0.5]] as [number,string,number][]).forEach(([r,c,w]) => {
-        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.strokeStyle=c; ctx.lineWidth=w; ctx.stroke();
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0,0,W,H);
+      const bg = ctx.createLinearGradient(0,0,0,H);
+      bg.addColorStop(0,'#02040e'); bg.addColorStop(1,'#04060f');
+      ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+      const neb = ctx.createRadialGradient(W*0.55,H*0.4,0,W*0.55,H*0.4,W*0.65);
+      neb.addColorStop(0,'rgba(90,45,170,0.07)'); neb.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = neb; ctx.fillRect(0,0,W,H);
+      stars.forEach(s => {
+        s.pulse += s.speed;
+        const op = s.op * (0.45 + 0.55 * Math.sin(s.pulse));
+        ctx.beginPath(); ctx.arc(s.x*W, s.y*H, s.r, 0, Math.PI*2);
+        ctx.fillStyle = s.gold ? `rgba(244,185,66,${op})` : `rgba(220,232,255,${op})`;
+        ctx.fill();
       });
-      ctx.strokeStyle="rgba(244,185,66,0.08)"; ctx.lineWidth=0.5;
-      ctx.beginPath(); ctx.moveTo(cx-55,cy); ctx.lineTo(cx+55,cy); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(cx,cy-55); ctx.lineTo(cx,cy+55); ctx.stroke();
-      const sw = ctx.createLinearGradient(cx,cy,cx+Math.cos(angle)*50,cy+Math.sin(angle)*50);
-      sw.addColorStop(0,"rgba(244,185,66,0.0)"); sw.addColorStop(1,"rgba(244,185,66,0.45)");
-      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,50,angle-1.0,angle,false); ctx.closePath(); ctx.fillStyle=sw; ctx.fill();
-      ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(angle)*50,cy+Math.sin(angle)*50);
-      ctx.strokeStyle="rgba(244,185,66,0.9)"; ctx.lineWidth=1.5; ctx.stroke();
-      const cg = ctx.createRadialGradient(cx,cy,0,cx,cy,6);
-      cg.addColorStop(0,"#F4B942"); cg.addColorStop(1,"#FF6B35");
-      ctx.beginPath(); ctx.arc(cx,cy,4,0,Math.PI*2); ctx.fillStyle=cg; ctx.shadowColor="#F4B942"; ctx.shadowBlur=10; ctx.fill(); ctx.shadowBlur=0;
-      ([[35,25],[70,45],[45,70],[80,30],[25,60]] as [number,number][]).forEach(([bx,by]) => {
-        const ba = Math.atan2(by-cy,bx-cx);
-        const diff = ((angle-ba)%(Math.PI*2)+Math.PI*2)%(Math.PI*2);
-        const alpha = diff<1.0?0.95:Math.max(0,0.3-diff*0.05);
-        ctx.beginPath(); ctx.arc(bx,by,2,0,Math.PI*2);
-        ctx.fillStyle=`rgba(0,229,255,${alpha})`; ctx.shadowColor="#00e5ff"; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
-      });
-      angle=(angle+0.022)%(Math.PI*2); raf=requestAnimationFrame(draw);
+      raf = requestAnimationFrame(draw);
     };
-    draw(); return () => cancelAnimationFrame(raf);
-  },[]);
-  return <canvas ref={canvasRef} width={120} height={120} style={{display:"block"}}/>;
-};
+    draw();
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); };
+  }, []);
+  return <canvas ref={ref} style={{ position:'absolute', inset:0, width:'100%', height:'100%', pointerEvents:'none' }} />;
+}
 
-const EnergyRing = ({ size=72, value, color, label }: { size?: number; value: number; color: string; label: string }) => {
-  const r=(size-12)/2, circ=2*Math.PI*r, dash=(value/100)*circ;
+function QRPanel() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    QRCode.toCanvas(ref.current, CARD_URL, {
+      width: 180, margin: 1,
+      color: { dark: '#F4B942', light: '#0A1628' },
+      errorCorrectionLevel: 'H',
+    }, (err) => { if (!err) setReady(true); });
+  }, []);
+  const download = () => {
+    if (!ref.current || !ready) return;
+    const SIZE = 560;
+    const dc = document.createElement('canvas');
+    dc.width = SIZE; dc.height = SIZE + 120;
+    const ctx = dc.getContext('2d')!;
+    ctx.fillStyle = C.midnight; ctx.fillRect(0,0,dc.width,dc.height);
+    ctx.fillStyle = C.gold; ctx.fillRect(0,0,dc.width,4);
+    ctx.fillStyle = C.gold; ctx.font = 'bold 26px Arial';
+    ctx.textAlign = 'center'; ctx.fillText('INKANYEZI TECHNOLOGIES', dc.width/2, 52);
+    ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '15px Arial';
+    ctx.fillText('AI Automation for South African Businesses', dc.width/2, 78);
+    const pad = (SIZE - 420) / 2;
+    ctx.drawImage(ref.current, pad, 100, 420, 420);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = '13px monospace';
+    ctx.fillText(CARD_URL, dc.width/2, SIZE + 54);
+    ctx.fillStyle = C.gold; ctx.font = 'italic 14px Arial';
+    ctx.fillText('"We are the signal in the noise"', dc.width/2, SIZE + 82);
+    ctx.fillStyle = C.orange; ctx.fillRect(0, dc.height - 4, dc.width, 4);
+    const a = document.createElement('a');
+    a.href = dc.toDataURL('image/png'); a.download = 'Inkanyezi_QR_Card.png'; a.click();
+  };
   return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="relative" style={{width:size,height:size}}>
-        <svg width={size} height={size} style={{transform:"rotate(-90deg)"}}>
-          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="7"/>
-          <circle cx={size/2} cy={size/2} r={r} fill="none" stroke={color} strokeWidth="7"
-            strokeDasharray={`${dash} ${circ}`} strokeLinecap="round"
-            style={{filter:`drop-shadow(0 0 6px ${color})`}}/>
-          <circle cx={size/2} cy={size/2} r={r-11} fill="none" stroke={`${color}30`} strokeWidth="1" strokeDasharray="2 3"/>
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-mono font-bold" style={{color,fontSize:"12px",lineHeight:1,textShadow:`0 0 8px ${color}`}}>{value}%</span>
-        </div>
+    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:12 }}>
+      <div style={{ padding:12, background:C.midnight, borderRadius:12, border:`2px solid ${C.gold}`, boxShadow:`0 0 24px rgba(244,185,66,0.25)` }}>
+        <canvas ref={ref} style={{ display:'block', borderRadius:6 }} />
       </div>
-      <span className="font-mono" style={{color:"rgba(255,255,255,0.3)",fontSize:"7px",letterSpacing:"0.1em"}}>{label}</span>
+      <p style={{ fontSize:'0.72rem', color:'rgba(255,255,255,0.45)', fontFamily:'monospace', textAlign:'center', margin:0 }}>Scan to open this card</p>
+      <button onClick={download} disabled={!ready}
+        style={{ padding:'8px 22px', borderRadius:8, border:'none', cursor:ready?'pointer':'not-allowed', background:ready?`linear-gradient(90deg,${C.gold},${C.orange})`:'rgba(244,185,66,0.15)', color:ready?C.midnight:'rgba(255,255,255,0.3)', fontWeight:700, fontSize:'0.7rem', fontFamily:'monospace', letterSpacing:'0.1em', textTransform:'uppercase', transition:'all 0.2s', boxShadow:ready?`0 4px 14px rgba(244,185,66,0.35)`:'none' }}>
+        {ready ? '⬇ Download QR' : 'Generating…'}
+      </button>
     </div>
   );
-};
+}
 
-const GameButton = ({ onClick, icon, label, sublabel, accent }: { onClick: () => void; icon: string; label: string; sublabel?: string; accent: string }) => {
-  const [hovered, setHovered] = useState(false);
+function HeritageStrip() {
   return (
-    <button onClick={onClick} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)}
-      className="relative flex flex-col items-center justify-center p-3 transition-all active:scale-95 overflow-hidden"
-      style={{
-        background: hovered ? `linear-gradient(145deg,rgba(${accent},0.18) 0%,rgba(10,22,40,0.95) 100%)` : "linear-gradient(145deg,rgba(10,22,40,0.98) 0%,rgba(5,10,20,1) 100%)",
-        border:`1px solid rgba(${accent},${hovered?0.7:0.3})`,
-        borderRadius:"6px",
-        clipPath:"polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))",
-        boxShadow:hovered?`0 0 16px rgba(${accent},0.35),inset 0 0 20px rgba(${accent},0.06)`:`0 0 6px rgba(${accent},0.1)`,
-        minHeight:"72px", transition:"all 0.2s ease"
-      }}>
-      {hovered && <div className="absolute inset-0 pointer-events-none" style={{background:`repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(${accent},0.03) 2px,rgba(${accent},0.03) 4px)`}}/>}
-      <div className="absolute top-0 right-0 w-2.5 h-2.5" style={{borderTop:`2px solid rgba(${accent},${hovered?1:0.5})`,borderRight:`2px solid rgba(${accent},${hovered?1:0.5})`,transition:"all 0.2s"}}/>
-      <div className="absolute bottom-0 left-0 w-2.5 h-2.5" style={{borderBottom:`2px solid rgba(${accent},${hovered?0.8:0.3})`,borderLeft:`2px solid rgba(${accent},${hovered?0.8:0.3})`,transition:"all 0.2s"}}/>
-      <div className="w-10 h-10 rounded-full flex items-center justify-center mb-1.5"
-        style={{background:`radial-gradient(circle,rgba(${accent},0.2) 0%,rgba(${accent},0.02) 70%)`,border:`1px solid rgba(${accent},${hovered?0.6:0.25})`,boxShadow:`0 0 ${hovered?18:8}px rgba(${accent},${hovered?0.4:0.15})`,transition:"all 0.2s"}}>
-        <span style={{fontSize:"16px"}}>{icon}</span>
-      </div>
-      <span className="font-mono font-bold" style={{color:`rgba(${accent},${hovered?1:0.8})`,fontSize:"8px",letterSpacing:"0.12em",textShadow:hovered?`0 0 8px rgba(${accent},0.8)`:"none",transition:"all 0.2s"}}>{label}</span>
-      {sublabel && <span className="font-mono mt-0.5" style={{color:"rgba(255,255,255,0.25)",fontSize:"7px"}}>{sublabel}</span>}
-      <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{background:`linear-gradient(90deg,transparent,rgba(${accent},${hovered?0.9:0.3}),transparent)`,transition:"all 0.2s"}}/>
-    </button>
-  );
-};
-
-const HUDBar = ({ label, color, active=true }: { label: string; color: string; active?: boolean }) => (
-  <div className="flex items-center gap-2 py-1">
-    <div className="flex gap-0.5">
-      {[...Array(4)].map((_,i)=>(
-        <div key={i} className="h-2.5 w-1 rounded-sm" style={{background:i<3?(active?color:"rgba(255,255,255,0.08)"):"rgba(255,255,255,0.03)",boxShadow:i<3&&active?`0 0 4px ${color}`:"none"}}/>
+    <div style={{ display:'flex', gap:3, justifyContent:'center' }}>
+      {[C.saGreen, C.saGold, C.saRed, C.saBlue, C.white].map((col,i) => (
+        <div key={i} style={{ width:i===2?22:14, height:3, background:col, borderRadius:2, opacity:0.75 }} />
       ))}
     </div>
-    <div className="flex-1 h-px" style={{background:`linear-gradient(90deg,${color}50,transparent)`}}/>
-    <span className="font-mono" style={{color:active?color:"rgba(255,255,255,0.2)",fontSize:"8px",letterSpacing:"0.12em"}}>{label}</span>
-    <div className="w-1.5 h-1.5 rounded-full" style={{background:active?"#00ff88":"rgba(255,255,255,0.1)",boxShadow:active?"0 0 5px #00ff88":"none"}}/>
-  </div>
-);
+  );
+}
+
+function ActionBtn({ icon, label, sub, onClick, accent, dark = true }: any) {
+  const [hov, setHov] = useState(false);
+  const bg = dark
+    ? (hov ? `${accent}18` : 'rgba(255,255,255,0.07)')
+    : (hov ? `${accent}10` : '#FFFFFF');
+  const border = dark
+    ? `1.5px solid ${hov ? accent : `${accent}50`}`
+    : `1.5px solid ${hov ? accent : '#D1D5DB'}`;
+  const labelCol = dark ? '#FFFFFF' : '#0A1628';
+  const subCol   = dark ? 'rgba(255,255,255,0.55)' : '#4B5563';
+  return (
+    <button onClick={onClick}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{
+        width:'100%', display:'flex', alignItems:'center', gap:16,
+        padding:'16px 18px 16px 14px',
+        borderRadius:14, border, background: bg,
+        cursor:'pointer', transition:'all 0.22s', textAlign:'left',
+        transform: hov ? 'translateY(-2px)' : 'translateY(0)',
+        boxShadow: hov
+          ? `0 6px 22px ${accent}40`
+          : dark ? `inset 3px 0 0 ${accent}60` : '0 1px 4px rgba(0,0,0,0.08)',
+      }}>
+      {/* Solid filled icon circle — always fully visible */}
+      <div style={{
+        width:50, height:50, borderRadius:'50%', flexShrink:0,
+        background: `linear-gradient(135deg, ${accent}, ${accent}cc)`,
+        border: `2px solid ${accent}`,
+        display:'flex', alignItems:'center', justifyContent:'center',
+        fontSize:22, transition:'all 0.22s',
+        boxShadow: hov ? `0 0 18px ${accent}70` : `0 0 10px ${accent}35`,
+      }}>{icon}</div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ fontSize:'1rem', fontWeight:700, color:labelCol, lineHeight:1.25, fontFamily:"'DM Sans',sans-serif" }}>{label}</div>
+        {sub && <div style={{ fontSize:'0.78rem', color:subCol, marginTop:4, fontFamily:"'DM Sans',sans-serif", lineHeight:1.3 }}>{sub}</div>}
+      </div>
+      {/* Arrow badge — always visible */}
+      <div style={{
+        width:30, height:30, borderRadius:'50%', flexShrink:0,
+        background: hov ? accent : `${accent}20`,
+        border: `1.5px solid ${accent}60`,
+        display:'flex', alignItems:'center', justifyContent:'center',
+        fontSize:16, color: hov ? (dark ? C.midnight : '#fff') : accent,
+        fontWeight:700, transition:'all 0.22s',
+        transform: hov ? 'translateX(2px)' : 'translateX(0)',
+      }}>›</div>
+    </button>
+  );
+}
 
 export default function Meet() {
-  const [phase, setPhase] = useState(0);
-  const [scanY, setScanY] = useState(0);
-  const [glitch, setGlitch] = useState(false);
-  const [pulse, setPulse] = useState(false);
+  const [dark, setDark] = useState(true);
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMsg, setToastMsg]         = useState('');
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(()=>{
-    setTimeout(()=>setPhase(1),700);
-    setTimeout(()=>setPhase(2),2100);
-  },[]);
+  // Load saved preference
+  useEffect(() => {
+    const saved = localStorage.getItem('ink_card_theme');
+    if (saved === 'light') setDark(false);
+  }, []);
 
-  useEffect(()=>{
-    if(phase!==1)return;
-    let y=0;
-    const id=setInterval(()=>{y+=3;setScanY(y);if(y>100)clearInterval(id);},18);
-    return()=>clearInterval(id);
-  },[phase]);
+  // Awareness hint: show once after 4 seconds
+  useEffect(() => {
+    const seen = localStorage.getItem('ink_card_hint_seen');
+    if (seen) return;
+    const t = setTimeout(() => {
+      setToastMsg('Tip: Toggle dark / light mode with the button above');
+      setToastVisible(true);
+      const hide = setTimeout(() => {
+        setToastVisible(false);
+        localStorage.setItem('ink_card_hint_seen', '1');
+      }, 3500);
+      return () => clearTimeout(hide);
+    }, 4000);
+    return () => clearTimeout(t);
+  }, []);
 
-  useEffect(()=>{
-    const g=setInterval(()=>{setGlitch(true);setTimeout(()=>setGlitch(false),110);},7000);
-    const p=setInterval(()=>{setPulse(true);setTimeout(()=>setPulse(false),400);},3000);
-    return()=>{clearInterval(g);clearInterval(p);};
-  },[]);
+  const toggleTheme = () => {
+    setDark(d => {
+      const next = !d;
+      localStorage.setItem('ink_card_theme', next ? 'dark' : 'light');
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+      setToastMsg(next ? '🌙 Dark mode activated' : '☀️ Light mode activated');
+      setToastVisible(true);
+      toastTimer.current = setTimeout(() => setToastVisible(false), 2200);
+      return next;
+    });
+  };
+
+  // Theme-derived values
+  const pageBg   = dark ? C.midnight  : '#F0F2F5';
+  const bodyBg   = dark ? `linear-gradient(180deg, ${C.deep} 0%, ${C.midnight} 100%)` : '#FFFFFF';
+  const bodyBord = dark ? 'rgba(244,185,66,0.12)' : '#E5E7EB';
+  const divCol   = dark ? 'rgba(244,185,66,0.12)' : '#E5E7EB';
+  const footnote = dark ? 'rgba(255,255,255,0.18)' : '#9CA3AF';
+  const toggleBg = dark ? 'rgba(10,22,40,0.9)' : 'rgba(255,255,255,0.9)';
+  const toggleBd = dark ? 'rgba(244,185,66,0.3)' : 'rgba(10,22,40,0.15)';
+  const toggleTx = dark ? C.gold : '#374151';
+  const toastBg  = dark ? 'rgba(10,22,40,0.96)' : 'rgba(255,255,255,0.96)';
+  const toastBd  = dark ? 'rgba(244,185,66,0.3)' : 'rgba(10,22,40,0.15)';
+  const toastTx  = dark ? C.gold : '#374151';
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{background:"#f0ece3"}}>
+    <div style={{ minHeight:'100vh', background:pageBg, display:'flex', justifyContent:'center', alignItems:'flex-start', padding:'24px 16px 48px', fontFamily:"'DM Sans', sans-serif", position:'relative', overflow:'hidden', transition:'background 0.4s ease' }}>
+      {dark && <div style={{ position:'fixed', inset:0, zIndex:0 }}><StarCanvas /></div>}
 
-      {/* Zulu pattern background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <svg width="100%" height="100%" style={{position:"absolute",inset:0}}>
-          <defs>
-            <pattern id="zuluBg" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-              <polygon points="40,2 78,40 40,78 2,40" fill="none" stroke="#E63946" strokeWidth="1.2" opacity="0.18"/>
-              <polygon points="40,14 66,40 40,66 14,40" fill="none" stroke="#F4B942" strokeWidth="0.8" opacity="0.2"/>
-              <polygon points="40,26 54,40 40,54 26,40" fill="#2DC653" opacity="0.07"/>
-              <polygon points="40,26 54,40 40,54 26,40" fill="none" stroke="#2DC653" strokeWidth="0.6" opacity="0.2"/>
-              <polygon points="0,0 18,0 0,18" fill="#E63946" opacity="0.1"/>
-              <polygon points="80,0 62,0 80,18" fill="#F4B942" opacity="0.12"/>
-              <polygon points="0,80 18,80 0,62" fill="#F4B942" opacity="0.1"/>
-              <polygon points="80,80 62,80 80,62" fill="#E63946" opacity="0.12"/>
-              <circle cx="40" cy="40" r="2" fill="#8B3AC4" opacity="0.15"/>
-              <circle cx="40" cy="2" r="1.2" fill="#F4B942" opacity="0.2"/>
-              <circle cx="40" cy="78" r="1.2" fill="#F4B942" opacity="0.2"/>
-              <circle cx="2" cy="40" r="1.2" fill="#E63946" opacity="0.2"/>
-              <circle cx="78" cy="40" r="1.2" fill="#E63946" opacity="0.2"/>
-            </pattern>
-            <pattern id="zuluChev" x="0" y="0" width="24" height="14" patternUnits="userSpaceOnUse">
-              <polygon points="0,14 12,0 24,14" fill="none" stroke="#E63946" strokeWidth="1.2" opacity="0.25"/>
-              <polygon points="0,14 12,0 24,14" fill="#F4B942" opacity="0.06"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#zuluBg)"/>
-          <rect x="0" y="0" width="100%" height="28" fill="url(#zuluChev)" opacity="0.7"/>
-          <rect x="0" y="calc(100% - 28px)" width="100%" height="28" fill="url(#zuluChev)" opacity="0.7"/>
-        </svg>
-        <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 30% 20%,rgba(244,185,66,0.08) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(230,57,70,0.06) 0%,transparent 50%)"}}/>
-        {[...Array(35)].map((_,i)=>(
-          <div key={i} className="absolute rounded-full animate-pulse"
-            style={{left:`${(i*41+13)%100}%`,top:`${(i*57+9)%100}%`,width:i%6===0?"2px":"1px",height:i%6===0?"2px":"1px",background:i%5===0?"#E63946":i%4===0?"#F4B942":i%3===0?"#8B3AC4":"#2DC653",opacity:0.15+(i%4)*0.05,animationDuration:`${2+(i%4)}s`,animationDelay:`${i*0.1}s`}}/>
-        ))}
-      </div>
+      {/* ── Theme toggle button ── */}
+      <button onClick={toggleTheme}
+        style={{
+          position:'fixed', top:18, right:18, zIndex:1000,
+          display:'flex', alignItems:'center', gap:6,
+          padding:'6px 12px', borderRadius:20, border:`1px solid ${toggleBd}`,
+          background:toggleBg, cursor:'pointer', backdropFilter:'blur(8px)',
+          boxShadow: dark ? '0 4px 16px rgba(0,0,0,0.4)' : '0 4px 16px rgba(0,0,0,0.1)',
+          transition:'all 0.3s ease',
+        }}>
+        {/* Toggle track */}
+        <div style={{ width:34, height:19, borderRadius:10, position:'relative', background: dark ? 'rgba(244,185,66,0.2)' : '#E5E7EB', border:`1px solid ${dark ? 'rgba(244,185,66,0.3)' : '#D1D5DB'}`, transition:'all 0.3s' }}>
+          <div style={{ position:'absolute', top:1.5, left: dark ? 15 : 1.5, width:14, height:14, borderRadius:'50%', background: dark ? `linear-gradient(135deg, ${C.gold}, ${C.orange})` : '#FFFFFF', boxShadow: dark ? `0 0 6px rgba(244,185,66,0.5)` : '0 1px 3px rgba(0,0,0,0.2)', transition:'left 0.3s ease', display:'flex', alignItems:'center', justifyContent:'center', fontSize:8 }}>{dark ? '🌙' : '☀️'}</div>
+        </div>
+        <span style={{ fontSize:'0.6rem', fontFamily:"'Space Mono',monospace", color:toggleTx, letterSpacing:'0.06em', fontWeight:600 }}>{dark ? 'DARK' : 'LIGHT'}</span>
+      </button>
 
-      <div className="w-full max-w-sm relative z-10">
-        {phase < 2 ? (
-          <div className="relative rounded-xl overflow-hidden shadow-2xl"
-            style={{background:"rgba(10,22,40,0.97)",border:"1px solid rgba(244,185,66,0.25)",minHeight:"220px"}}>
-            <div className="h-0.5 w-full" style={{background:"linear-gradient(90deg,transparent,#F4B942,#FF6B35,transparent)"}}/>
-            {phase===1&&<div className="absolute left-0 right-0 h-0.5 pointer-events-none" style={{top:`${scanY}%`,background:"linear-gradient(90deg,transparent,#F4B942,#FF6B35,#00e5ff,transparent)",boxShadow:"0 0 25px rgba(244,185,66,0.7)",zIndex:10}}/>}
-            <div className="flex flex-col items-center justify-center py-14 gap-4">
-              <div className="relative">
-                <div className="w-16 h-16 rounded-full border-2 animate-spin" style={{borderColor:"rgba(244,185,66,0.15)",borderTopColor:"#F4B942",boxShadow:"0 0 25px rgba(244,185,66,0.35)"}}/>
-                <div className="w-16 h-16 rounded-full border animate-spin absolute inset-0" style={{borderColor:"transparent",borderRightColor:"#FF6B35",animationDirection:"reverse",animationDuration:"1.5s",opacity:0.6}}/>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-5 h-5 rounded-full" style={{background:"radial-gradient(circle,#F4B942,#FF6B35)",boxShadow:"0 0 14px #F4B942"}}/>
-                </div>
-              </div>
-              <div className="text-center">
-                <p className="font-mono text-xs animate-pulse mb-1" style={{color:"#F4B942",letterSpacing:"0.3em"}}>{phase===0?"SYSTEM BOOT...":"IDENTITY LOCK..."}</p>
-                <p className="font-mono" style={{color:"rgba(255,255,255,0.2)",fontSize:"8px",letterSpacing:"0.2em"}}>INKANYEZI TECHNOLOGIES v2.0</p>
-              </div>
-            </div>
-            <div className="h-0.5 w-full" style={{background:"linear-gradient(90deg,transparent,#FF6B35,#F4B942,transparent)"}}/>
+      {/* ── Awareness toast ── */}
+      <div style={{
+        position:'fixed', top:62, right:18, zIndex:999,
+        background:toastBg, border:`1px solid ${toastBd}`,
+        borderRadius:10, padding:'8px 14px',
+        fontFamily:"'Space Mono',monospace", fontSize:'0.62rem',
+        color:toastTx, whiteSpace:'nowrap',
+        opacity: toastVisible ? 1 : 0,
+        transform: toastVisible ? 'translateY(0)' : 'translateY(-6px)',
+        transition:'opacity 0.35s ease, transform 0.35s ease',
+        pointerEvents:'none',
+        boxShadow: dark ? '0 4px 20px rgba(0,0,0,0.5)' : '0 4px 20px rgba(0,0,0,0.12)',
+      }}>{toastMsg}</div>
+
+      <div style={{ position:'relative', zIndex:1, width:'100%', maxWidth:440 }}>
+
+        {/* Header */}
+        <div style={{ background:`linear-gradient(135deg, ${C.midnight} 0%, ${C.navy} 100%)`, border:`1px solid rgba(244,185,66,0.2)`, borderRadius:'20px 20px 0 0', padding:'32px 24px 26px', textAlign:'center', position:'relative', overflow:'hidden' }}>
+          <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)` }} />
+          {/* Avatar */}
+          <div style={{ width:96, height:96, borderRadius:'50%', margin:'0 auto 18px', background:`linear-gradient(135deg, ${C.gold}, ${C.orange})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:40, boxShadow:`0 0 32px rgba(244,185,66,0.4), 0 0 0 4px rgba(244,185,66,0.18)` }}>⭐</div>
+          {/* Name — largest, most prominent */}
+          <h1 style={{ margin:'0 0 6px', fontSize:'1.9rem', fontWeight:800, color:C.white, letterSpacing:'-0.02em', fontFamily:"'Syne', sans-serif", lineHeight:1.1 }}>Sanele Sishange</h1>
+          {/* Title */}
+          <p style={{ margin:'0 0 5px', fontSize:'1rem', color:C.gold, fontWeight:700, letterSpacing:'0.04em', textTransform:'uppercase', lineHeight:1.3 }}>Founder &amp; AI Automation Consultant</p>
+          {/* Company + location */}
+          <p style={{ margin:'0 0 18px', fontSize:'0.9rem', color:'rgba(255,255,255,0.6)', letterSpacing:'0.02em' }}>Inkanyezi Technologies · Durban, KZN 🇿🇦</p>
+          <HeritageStrip />
+          {/* Tagline */}
+          <p style={{ margin:'16px 0 0', fontSize:'0.88rem', color:'rgba(255,255,255,0.5)', fontStyle:'italic', letterSpacing:'0.02em' }}>"We are the signal in the noise"</p>
+        </div>
+
+        {/* Body */}
+        <div style={{ background:bodyBg, border:`1px solid ${bodyBord}`, borderTop:'none', borderRadius:'0 0 20px 20px', padding:'22px 20px 26px', transition:'background 0.4s ease' }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:12, marginBottom:20 }}>
+            <ActionBtn dark={dark} icon="💾" label="Save Contact" sub="Download vCard to your phone" onClick={downloadVCard} accent={C.gold} />
+            <ActionBtn dark={dark} icon="💬" label="WhatsApp Me" sub="+27 65 880 4122" onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${WA_MSG}`,'_blank')} accent="#25D366" />
+            <ActionBtn dark={dark} icon="🤖" label="Chat with InkanyeziBot" sub="AI automation demo — live now" onClick={() => window.open(CHATBOT,'_blank')} accent={C.orange} />
+            <ActionBtn dark={dark} icon="🌐" label="Visit Website" sub="inkanyezi-tech.lovable.app" onClick={() => window.open('https://inkanyezi-tech.lovable.app','_blank')} accent={C.gold} />
+            <ActionBtn dark={dark} icon="✉️" label="Send Email" sub={EMAIL} onClick={() => window.open(`mailto:${EMAIL}`)} accent="#60a5fa" />
+            <ActionBtn dark={dark} icon="💼" label="LinkedIn" sub="Connect professionally" onClick={() => window.open(LINKEDIN,'_blank')} accent="#0A66C2" />
           </div>
-        ) : (
-          <div className={`relative rounded-xl overflow-hidden shadow-2xl ${glitch?"translate-x-0.5 opacity-95":""}`}
-            style={{background:"linear-gradient(160deg,#0d1f3c 0%,#0A1628 50%,#070f1e 100%)",border:"1px solid rgba(244,185,66,0.2)",boxShadow:`0 0 60px rgba(0,0,0,0.8),0 0 ${pulse?40:20}px rgba(244,185,66,${pulse?0.12:0.05})`,transition:"box-shadow 0.4s ease"}}>
-
-            <div className="h-0.5" style={{background:"linear-gradient(90deg,transparent,#F4B942,#FF6B35,#00e5ff,transparent)"}}/>
-
-            <div className="absolute top-2 left-2 w-7 h-7 pointer-events-none" style={{borderTop:"2px solid #F4B942",borderLeft:"2px solid #F4B942",opacity:0.7}}/>
-            <div className="absolute top-2 right-2 w-7 h-7 pointer-events-none" style={{borderTop:"2px solid #FF6B35",borderRight:"2px solid #FF6B35",opacity:0.7}}/>
-            <div className="absolute bottom-2 left-2 w-7 h-7 pointer-events-none" style={{borderBottom:"2px solid #FF6B35",borderLeft:"2px solid #FF6B35",opacity:0.5}}/>
-            <div className="absolute bottom-2 right-2 w-7 h-7 pointer-events-none" style={{borderBottom:"2px solid #F4B942",borderRight:"2px solid #F4B942",opacity:0.5}}/>
-
-            {/* HEADER */}
-            <div className="relative px-5 pt-5 pb-4" style={{borderBottom:"1px solid rgba(244,185,66,0.08)",background:"linear-gradient(180deg,rgba(244,185,66,0.04) 0%,transparent 100%)"}}>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-1.5">
-                  {["#F4B942","#FF6B35","#00ff88","#00e5ff"].map((c,i)=>(
-                    <div key={i} className="w-1.5 h-1.5 rounded-full animate-pulse" style={{background:c,boxShadow:`0 0 5px ${c}`,animationDelay:`${i*0.2}s`}}/>
-                  ))}
-                </div>
-                <span className="font-mono" style={{color:"rgba(244,185,66,0.45)",fontSize:"8px",letterSpacing:"0.18em"}}>INK-TECH · NODE-ZA-001</span>
-                <div className="flex items-center gap-1 px-2 py-0.5 rounded" style={{background:"rgba(0,255,136,0.08)",border:"1px solid rgba(0,255,136,0.2)"}}>
-                  <div className="w-1 h-1 rounded-full" style={{background:"#00ff88",boxShadow:"0 0 4px #00ff88"}}/>
-                  <span className="font-mono" style={{color:"#00ff88",fontSize:"7px",fontWeight:"700"}}>ONLINE</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="flex-shrink-0 relative" style={{width:"80px",height:"80px"}}>
-                  <div style={{transform:"scale(0.667)",transformOrigin:"top left"}}><CosmicRadar/></div>
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <svg width="28" height="28" viewBox="0 0 72 72" fill="none">
-                      <line x1="36" y1="14" x2="54" y2="40" stroke="url(#gn)" strokeWidth="1.5" opacity="0.9"/>
-                      <line x1="36" y1="14" x2="18" y2="40" stroke="url(#gn)" strokeWidth="1.5" opacity="0.9"/>
-                      <line x1="18" y1="40" x2="54" y2="40" stroke="url(#gn)" strokeWidth="1.5" opacity="0.9"/>
-                      <path d="M36 7 L37.8 12.2 L43.2 12.2 L38.9 15.4 L40.6 20.6 L36 17.4 L31.4 20.6 L33.1 15.4 L28.8 12.2 L34.2 12.2 Z" fill="url(#gn)"/>
-                      <path d="M18 34.5 L19.4 38.6 L23.7 38.6 L20.3 41.1 L21.6 45.2 L18 42.7 L14.4 45.2 L15.7 41.1 L12.3 38.6 L16.6 38.6 Z" fill="url(#gn)" opacity="0.85"/>
-                      <path d="M54 34.5 L55.4 38.6 L59.7 38.6 L56.3 41.1 L57.6 45.2 L54 42.7 L50.4 45.2 L51.7 41.1 L48.3 38.6 L52.6 38.6 Z" fill="url(#gn)" opacity="0.85"/>
-                      <circle cx="36" cy="58" r="2.5" fill="url(#gn)" opacity="0.7"/>
-                      <defs>
-                        <linearGradient id="gn" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#F4B942"/><stop offset="100%" stopColor="#FF6B35"/>
-                        </linearGradient>
-                      </defs>
-                    </svg>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="font-mono mb-1" style={{color:"rgba(244,185,66,0.4)",fontSize:"7px",letterSpacing:"0.25em"}}>// UMNIKAZI · OPERATOR</div>
-                  <h1 className="font-bold" style={{fontFamily:"Georgia,serif",fontSize:"18px",color:"#ffffff",textShadow:"0 0 20px rgba(244,185,66,0.4)"}}>
-                    {glitch?"S▓nele Sis▓ange":"Sanele Sishange"}
-                  </h1>
-                  <p className="font-mono mt-0.5" style={{color:"#F4B942",fontSize:"9px"}}>Founder · AI Automation Consultant</p>
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <div className="h-px flex-1" style={{background:"linear-gradient(90deg,rgba(244,185,66,0.5),rgba(255,107,53,0.3),transparent)"}}/>
-                    <span className="font-mono" style={{color:"rgba(255,255,255,0.2)",fontSize:"7px"}}>eThekwini · KZN · ZA</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-3 flex items-center gap-2 px-3 py-2"
-                style={{background:"rgba(244,185,66,0.05)",border:"1px solid rgba(244,185,66,0.15)",clipPath:"polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))"}}>
-                <div className="w-px h-4" style={{background:"linear-gradient(180deg,#F4B942,#FF6B35)"}}/>
-                <span className="font-mono italic flex-1" style={{color:"rgba(244,185,66,0.85)",fontSize:"9px"}}>"We are the signal in the noise"</span>
-                <span className="font-mono" style={{color:"rgba(255,255,255,0.1)",fontSize:"7px"}}>INKANYEZI</span>
-              </div>
-            </div>
-
-            {/* CAPABILITY MATRIX */}
-            <div className="px-5 py-3" style={{borderBottom:"1px solid rgba(244,185,66,0.07)",background:"rgba(0,0,0,0.15)"}}>
-              <div className="font-mono mb-2" style={{color:"rgba(244,185,66,0.3)",fontSize:"7px",letterSpacing:"0.2em"}}>// AMANDLA · CAPABILITY MATRIX</div>
-              <div className="flex justify-around">
-                <EnergyRing size={72} value={96} color="#F4B942" label="AI CORE"/>
-                <EnergyRing size={72} value={88} color="#FF6B35" label="AUTOMATE"/>
-                <EnergyRing size={72} value={100} color="#00e5ff" label="SIGNAL"/>
-              </div>
-            </div>
-
-            {/* ACTIVE SYSTEMS */}
-            <div className="px-5 py-2" style={{borderBottom:"1px solid rgba(244,185,66,0.07)"}}>
-              <div className="font-mono mb-1" style={{color:"rgba(244,185,66,0.3)",fontSize:"7px",letterSpacing:"0.2em"}}>// IZINHLELO · ACTIVE SYSTEMS</div>
-              <HUDBar label="WHATSAPP AI · ACTIVE" color="#F4B942"/>
-              <HUDBar label="CHATBOT ENGINE · ONLINE" color="#00e5ff"/>
-              <HUDBar label="AUTOMATION FLOWS · RUNNING" color="#FF6B35"/>
-            </div>
-
-            {/* GAMING BUTTONS */}
-            <div className="px-5 py-4">
-              <div className="font-mono mb-3" style={{color:"rgba(244,185,66,0.3)",fontSize:"7px",letterSpacing:"0.2em"}}>// QALISA · INITIATE SEQUENCE</div>
-              <button onClick={downloadVCard}
-                className="w-full mb-3 py-3 flex items-center justify-center gap-3 relative overflow-hidden active:scale-95 transition-all"
-                style={{background:"linear-gradient(135deg,rgba(244,185,66,0.15) 0%,rgba(255,107,53,0.1) 100%)",border:"1px solid rgba(244,185,66,0.5)",borderRadius:"6px",clipPath:"polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))",boxShadow:"0 0 20px rgba(244,185,66,0.15),inset 0 0 30px rgba(244,185,66,0.04)"}}>
-                <div className="absolute inset-0 pointer-events-none" style={{background:"repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(244,185,66,0.02) 2px,rgba(244,185,66,0.02) 4px)"}}/>
-                <div className="absolute top-0 left-0 right-0 h-px" style={{background:"linear-gradient(90deg,transparent,#F4B942,transparent)"}}/>
-                <div className="absolute bottom-0 left-0 right-0 h-px" style={{background:"linear-gradient(90deg,transparent,#FF6B35,transparent)"}}/>
-                <span style={{fontSize:"16px"}}>👤</span>
-                <span className="font-mono font-bold tracking-widest" style={{color:"#F4B942",fontSize:"11px",letterSpacing:"0.2em",textShadow:"0 0 10px rgba(244,185,66,0.8)"}}>SAVE CONTACT</span>
-                <div className="flex gap-0.5 ml-auto">
-                  {[...Array(3)].map((_,i)=>(
-                    <div key={i} className="w-0.5 rounded-full" style={{height:`${8+i*4}px`,background:"rgba(244,185,66,0.5)"}}/>
-                  ))}
-                </div>
-              </button>
-              <div className="grid grid-cols-3 gap-2 mb-2">
-                <GameButton onClick={()=>window.open("https://wa.me/27658804122?text=Hi%20Sanele%2C%20I%27d%20like%20to%20learn%20more%20about%20Inkanyezi%20Technologies.","_blank")} icon="💬" label="WHATSAPP" sublabel="CHANNEL" accent="37,211,102"/>
-                <GameButton onClick={()=>window.open("https://inkanyezi-tech.lovable.app","_blank")} icon="🌐" label="WEBSITE" sublabel="ACCESS" accent="0,229,255"/>
-                <GameButton onClick={()=>window.open("https://inkanyezi-tech.lovable.app/#chat","_blank")} icon="🤖" label="AI AGENT" sublabel="ENGAGE" accent="244,185,66"/>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <GameButton onClick={()=>window.open("mailto:inkanyeziaisolutions3@gmail.com","_blank")} icon="✉️" label="TRANSMIT" sublabel="MESSAGE" accent="200,200,255"/>
-                <GameButton onClick={()=>window.open("https://www.linkedin.com/company/inkanyezi-technologies","_blank")} icon="💼" label="NETWORK" sublabel="LINKEDIN" accent="10,120,220"/>
-              </div>
-            </div>
-
-            {/* FOOTER */}
-            <div className="px-5 py-2 flex justify-between items-center" style={{borderTop:"1px solid rgba(244,185,66,0.07)",background:"rgba(0,0,0,0.2)"}}>
-              <span className="font-mono" style={{color:"rgba(255,255,255,0.1)",fontSize:"7px",letterSpacing:"0.2em"}}>SYS.VER 2.0.26</span>
-              <span className="font-mono" style={{color:"rgba(244,185,66,0.2)",fontSize:"7px"}}>INKANYEZI · TECH</span>
-              <span className="font-mono" style={{color:"rgba(0,229,255,0.2)",fontSize:"7px"}}>eThekwini-001</span>
-            </div>
-            <div className="h-0.5" style={{background:"linear-gradient(90deg,transparent,#FF6B35,#F4B942,transparent)"}}/>
+          <div style={{ height:1, background:divCol, marginBottom:20 }} />
+          <div style={{ textAlign:'center' }}>
+            <p style={{ margin:'0 0 14px', fontSize:'0.8rem', letterSpacing:'0.12em', textTransform:'uppercase', color: dark ? 'rgba(255,255,255,0.45)' : '#6B7280', fontFamily:'monospace', fontWeight:600 }}>Share This Card</p>
+            <QRPanel />
           </div>
-        )}
-        <p className="text-center mt-3 font-mono" style={{color:"rgba(0,0,0,0.2)",fontSize:"8px",letterSpacing:"0.25em"}}>
-          ◈ INKANYEZI TECHNOLOGIES · SIGNAL IN THE NOISE ◈
+        </div>
+
+        <p style={{ textAlign:'center', marginTop:18, fontSize:'0.68rem', color:footnote, letterSpacing:'0.08em', fontFamily:'monospace' }}>
+          INKANYEZI TECHNOLOGIES · 🇿🇦 · {new Date().getFullYear()}
         </p>
       </div>
     </div>
