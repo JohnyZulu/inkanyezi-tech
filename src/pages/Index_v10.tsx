@@ -239,6 +239,12 @@ function scoreConversation(ctx: any, userCount: number, lastMsg: string) {
   return { score, shouldShow: score >= THRESHOLD && userCount >= MIN_MSGS };
 }
 
+const CHIPS = [
+  { label:'📊 Calculate my ROI',         msg:'Calculate my ROI' },
+  { label:"🚀 Show me what you've built", msg:"Show me what you've built" },
+  { label:'📅 Book a free demo',          msg:'Book a free demo' },
+  { label:'💬 Automate my WhatsApp',      msg:'Automate my WhatsApp' },
+];
 
 const INDUSTRIES = [
   { value:'plumbing',      label:'🔧 Plumbing & Trade' },
@@ -335,7 +341,7 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting, onVo
             <div>
               <div style={{ fontSize:'0.48rem', letterSpacing:'0.26em', textTransform:'uppercase', color:C.gold, fontFamily:"'Space Mono',monospace", marginBottom:'0.2rem', opacity:0.9 }}>Inkanyezi Technologies</div>
               <h3 style={{ margin:0, fontFamily:"'Syne',sans-serif", fontSize:'0.9rem', fontWeight:800, color:'#FFFFFF', lineHeight:1.2 }}>
-                {"Let's make this"}{" "}
+                Let's make this{' '}
                 <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>official</span>
               </h3>
               <p style={{ margin:'0.2rem 0 0', fontSize:'0.65rem', color:'rgba(255,255,255,0.45)', lineHeight:1.4, fontFamily:"'DM Sans',sans-serif" }}>Sanele follows up personally within 24 hours.</p>
@@ -688,6 +694,7 @@ function InkanyeziBotWidget() {
   const [showLeadForm, setShowLeadForm]           = useState(false);
   const [leadFormSubmitted, setLeadFormSubmitted] = useState(false);
   const [leadSubmitting, setLeadSubmitting]       = useState(false);
+  const [showChips, setShowChips]   = useState(true);
   const [showGreeting, setShowGreeting]       = useState(false);
   const [greetingVisible, setGreetingVisible] = useState(false);
   const [showDoor, setShowDoor]               = useState(false);
@@ -743,9 +750,9 @@ function InkanyeziBotWidget() {
       recognition.onerror = (e: any) => {
         // 'no-speech' means silence — just restart automatically
         if (e.error === 'no-speech') {
-          try { recognition.stop(); } catch (_e) { /* ignore */ }
+          try { recognition.stop(); } catch {}
           setTimeout(() => {
-            try { recognition.start(); } catch (_e) { /* ignore */ }
+            try { recognition.start(); } catch {}
           }, 200);
         } else {
           setIsListening(false);
@@ -755,7 +762,7 @@ function InkanyeziBotWidget() {
         // If still listening (didn't get final result), restart
         setIsListening(prev => {
           if (prev) {
-            setTimeout(() => { try { recognition.start(); } catch (_e) { /* ignore */ } }, 100);
+            setTimeout(() => { try { recognition.start(); } catch {} }, 100);
             return true;
           }
           return false;
@@ -815,11 +822,12 @@ function InkanyeziBotWidget() {
         const parsed = JSON.parse(saved);
         if (parsed.messages?.length > 1) {
           setMessages(parsed.messages);
+          setShowChips(false);
           if (parsed.sessionContext) setSessionContext(parsed.sessionContext);
           // Don't auto-reopen — user can click the bubble to continue
         }
       }
-    } catch (_e) { /* ignore */ }
+    } catch {}
 
     // ── 3. ACTIVE-TIME-ONLY INACTIVITY TIMER ───────────────────────
     // Only count time when the page is VISIBLE and FOCUSED
@@ -840,6 +848,7 @@ function InkanyeziBotWidget() {
       setInput('');
       setShowLeadForm(false);
       setLeadFormSubmitted(false);
+      setShowChips(true);
       setSessionContext(null);
       hasTriggered.current = false;
       sessionStorage.removeItem(STORAGE_KEY);
@@ -919,7 +928,7 @@ function InkanyeziBotWidget() {
       if (sessionContext?.name) {
         localStorage.setItem('inkanyezi_name', sessionContext.name);
       }
-    } catch (_e) { /* ignore */ }
+    } catch {}
   }, [messages, sessionContext]);
 
   // Proactive greeting after 8s
@@ -973,6 +982,7 @@ function InkanyeziBotWidget() {
   const sendMessage = async (text?: string) => {
     const content = (text||input).trim();
     if (!content||isLoading) return;
+    setShowChips(false);
     const userMessage  = { role:'user', content };
     const newMessages  = [...messages, userMessage];
     setMessages(newMessages); setInput('');
@@ -1367,105 +1377,42 @@ function WhatsAppWidget() {
 }
 
 // ════════════════════════════════════════════════════════════════════
-// SITE THEME TOGGLE
-// ════════════════════════════════════════════════════════════════════
-function SiteThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
-  const [show, setShow] = useState(false);
-  const [msg, setMsg]   = useState('');
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (localStorage.getItem('ink_hint')) return;
-    const t = setTimeout(() => {
-      setMsg('Tip: Switch dark / light mode');
-      setShow(true);
-      setTimeout(() => { setShow(false); localStorage.setItem('ink_hint', '1'); }, 3500);
-    }, 4000);
-    return () => clearTimeout(t);
-  }, []);
-
-  const handle = () => {
-    onToggle();
-    if (timer.current) clearTimeout(timer.current);
-    setMsg(dark ? 'Light mode' : 'Dark mode');
-    setShow(true);
-    timer.current = setTimeout(() => setShow(false), 2000);
-  };
-
-  return (
-    <>
-      <div style={{
-        position:'fixed', bottom:163, right:84, zIndex:99996,
-        background: dark ? 'rgba(10,22,40,0.97)' : 'rgba(255,255,255,0.97)',
-        border: '1px solid ' + (dark ? 'rgba(244,185,66,0.35)' : 'rgba(10,22,40,0.15)'),
-        borderRadius:10, padding:'7px 12px',
-        fontFamily:"'Space Mono',monospace", fontSize:'0.6rem',
-        color: dark ? '#F4B942' : '#374151', whiteSpace:'nowrap',
-        opacity: show ? 1 : 0, pointerEvents:'none',
-        transition:'opacity 0.3s ease',
-        boxShadow:'0 4px 16px rgba(0,0,0,0.3)',
-      }}>{msg}</div>
-      <button
-        onClick={handle}
-        aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-        style={{
-          position:'fixed', bottom:155, right:24, zIndex:99997,
-          width:52, height:52, borderRadius:'50%',
-          border:'none', cursor:'pointer',
-          display:'flex', alignItems:'center', justifyContent:'center',
-          fontSize:22,
-          background: dark ? 'linear-gradient(135deg,#0A1628,#0D1E35)' : '#FFFFFF',
-          boxShadow: dark
-            ? '0 0 0 1.5px rgba(244,185,66,0.4),0 4px 20px rgba(0,0,0,0.5)'
-            : '0 0 0 1.5px rgba(10,22,40,0.15),0 4px 20px rgba(0,0,0,0.15)',
-          transition:'all 0.3s ease',
-        }}>
-        {dark ? '☀️' : '🌙'}
-      </button>
-    </>
-  );
-}
-
-// ════════════════════════════════════════════════════════════════════
 // MAIN PAGE
 // ════════════════════════════════════════════════════════════════════
 const Index = () => {
-  const [siteDark, setSiteDark] = useState(true);
+  const [dark, setDark] = useState(true);
 
   useEffect(() => {
-    if (localStorage.getItem('ink_site_theme') === 'light') setSiteDark(false);
+    if (localStorage.getItem('ink_site_theme') === 'light') setDark(false);
   }, []);
-
-  const toggleTheme = () => {
-    setSiteDark(d => { localStorage.setItem('ink_site_theme', d ? 'light' : 'dark'); return !d; });
-  };
 
   useEffect(() => {
     const r = document.documentElement;
-    if (siteDark) {
-      r.classList.add('dark'); r.style.colorScheme='dark';
-      r.style.setProperty('--background','222 47% 6%');
-      r.style.setProperty('--foreground','210 40% 98%');
-      r.style.setProperty('--card','222 47% 8%');
-      r.style.setProperty('--card-foreground','210 40% 98%');
-      r.style.setProperty('--muted','217 33% 12%');
-      r.style.setProperty('--muted-foreground','215 20% 65%');
-      r.style.setProperty('--border','217 33% 16%');
+    if (dark) {
+      r.classList.add('dark');
+      r.style.setProperty('--background', '222 47% 6%');
+      r.style.setProperty('--foreground', '210 40% 98%');
+      r.style.setProperty('--card', '222 47% 8%');
+      r.style.setProperty('--muted', '217 33% 12%');
+      r.style.setProperty('--border', '217 33% 16%');
     } else {
-      r.classList.remove('dark'); r.style.colorScheme='light';
-      r.style.setProperty('--background','210 40% 98%');
-      r.style.setProperty('--foreground','222 47% 11%');
-      r.style.setProperty('--card','0 0% 100%');
-      r.style.setProperty('--card-foreground','222 47% 11%');
-      r.style.setProperty('--muted','210 40% 93%');
-      r.style.setProperty('--muted-foreground','215 16% 47%');
-      r.style.setProperty('--border','214 32% 85%');
+      r.classList.remove('dark');
+      r.style.setProperty('--background', '210 40% 98%');
+      r.style.setProperty('--foreground', '222 47% 11%');
+      r.style.setProperty('--card', '0 0% 100%');
+      r.style.setProperty('--muted', '210 40% 93%');
+      r.style.setProperty('--border', '214 32% 85%');
     }
-  }, [siteDark]);
+  }, [dark]);
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
-      <SiteThemeToggle dark={siteDark} onToggle={toggleTheme} />
+      {/* Theme toggle — bottom right, above WhatsApp */}
+      <button
+        onClick={() => setDark(d => { localStorage.setItem('ink_site_theme', d ? 'light' : 'dark'); return !d; })}
+        aria-label="Toggle theme"
+        style={{ position:'fixed', bottom:155, right:24, zIndex:99997, width:52, height:52, borderRadius:'50%', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, background:dark?'linear-gradient(135deg,#0A1628,#0D1E35)':'#FFFFFF', boxShadow:dark?'0 0 0 1.5px rgba(244,185,66,0.4),0 4px 20px rgba(0,0,0,0.5)':'0 0 0 1.5px rgba(10,22,40,0.15),0 4px 20px rgba(0,0,0,0.15)', transition:'all 0.3s ease' }}
+      >{dark ? '☀️' : '🌙'}</button>
       <CustomCursor />
       <GlobalStarfield />
       <ShootingStars />
