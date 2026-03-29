@@ -967,7 +967,7 @@ function InkanyeziBotWidget() {
       hasTriggered.current = true;
       // Bot sends a warm, short bridge message, then form appears
       const bridgeMsg = sessionContext?.name
-        ? `Perfect${sessionContext.name ? `, ${sessionContext.name.split(' ')[0]}` : ''}. Let me get your details so Sanele can follow up personally — takes 30 seconds. 👇`
+        ? ('Perfect' + (sessionContext.name ? ', ' + sessionContext.name.split(' ')[0] : '') + '. Let me get your details so Sanele can follow up personally — takes 30 seconds. 👇')
         : `Great — let me grab a few details so Sanele can follow up with you directly. Takes about 30 seconds. 👇`;
       // Only add the bridge if the last bot message didn't already invite details
       const alreadyInvited = lastBotMsg.toLowerCase().includes('detail') || lastBotMsg.toLowerCase().includes('follow up') || lastBotMsg.toLowerCase().includes('reach');
@@ -1050,7 +1050,7 @@ function InkanyeziBotWidget() {
         const biz = formData.company || sessionContext?.business || 'your business';
         const industry = formData.industry || sessionContext?.industry || '';
         const industryLine = industry ? ` in the ${industry} space` : '';
-        setMessages(prev => [...prev, { role:'assistant', content:`✦ All locked in${firstName ? `, ${firstName}` : ''}! Sanele will personally reach out to you about ${biz}${industryLine} within 24 hours.\n\nIn the meantime — is there anything specific about how we automate ${biz} that you'd like me to explain?` }]);
+        setMessages(prev => [...prev, { role:'assistant', content:'✦ All locked in' + (firstName ? ', ' + firstName : '') + '! Sanele will personally reach out to you about ' + biz + industryLine + ' within 24 hours.\n\nIn the meantime — is there anything specific about how we automate ' + biz + ' that you would like me to explain?' }]);
       }, 700);
       return { success:true };
     } catch { return { success:false }; }
@@ -1500,62 +1500,53 @@ function SiteThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => vo
 
   return (
     <>
-      {/* Awareness toast */}
+      {/* Awareness toast — appears to the left of the button */}
       <div style={{
-        position: 'fixed', top: 62, left: 18, zIndex: 99996,
-        background: dark ? 'rgba(10,22,40,0.96)' : 'rgba(255,255,255,0.96)',
-        border: `1px solid ${dark ? 'rgba(244,185,66,0.3)' : 'rgba(10,22,40,0.15)'}`,
+        position: 'fixed', bottom: 163, right: 84, zIndex: 99996,
+        background: dark ? 'rgba(10,22,40,0.97)' : 'rgba(255,255,255,0.97)',
+        border: `1px solid ${dark ? 'rgba(244,185,66,0.35)' : 'rgba(10,22,40,0.15)'}`,
         borderRadius: 10, padding: '8px 14px',
-        fontFamily: "'Space Mono',monospace", fontSize: '0.65rem',
+        fontFamily: "'Space Mono',monospace", fontSize: '0.62rem',
         color: dark ? C.gold : '#374151', letterSpacing: '0.04em',
-        boxShadow: dark ? '0 4px 20px rgba(0,0,0,0.5)' : '0 4px 20px rgba(0,0,0,0.12)',
+        boxShadow: dark ? '0 4px 20px rgba(0,0,0,0.6)' : '0 4px 20px rgba(0,0,0,0.12)',
         whiteSpace: 'nowrap',
         opacity: toastVisible ? 1 : 0,
-        transform: toastVisible ? 'translateY(0)' : 'translateY(-6px)',
+        transform: toastVisible ? 'translateY(0)' : 'translateY(6px)',
         transition: 'opacity 0.35s ease, transform 0.35s ease',
         pointerEvents: 'none',
       }}>
         {toastMsg}
+        {/* Arrow pointing right toward button */}
+        <div style={{
+          position: 'absolute', right: -6, top: '50%', transform: 'translateY(-50%)',
+          width: 0, height: 0,
+          borderTop: '5px solid transparent',
+          borderBottom: '5px solid transparent',
+          borderLeft: `5px solid ${dark ? 'rgba(244,185,66,0.35)' : 'rgba(10,22,40,0.15)'}`,
+        }} />
       </div>
 
-      {/* Toggle button */}
+      {/* Toggle button — bottom-right, above WhatsApp */}
       <button
         onClick={handleToggle}
         title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
         aria-label="Toggle colour theme"
         style={{
-          position: 'fixed', top: 18, left: 18, zIndex: 99997,
-          display: 'flex', alignItems: 'center', gap: 6,
-          padding: '6px 12px', borderRadius: 20, border: 'none', cursor: 'pointer',
+          position: 'fixed', bottom: 155, right: 24, zIndex: 99997,
+          width: 52, height: 52, borderRadius: '50%',
+          border: 'none', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: dark
-            ? 'linear-gradient(135deg, rgba(10,22,40,0.95), rgba(13,30,53,0.95))'
-            : 'rgba(255,255,255,0.92)',
+            ? 'linear-gradient(135deg, rgba(10,22,40,0.97), rgba(13,30,53,0.97))'
+            : 'rgba(255,255,255,0.97)',
           boxShadow: dark
-            ? '0 0 0 1px rgba(244,185,66,0.25), 0 4px 16px rgba(0,0,0,0.4)'
-            : '0 0 0 1px rgba(10,22,40,0.12), 0 4px 16px rgba(0,0,0,0.1)',
+            ? '0 0 0 1.5px rgba(244,185,66,0.35), 0 4px 20px rgba(0,0,0,0.5)'
+            : '0 0 0 1.5px rgba(10,22,40,0.15), 0 4px 20px rgba(0,0,0,0.15)',
           transition: 'all 0.3s ease',
-          backdropFilter: 'blur(8px)',
+          backdropFilter: 'blur(10px)',
+          fontSize: 22,
         }}>
-        <div style={{
-          width: 36, height: 20, borderRadius: 10, position: 'relative',
-          background: dark ? 'rgba(244,185,66,0.2)' : '#E5E7EB',
-          border: dark ? '1px solid rgba(244,185,66,0.3)' : '1px solid #D1D5DB',
-          transition: 'all 0.3s',
-        }}>
-          <div style={{
-            position: 'absolute', top: 1, left: dark ? 17 : 1,
-            width: 16, height: 16, borderRadius: '50%',
-            background: dark ? `linear-gradient(135deg, ${C.gold}, ${C.orange})` : '#FFFFFF',
-            boxShadow: dark ? `0 0 6px rgba(244,185,66,0.5)` : '0 1px 3px rgba(0,0,0,0.2)',
-            transition: 'left 0.3s ease',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 9,
-          }}>{dark ? '🌙' : '☀️'}</div>
-        </div>
-        <span style={{
-          fontSize: '0.62rem', fontFamily: "'Space Mono',monospace",
-          color: dark ? C.gold : '#374151', letterSpacing: '0.06em', fontWeight: 600,
-        }}>{dark ? 'DARK' : 'LIGHT'}</span>
+        {dark ? '☀️' : '🌙'}
       </button>
     </>
   );
@@ -1577,15 +1568,58 @@ const Index = () => {
     });
   };
 
-  // Apply theme class to document root for Tailwind dark mode
+  // Apply theme — sets both Tailwind class AND CSS custom properties
+  // so ALL Lovable-generated components respond regardless of config
   React.useEffect(() => {
     const root = document.documentElement;
     if (siteDark) {
       root.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
       root.style.colorScheme = 'dark';
+      // Force CSS variable overrides for dark mode
+      root.style.setProperty('--background', '222 47% 6%');
+      root.style.setProperty('--foreground', '210 40% 98%');
+      root.style.setProperty('--card', '222 47% 8%');
+      root.style.setProperty('--card-foreground', '210 40% 98%');
+      root.style.setProperty('--muted', '217 33% 12%');
+      root.style.setProperty('--muted-foreground', '215 20% 65%');
+      root.style.setProperty('--border', '217 33% 16%');
+      root.style.setProperty('--primary', '38 89% 61%');
+      root.style.setProperty('--primary-foreground', '222 47% 6%');
+      root.style.setProperty('--secondary', '217 33% 14%');
+      root.style.setProperty('--secondary-foreground', '210 40% 98%');
+      root.style.setProperty('--accent', '217 33% 14%');
+      root.style.setProperty('--accent-foreground', '210 40% 98%');
+      root.style.setProperty('--destructive', '0 63% 31%');
+      root.style.setProperty('--destructive-foreground', '210 40% 98%');
+      root.style.setProperty('--input', '217 33% 16%');
+      root.style.setProperty('--ring', '38 89% 61%');
+      root.style.setProperty('--popover', '222 47% 8%');
+      root.style.setProperty('--popover-foreground', '210 40% 98%');
     } else {
       root.classList.remove('dark');
+      root.setAttribute('data-theme', 'light');
       root.style.colorScheme = 'light';
+      // Force CSS variable overrides for light mode
+      root.style.setProperty('--background', '210 40% 98%');
+      root.style.setProperty('--foreground', '222 47% 11%');
+      root.style.setProperty('--card', '0 0% 100%');
+      root.style.setProperty('--card-foreground', '222 47% 11%');
+      root.style.setProperty('--muted', '210 40% 93%');
+      root.style.setProperty('--muted-foreground', '215 16% 47%');
+      root.style.setProperty('--border', '214 32% 85%');
+      root.style.setProperty('--primary', '38 89% 55%');
+      root.style.setProperty('--primary-foreground', '222 47% 6%');
+      root.style.setProperty('--secondary', '210 40% 93%');
+      root.style.setProperty('--secondary-foreground', '222 47% 11%');
+      root.style.setProperty('--accent', '210 40% 90%');
+      root.style.setProperty('--accent-foreground', '222 47% 11%');
+      root.style.setProperty('--destructive', '0 84% 60%');
+      root.style.setProperty('--destructive-foreground', '210 40% 98%');
+      root.style.setProperty('--input', '214 32% 85%');
+      root.style.setProperty('--ring', '38 89% 55%');
+      root.style.setProperty('--popover', '0 0% 100%');
+      root.style.setProperty('--popover-foreground', '222 47% 11%');
     }
   }, [siteDark]);
 
