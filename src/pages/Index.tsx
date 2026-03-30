@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, CSSProperties } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import ProblemSection from "@/components/ProblemSection";
@@ -195,7 +195,7 @@ function CosmosCanvas({ width, height }: { width: number; height: number }) {
 }
 
 // ── SA HERITAGE STRIP ────────────────────────────────────────────────
-function HeritageStrip({ style }: { style?: CSSProperties }) {
+function HeritageStrip({ style }: { style?: React.CSSProperties }) {
   return (
     <div style={{ display:'flex', gap:3, alignItems:'center', ...style }}>
       {[C.saGreen,C.saGold,C.saRed,C.saBlue,C.white].map((c,i) => (
@@ -239,6 +239,12 @@ function scoreConversation(ctx: any, userCount: number, lastMsg: string) {
   return { score, shouldShow: score >= THRESHOLD && userCount >= MIN_MSGS };
 }
 
+const CHIPS = [
+  { label:'📊 Calculate my ROI',         msg:'Calculate my ROI' },
+  { label:"🚀 Show me what you've built", msg:"Show me what you've built" },
+  { label:'📅 Book a free demo',          msg:'Book a free demo' },
+  { label:'💬 Automate my WhatsApp',      msg:'Automate my WhatsApp' },
+];
 
 const INDUSTRIES = [
   { value:'plumbing',      label:'🔧 Plumbing & Trade' },
@@ -335,7 +341,7 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting, onVo
             <div>
               <div style={{ fontSize:'0.48rem', letterSpacing:'0.26em', textTransform:'uppercase', color:C.gold, fontFamily:"'Space Mono',monospace", marginBottom:'0.2rem', opacity:0.9 }}>Inkanyezi Technologies</div>
               <h3 style={{ margin:0, fontFamily:"'Syne',sans-serif", fontSize:'0.9rem', fontWeight:800, color:'#FFFFFF', lineHeight:1.2 }}>
-                {"Let's make this"}{' '}
+                Let's make this{' '}
                 <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>official</span>
               </h3>
               <p style={{ margin:'0.2rem 0 0', fontSize:'0.65rem', color:'rgba(255,255,255,0.45)', lineHeight:1.4, fontFamily:"'DM Sans',sans-serif" }}>Sanele follows up personally within 24 hours.</p>
@@ -688,6 +694,7 @@ function InkanyeziBotWidget() {
   const [showLeadForm, setShowLeadForm]           = useState(false);
   const [leadFormSubmitted, setLeadFormSubmitted] = useState(false);
   const [leadSubmitting, setLeadSubmitting]       = useState(false);
+  const [showChips, setShowChips]   = useState(true);
   const [showGreeting, setShowGreeting]       = useState(false);
   const [greetingVisible, setGreetingVisible] = useState(false);
   const [showDoor, setShowDoor]               = useState(false);
@@ -743,9 +750,9 @@ function InkanyeziBotWidget() {
       recognition.onerror = (e: any) => {
         // 'no-speech' means silence — just restart automatically
         if (e.error === 'no-speech') {
-          try { recognition.stop(); } catch (_e) { /* suppress */ }
+          try { recognition.stop(); } catch {}
           setTimeout(() => {
-            try { recognition.start(); } catch (_e) { /* suppress */ }
+            try { recognition.start(); } catch {}
           }, 200);
         } else {
           setIsListening(false);
@@ -755,7 +762,7 @@ function InkanyeziBotWidget() {
         // If still listening (didn't get final result), restart
         setIsListening(prev => {
           if (prev) {
-            setTimeout(() => { try { recognition.start(); } catch (_e) { /* suppress */ } }, 100);
+            setTimeout(() => { try { recognition.start(); } catch {} }, 100);
             return true;
           }
           return false;
@@ -815,11 +822,12 @@ function InkanyeziBotWidget() {
         const parsed = JSON.parse(saved);
         if (parsed.messages?.length > 1) {
           setMessages(parsed.messages);
+          setShowChips(false);
           if (parsed.sessionContext) setSessionContext(parsed.sessionContext);
           // Don't auto-reopen — user can click the bubble to continue
         }
       }
-    } catch (_e) { /* suppress */ }
+    } catch {}
 
     // ── 3. ACTIVE-TIME-ONLY INACTIVITY TIMER ───────────────────────
     // Only count time when the page is VISIBLE and FOCUSED
@@ -840,6 +848,7 @@ function InkanyeziBotWidget() {
       setInput('');
       setShowLeadForm(false);
       setLeadFormSubmitted(false);
+      setShowChips(true);
       setSessionContext(null);
       hasTriggered.current = false;
       sessionStorage.removeItem(STORAGE_KEY);
@@ -919,7 +928,7 @@ function InkanyeziBotWidget() {
       if (sessionContext?.name) {
         localStorage.setItem('inkanyezi_name', sessionContext.name);
       }
-    } catch (_e) { /* suppress */ }
+    } catch {}
   }, [messages, sessionContext]);
 
   // Proactive greeting after 8s
@@ -927,7 +936,7 @@ function InkanyeziBotWidget() {
     const show = setTimeout(() => { if (!isOpen) { setShowGreeting(true); setTimeout(() => setGreetingVisible(true), 50); } }, 8000);
     const hide = setTimeout(() => { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }, 20000);
     return () => { clearTimeout(show); clearTimeout(hide); };
-  }, [isOpen]);
+  }, []);
 
   useEffect(() => {
     if (isOpen) { setGreetingVisible(false); setTimeout(() => setShowGreeting(false), 400); }
@@ -973,6 +982,7 @@ function InkanyeziBotWidget() {
   const sendMessage = async (text?: string) => {
     const content = (text||input).trim();
     if (!content||isLoading) return;
+    setShowChips(false);
     const userMessage  = { role:'user', content };
     const newMessages  = [...messages, userMessage];
     setMessages(newMessages); setInput('');
@@ -1151,7 +1161,7 @@ function InkanyeziBotWidget() {
           <div style={{ position:'absolute', width:52, height:52, animation:'orbitRing 4s linear infinite', pointerEvents:'none' }}>
             <div style={{ position:'absolute', top:-3, left:'50%', width:7, height:7, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 10px ${C.gold}` }} />
           </div>
-          <span style={{ position:'relative', zIndex:1 }}>⭐</span>
+          <span style={{ position:'relative', zIndex:1, fontSize:24 }}>👨‍🚀</span>
         </button>
       )}
 
@@ -1189,7 +1199,7 @@ function InkanyeziBotWidget() {
           }}>
             <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)`, backgroundSize:'200% 100%', animation:'headerShimmer 3s linear infinite' }} />
             <div style={{ position:'relative', flexShrink:0 }}>
-              <div style={{ width:42, height:42, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, boxShadow:'0 0 16px rgba(249,115,22,0.6)' }}>⭐</div>
+              <div style={{ width:42, height:42, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, boxShadow:'0 0 16px rgba(249,115,22,0.6)' }}>👨‍🚀</div>
               <div style={{ position:'absolute', inset:-4, animation:'orbitRing 5s linear infinite', pointerEvents:'none' }}>
                 <div style={{ position:'absolute', top:0, left:'50%', width:5, height:5, borderRadius:'50%', background:C.gold, transform:'translateX(-50%)', boxShadow:`0 0 6px ${C.gold}` }} />
               </div>
@@ -1224,12 +1234,12 @@ function InkanyeziBotWidget() {
           </div>
 
           {/* Messages — with twinkling star background */}
-          <div className="ink-msgs" style={{ flex:'1 1 0', minHeight:0, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'#0A1628', position:'relative' }}>
+          <div className="ink-msgs" style={{ flex:'1 1 0', minHeight:0, overflowY:'auto', padding:'14px 14px 6px', display:'flex', flexDirection:'column', gap:10, background:'transparent', position:'relative' }}>
             <CosmosCanvas width={370} height={580} />
             {messages.map((msg,i) => (
               <div key={i} className="ink-msg" style={{ display:'flex', justifyContent:msg.role==='user'?'flex-end':'flex-start', alignItems:'flex-end', gap:6, animationDelay:`${i*0.03}s` }}>
                 {msg.role==='assistant' && (
-                  <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, boxShadow:'0 0 8px rgba(249,115,22,0.4)' }}>⭐</div>
+                  <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, boxShadow:'0 0 8px rgba(249,115,22,0.4)' }}>👨‍🚀</div>
                 )}
                 <div style={{ maxWidth:'78%', padding:'10px 13px', borderRadius:14, fontSize:13, lineHeight:1.6, wordBreak:'break-word', background:msg.role==='user'?'linear-gradient(135deg, #F4B942, #FF6B35)':'linear-gradient(145deg, rgba(18,32,60,0.96) 0%, rgba(10,22,40,0.98) 100%)', color:msg.role==='user'?'#1a1a2e':'rgba(240,245,255,0.95)', border:msg.role==='user'?'1px solid rgba(255,200,80,0.4)':'1px solid rgba(120,160,255,0.18)', boxShadow:msg.role==='user'?'0 2px 14px rgba(244,185,66,0.35), 0 1px 0 rgba(255,230,120,0.4) inset, 0 -1px 0 rgba(180,100,20,0.3) inset':'0 4px 20px rgba(0,0,20,0.6), 0 1px 0 rgba(130,170,255,0.15) inset, 0 -1px 0 rgba(0,0,30,0.5) inset, 1px 0 0 rgba(100,140,255,0.08) inset', borderBottomLeftRadius:msg.role==='assistant'?3:14, borderBottomRightRadius:msg.role==='user'?3:14, fontFamily:"'DM Sans',sans-serif" }}
                   dangerouslySetInnerHTML={{ __html:formatMessage(msg.content) }} />
@@ -1367,108 +1377,42 @@ function WhatsAppWidget() {
 }
 
 // ════════════════════════════════════════════════════════════════════
-// SITE THEME TOGGLE — bottom-right floating button, above WhatsApp
-// ════════════════════════════════════════════════════════════════════
-function SiteThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
-  const [toastVisible, setToastVisible] = useState(false);
-  const [toastMsg, setToastMsg]         = useState('');
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (localStorage.getItem('ink_theme_hint_seen')) return;
-    const t = setTimeout(() => {
-      setToastMsg('Tip: Switch dark / light mode');
-      setToastVisible(true);
-      setTimeout(() => {
-        setToastVisible(false);
-        localStorage.setItem('ink_theme_hint_seen', '1');
-      }, 3500);
-    }, 4000);
-    return () => clearTimeout(t);
-  }, []);
- const handleToggle = () => {
-    onToggle();
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    setToastMsg(dark ? 'Light mode activated' : 'Dark mode activated');
-    setToastVisible(true);
-    toastTimer.current = setTimeout(() => setToastVisible(false), 2000);
-  };
-
-  return (
-    <>
-      <div style={{
-        position: 'fixed', bottom: 163, right: 84, zIndex: 99996,
-        background: dark ? 'rgba(10,22,40,0.97)' : 'rgba(255,255,255,0.97)',
-        border: '1px solid ' + (dark ? 'rgba(244,185,66,0.35)' : 'rgba(10,22,40,0.15)'),
-        borderRadius: 10, padding: '7px 12px',
-        fontFamily: "'Space Mono',monospace", fontSize: '0.6rem',
-        color: dark ? '#F4B942' : '#374151', whiteSpace: 'nowrap',
-        opacity: toastVisible ? 1 : 0,
-        transform: toastVisible ? 'translateX(0)' : 'translateX(8px)',
-        transition: 'opacity 0.3s ease, transform 0.3s ease',
-        pointerEvents: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
-      }}>{toastMsg}</div>
-      <button
-        onClick={handleToggle}
-        aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
-        style={{
-          position: 'fixed', bottom: 155, right: 24, zIndex: 99997,
-          width: 52, height: 52, borderRadius: '50%',
-          border: 'none', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 22,
-          background: dark ? 'linear-gradient(135deg, #0A1628, #0D1E35)' : '#FFFFFF',
-          boxShadow: dark
-            ? '0 0 0 1.5px rgba(244,185,66,0.4), 0 4px 20px rgba(0,0,0,0.5)'
-            : '0 0 0 1.5px rgba(10,22,40,0.15), 0 4px 20px rgba(0,0,0,0.15)',
-          transition: 'all 0.3s ease', backdropFilter: 'blur(10px)',
-        }}>
-        {dark ? '☀️' : '🌙'}
-      </button>
-    </>
-  );
-}
-
-// ════════════════════════════════════════════════════════════════════
 // MAIN PAGE
 // ════════════════════════════════════════════════════════════════════
 const Index = () => {
-  const [siteDark, setSiteDark] = useState(true);
+  const [dark, setDark] = useState(true);
 
   useEffect(() => {
-    if (localStorage.getItem('ink_site_theme') === 'light') setSiteDark(false);
+    if (localStorage.getItem('ink_site_theme') === 'light') setDark(false);
   }, []);
-
-  const toggleTheme = () => {
-    setSiteDark(d => { localStorage.setItem('ink_site_theme', d ? 'light' : 'dark'); return !d; });
-  };
 
   useEffect(() => {
     const r = document.documentElement;
-    if (siteDark) {
-      r.classList.add('dark'); r.setAttribute('data-theme','dark'); r.style.colorScheme='dark';
-      r.style.setProperty('--background','222 47% 6%'); r.style.setProperty('--foreground','210 40% 98%');
-      r.style.setProperty('--card','222 47% 8%'); r.style.setProperty('--card-foreground','210 40% 98%');
-      r.style.setProperty('--muted','217 33% 12%'); r.style.setProperty('--muted-foreground','215 20% 65%');
-      r.style.setProperty('--border','217 33% 16%'); r.style.setProperty('--primary','38 89% 61%');
-      r.style.setProperty('--popover','222 47% 8%'); r.style.setProperty('--popover-foreground','210 40% 98%');
+    if (dark) {
+      r.classList.add('dark');
+      r.style.setProperty('--background', '222 47% 6%');
+      r.style.setProperty('--foreground', '210 40% 98%');
+      r.style.setProperty('--card', '222 47% 8%');
+      r.style.setProperty('--muted', '217 33% 12%');
+      r.style.setProperty('--border', '217 33% 16%');
     } else {
-      r.classList.remove('dark'); r.setAttribute('data-theme','light'); r.style.colorScheme='light';
-      r.style.setProperty('--background','210 40% 98%'); r.style.setProperty('--foreground','222 47% 11%');
-      r.style.setProperty('--card','0 0% 100%'); r.style.setProperty('--card-foreground','222 47% 11%');
-      r.style.setProperty('--muted','210 40% 93%'); r.style.setProperty('--muted-foreground','215 16% 47%');
-      r.style.setProperty('--border','214 32% 85%'); r.style.setProperty('--primary','38 89% 55%');
-      r.style.setProperty('--popover','0 0% 100%'); r.style.setProperty('--popover-foreground','222 47% 11%');
+      r.classList.remove('dark');
+      r.style.setProperty('--background', '210 40% 98%');
+      r.style.setProperty('--foreground', '222 47% 11%');
+      r.style.setProperty('--card', '0 0% 100%');
+      r.style.setProperty('--muted', '210 40% 93%');
+      r.style.setProperty('--border', '214 32% 85%');
     }
-  }, [siteDark]);
+  }, [dark]);
 
   return (
-    <div
-      className="min-h-screen bg-background text-foreground relative"
-      data-theme={siteDark ? 'dark' : 'light'}
-      style={{ transition: 'background-color 0.4s ease, color 0.4s ease' }}
-    >
-      <SiteThemeToggle dark={siteDark} onToggle={toggleTheme} />
+    <div className="min-h-screen bg-background text-foreground relative">
+      {/* Theme toggle — bottom right, above WhatsApp */}
+      <button
+        onClick={() => setDark(d => { localStorage.setItem('ink_site_theme', d ? 'light' : 'dark'); return !d; })}
+        aria-label="Toggle theme"
+        style={{ position:'fixed', bottom:155, right:24, zIndex:99997, width:52, height:52, borderRadius:'50%', border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, background:dark?'linear-gradient(135deg,#0A1628,#0D1E35)':'#FFFFFF', boxShadow:dark?'0 0 0 1.5px rgba(244,185,66,0.4),0 4px 20px rgba(0,0,0,0.5)':'0 0 0 1.5px rgba(10,22,40,0.15),0 4px 20px rgba(0,0,0,0.15)', transition:'all 0.3s ease' }}
+      >{dark ? '☀️' : '🌙'}</button>
       <CustomCursor />
       <GlobalStarfield />
       <ShootingStars />
