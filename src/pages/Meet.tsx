@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import * as QRCode from "qrcode";
 
 const C = {
   midnight: '#0A1628', deep: '#0D1E35', navy: '#0F2240',
@@ -69,47 +68,23 @@ function StarCanvas() {
 }
 
 function QRPanel() {
-  const ref = useRef<HTMLCanvasElement>(null);
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    if (!ref.current) return;
-    QRCode.toCanvas(ref.current, CARD_URL, {
-      width: 180, margin: 1,
-      color: { dark: '#F4B942', light: '#0A1628' },
-      errorCorrectionLevel: 'H',
-    }, (err: Error | null | undefined) => { if (!err) setReady(true); });
-  }, []);
+  const QR_URL = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' + encodeURIComponent(CARD_URL) + '&color=F4B942&bgcolor=0A1628&margin=1';
   const download = () => {
-    if (!ref.current || !ready) return;
-    const SIZE = 560;
-    const dc = document.createElement('canvas');
-    dc.width = SIZE; dc.height = SIZE + 120;
-    const ctx = dc.getContext('2d')!;
-    ctx.fillStyle = C.midnight; ctx.fillRect(0,0,dc.width,dc.height);
-    ctx.fillStyle = C.gold; ctx.fillRect(0,0,dc.width,4);
-    ctx.fillStyle = C.gold; ctx.font = 'bold 26px Arial';
-    ctx.textAlign = 'center'; ctx.fillText('INKANYEZI TECHNOLOGIES', dc.width/2, 52);
-    ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '15px Arial';
-    ctx.fillText('AI Automation for South African Businesses', dc.width/2, 78);
-    const pad = (SIZE - 420) / 2;
-    ctx.drawImage(ref.current, pad, 100, 420, 420);
-    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = '13px monospace';
-    ctx.fillText(CARD_URL, dc.width/2, SIZE + 54);
-    ctx.fillStyle = C.gold; ctx.font = 'italic 14px Arial';
-    ctx.fillText('"We are the signal in the noise"', dc.width/2, SIZE + 82);
-    ctx.fillStyle = C.orange; ctx.fillRect(0, dc.height - 4, dc.width, 4);
     const a = document.createElement('a');
-    a.href = dc.toDataURL('image/png'); a.download = 'Inkanyezi_QR_Card.png'; a.click();
+    a.href = QR_URL;
+    a.download = 'Inkanyezi_QR.png';
+    a.target = '_blank';
+    a.click();
   };
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:12 }}>
       <div style={{ padding:12, background:C.midnight, borderRadius:12, border:`2px solid ${C.gold}`, boxShadow:`0 0 24px rgba(244,185,66,0.25)` }}>
-        <canvas ref={ref} style={{ display:'block', borderRadius:6 }} />
+        <img src={QR_URL} alt="QR Code" width={180} height={180} style={{ display:'block', borderRadius:6 }} />
       </div>
       <p style={{ fontSize:'0.6rem', color:'rgba(255,255,255,0.3)', fontFamily:'monospace', textAlign:'center', margin:0 }}>Scan to open this card</p>
-      <button onClick={download} disabled={!ready}
-        style={{ padding:'8px 22px', borderRadius:8, border:'none', cursor:ready?'pointer':'not-allowed', background:ready?`linear-gradient(90deg,${C.gold},${C.orange})`:'rgba(244,185,66,0.15)', color:ready?C.midnight:'rgba(255,255,255,0.3)', fontWeight:700, fontSize:'0.7rem', fontFamily:'monospace', letterSpacing:'0.1em', textTransform:'uppercase', transition:'all 0.2s', boxShadow:ready?`0 4px 14px rgba(244,185,66,0.35)`:'none' }}>
-        {ready ? '⬇ Download QR' : 'Generating…'}
+      <button onClick={download}
+        style={{ padding:'8px 22px', borderRadius:8, border:'none', cursor:'pointer', background:`linear-gradient(90deg,${C.gold},${C.orange})`, color:C.midnight, fontWeight:700, fontSize:'0.7rem', fontFamily:'monospace', letterSpacing:'0.1em', textTransform:'uppercase', transition:'all 0.2s', boxShadow:`0 4px 14px rgba(244,185,66,0.35)` }}>
+        ⬇ Download QR
       </button>
     </div>
   );
@@ -127,42 +102,15 @@ function HeritageStrip() {
 
 function ActionBtn({ icon, label, sub, onClick, accent }: any) {
   const [hov, setHov] = useState(false);
-  const bdr = hov ? accent : (accent + '55');
-  const bgc = hov ? (accent + '18') : 'rgba(255,255,255,0.06)';
-  const shd = hov ? ('0 6px 22px ' + accent + '40') : ('inset 3px 0 0 ' + accent + '60');
-  const icoBg = 'linear-gradient(135deg,' + accent + 'ee,' + accent + 'aa)';
-  const icoShd = hov ? ('0 0 18px ' + accent + '70') : ('0 0 10px ' + accent + '35');
-  const arrBg = hov ? accent : (accent + '20');
-  const arrBd = accent + '60';
-  const arrCol = hov ? '#0A1628' : accent;
   return (
     <button onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
-      style={{
-        width:'100%', display:'flex', alignItems:'center', gap:14,
-        padding:'15px 18px', borderRadius:14, cursor:'pointer', textAlign:'left',
-        transition:'all 0.22s',
-        border: '1.5px solid ' + bdr,
-        background: bgc,
-        transform: hov ? 'translateY(-2px)' : 'translateY(0)',
-        boxShadow: shd,
-      }}>
-      <div style={{
-        width:50, height:50, borderRadius:'50%', flexShrink:0,
-        background: icoBg, border: '2px solid ' + accent,
-        display:'flex', alignItems:'center', justifyContent:'center',
-        fontSize:22, transition:'all 0.22s', boxShadow: icoShd,
-      }}>{icon}</div>
+      style={{ width:'100%', display:'flex', alignItems:'center', gap:14, padding:'15px 18px', borderRadius:14, border:'1.5px solid ' + (hov ? accent : accent + '55'), background:hov ? accent + '18' : 'rgba(255,255,255,0.06)', cursor:'pointer', transition:'all 0.22s', textAlign:'left', transform:hov?'translateY(-2px)':'translateY(0)', boxShadow:hov?'0 6px 22px ' + accent + '40':'inset 3px 0 0 ' + accent + '60' }}>
+      <div style={{ width:50, height:50, borderRadius:'50%', flexShrink:0, background:'linear-gradient(135deg,' + accent + 'ee,' + accent + 'aa)', border:'2px solid ' + accent, display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, transition:'all 0.22s', boxShadow:hov?'0 0 18px ' + accent + '70':'0 0 10px ' + accent + '35' }}>{icon}</div>
       <div style={{ flex:1, minWidth:0 }}>
         <div style={{ fontSize:'1rem', fontWeight:700, color:'#fff', lineHeight:1.25 }}>{label}</div>
         {sub && <div style={{ fontSize:'0.78rem', color:'rgba(255,255,255,0.55)', marginTop:4 }}>{sub}</div>}
       </div>
-      <div style={{
-        width:30, height:30, borderRadius:'50%', flexShrink:0,
-        background: arrBg, border: '1.5px solid ' + arrBd,
-        display:'flex', alignItems:'center', justifyContent:'center',
-        fontSize:15, color: arrCol, fontWeight:700,
-        transition:'all 0.22s', transform: hov ? 'translateX(2px)' : 'translateX(0)',
-      }}>{'>'}</div>
+      <div style={{ width:30, height:30, borderRadius:'50%', flexShrink:0, background:hov?accent:accent+'20', border:'1.5px solid ' + accent + '60', display:'flex', alignItems:'center', justifyContent:'center', fontSize:15, color:hov?'#0A1628':accent, fontWeight:700, transition:'all 0.22s' }}>{'>'}</div>
     </button>
   );
 }
@@ -261,8 +209,8 @@ export default function Meet() {
         <div style={{ background:`linear-gradient(135deg, ${C.midnight} 0%, ${C.navy} 100%)`, border:`1px solid rgba(244,185,66,0.2)`, borderRadius:'20px 20px 0 0', padding:'28px 24px 22px', textAlign:'center', position:'relative', overflow:'hidden' }}>
           <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:`linear-gradient(90deg, transparent, ${C.gold}, ${C.orange}, ${C.gold}, transparent)` }} />
           <div style={{ width:80, height:80, borderRadius:'50%', margin:'0 auto 14px', background:`linear-gradient(135deg, ${C.gold}, ${C.orange})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:36, boxShadow:`0 0 28px rgba(244,185,66,0.35), 0 0 0 3px rgba(244,185,66,0.15)` }}>⭐</div>
-          <h1 style={{ margin:'0 0 5px', fontSize:'1.65rem', fontWeight:800, color:C.white, letterSpacing:'-0.02em', fontFamily:"'Syne', sans-serif", lineHeight:1.1 }}>Sanele Sishange</h1>
-          <p style={{ margin:'0 0 5px', fontSize:'0.88rem', color:C.gold, fontWeight:700, letterSpacing:'0.05em', textTransform:'uppercase', lineHeight:1.3 }}>Founder &amp; AI Automation Consultant</p>
+          <h1 style={{ margin:'0 0 3px', fontSize:'1.65rem', fontWeight:800, color:C.white, letterSpacing:'-0.02em', fontFamily:"'Syne', sans-serif", lineHeight:1.1 }}>Sanele Sishange</h1>
+          <p style={{ margin:'0 0 4px', fontSize:'0.88rem', color:C.gold, fontWeight:700, letterSpacing:'0.05em', textTransform:'uppercase', lineHeight:1.3 }}>Founder &amp; AI Automation Consultant</p>
           <p style={{ margin:'0 0 14px', fontSize:'0.8rem', color:'rgba(255,255,255,0.5)' }}>Inkanyezi Technologies · Durban, KZN</p>
           <HeritageStrip />
           <p style={{ margin:'14px 0 0', fontSize:'0.72rem', color:'rgba(255,255,255,0.25)', fontStyle:'italic' }}>&quot;We are the signal in the noise&quot;</p>
@@ -271,12 +219,12 @@ export default function Meet() {
         {/* Body */}
         <div style={{ background:bodyBg, border:`1px solid ${bodyBord}`, borderTop:'none', borderRadius:'0 0 20px 20px', padding:'22px 20px 26px', transition:'background 0.4s ease' }}>
           <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:20 }}>
-            <ActionBtn dark={dark} icon="💾" label="Save Contact" sub="Download vCard to your phone" onClick={downloadVCard} accent={C.gold} />
-            <ActionBtn dark={dark} icon="💬" label="WhatsApp Me" sub="+27 65 880 4122" onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${WA_MSG}`,'_blank')} accent="#25D366" />
-            <ActionBtn dark={dark} icon="🤖" label="Chat with InkanyeziBot" sub="AI automation demo — live now" onClick={() => window.open(CHATBOT,'_blank')} accent={C.orange} />
-            <ActionBtn dark={dark} icon="🌐" label="Visit Website" sub="inkanyezi-tech.lovable.app" onClick={() => window.open('https://inkanyezi-tech.lovable.app','_blank')} accent={C.gold} />
-            <ActionBtn dark={dark} icon="✉️" label="Send Email" sub={EMAIL} onClick={() => window.open(`mailto:${EMAIL}`)} accent="#60a5fa" />
-            <ActionBtn dark={dark} icon="💼" label="LinkedIn" sub="Connect professionally" onClick={() => window.open(LINKEDIN,'_blank')} accent="#0A66C2" />
+            <ActionBtn icon="💾" label="Save Contact" sub="Download vCard to your phone" onClick={downloadVCard} accent={C.gold} />
+            <ActionBtn icon="💬" label="WhatsApp Me" sub="+27 65 880 4122" onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${WA_MSG}`,'_blank')} accent="#25D366" />
+            <ActionBtn icon="🤖" label="Chat with InkanyeziBot" sub="AI automation demo — live now" onClick={() => window.open(CHATBOT,'_blank')} accent={C.orange} />
+            <ActionBtn icon="🌐" label="Visit Website" sub="inkanyezi-tech.lovable.app" onClick={() => window.open('https://inkanyezi-tech.lovable.app','_blank')} accent={C.gold} />
+            <ActionBtn icon="✉️" label="Send Email" sub={EMAIL} onClick={() => window.open(`mailto:${EMAIL}`)} accent="#60a5fa" />
+            <ActionBtn icon="💼" label="LinkedIn" sub="Connect professionally" onClick={() => window.open(LINKEDIN,'_blank')} accent="#0A66C2" />
           </div>
           <div style={{ height:1, background:divCol, marginBottom:20 }} />
           <div style={{ textAlign:'center' }}>
