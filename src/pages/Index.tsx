@@ -365,7 +365,7 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting, onVo
               <p style={{ fontSize:'0.72rem', color:'#6B7280', margin:'0 0 0.6rem', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif" }}>
                 {form.company ? `Sanele will reach out to ${form.company} within 24 hours.` : 'Sanele will be in touch within 24 hours.'}
               </p>
-              <p style={{ fontSize:'0.56rem', color:'#9CA3AF', margin:0, fontFamily:"'Space Mono',monospace" }}>Durban, KZN 🇿🇦 · We are the signal in the noise.</p>
+              <p style={{ fontSize:'0.56rem', color:'#9CA3AF', margin:0, fontFamily:"'Space Mono',monospace" }}>Durban, KZN [ZA] · We are the signal in the noise.</p>
             </div>
           ) : (
             <form onSubmit={submit}>
@@ -400,7 +400,7 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting, onVo
                 style={{ width:'100%', padding:'0.62rem', background:submitting||!consent?'#E5E7EB':`linear-gradient(90deg, ${C.gold}, ${C.orange})`, border:'none', borderRadius:'6px', color:submitting||!consent?'#9CA3AF':C.midnight, fontFamily:"'Space Mono',monospace", fontSize:'0.65rem', fontWeight:700, letterSpacing:'0.12em', textTransform:'uppercase', cursor:submitting||!consent?'not-allowed':'pointer', transition:'all 0.25s', boxShadow:!submitting&&consent?`0 4px 14px rgba(244,185,66,0.35)`:'none' }}>
                 {submitting ? 'Sending...' : 'Send My Details →'}
               </button>
-              <p style={{ textAlign:'center', fontSize:'0.54rem', color:'#9CA3AF', margin:'0.5rem 0 0', fontFamily:"'Space Mono',monospace" }}>Durban, KZN 🇿🇦 · We are the signal in the noise.</p>
+              <p style={{ textAlign:'center', fontSize:'0.54rem', color:'#9CA3AF', margin:'0.5rem 0 0', fontFamily:"'Space Mono',monospace" }}>Durban, KZN [ZA] · We are the signal in the noise.</p>
             </form>
           )}
         </div>
@@ -1003,7 +1003,7 @@ function InkanyeziBotWidget() {
         setSessionContext(data.context);
         if (data.context.conversation_complete && !sessionContext?.conversation_complete) {
           setTimeout(() => {
-            setMessages(prev => [...prev, { role:'assistant', content:`Your reference is ${data.context.referenceNumber}. Sanele will be in touch within 24 hours — feel free to reach out on WhatsApp (+27 65 880 4122) anytime. Sharp! 🇿🇦` }]);
+            setMessages(prev => [...prev, { role:'assistant', content:`Your reference is ${data.context.referenceNumber}. Sanele will be in touch within 24 hours — feel free to reach out on WhatsApp (+27 65 880 4122) anytime. Sharp! ✦` }]);
           }, 1500);
         }
       }
@@ -1227,7 +1227,7 @@ function InkanyeziBotWidget() {
                 onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(229,62,62,0.08)';}}
               >✕</button>
               <div style={{ textAlign:'right' }}>
-                <div style={{ fontSize:10, color:'rgba(100,80,20,0.5)', fontFamily:"'Space Mono',monospace" }}>🇿🇦 SA AI</div>
+                <div style={{ fontSize:12, letterSpacing:'0.04em' }}>🇿🇦 <span style={{ fontSize:8, color:'rgba(100,80,20,0.6)', fontFamily:"'Space Mono',monospace" }}>SA AI</span></div>
                 <HeritageStrip style={{ justifyContent:'flex-end', marginTop:3 }} />
               </div>
             </div>
