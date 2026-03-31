@@ -412,15 +412,18 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting, onVo
 // ── FORMAT MESSAGE ───────────────────────────────────────────────────
 function formatMessage(text: string) {
   if (!text) return '';
-  const clean = text
+  let clean = text
     .replace(/<context>[\s\S]*?<\/context>/gi, '')
     .replace(/<response>|<\/response>/gi, '')
+    .replace(/\[THINK\][\s\S]*?\[\/THINK\]/gi, '')
     .trim();
+  // Drop trailing raw JSON if it leaked
+  const jIdx = clean.indexOf('\n{');
+  if (jIdx > -1 && clean.includes('"pain_point"')) clean = clean.substring(0, jIdx).trim();
   return clean
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\n/g, '<br/>');
 }
-
 
 // ════════════════════════════════════════════════════════════════════
 // INKANYEZI DOOR — Pure tech, holographic, plasma energy
@@ -994,10 +997,16 @@ function InkanyeziBotWidget() {
         body:JSON.stringify({ messages:newMessages, sessionId }),
       });
       const data = await res.json();
-      const cleanMessage = (data.message || '')
+            // Strip context/JSON that sometimes leaks into message text
+      let cleanMessage = (data.message || '')
         .replace(/<context>[\s\S]*?<\/context>/gi, '')
         .replace(/<response>|<\/response>/gi, '')
+        .replace(/\[THINK\][\s\S]*?\[\/THINK\]/gi, '')
         .trim();
+      const jIdx = cleanMessage.indexOf('\n{');
+      if (jIdx > -1 && cleanMessage.includes('"pain_point"')) {
+        cleanMessage = cleanMessage.substring(0, jIdx).trim();
+      }
       setMessages([...newMessages, { role:'assistant', content: cleanMessage }]);
       if (data.context) {
         setSessionContext(data.context);
