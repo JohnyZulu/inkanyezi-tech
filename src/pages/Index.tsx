@@ -963,7 +963,7 @@ function InkanyeziBotWidget() {
     const hasIntent = intentKeywords.some(kw => allText.includes(kw));
 
     // Trigger on: intent detected after 1+ exchanges, OR naturally after 4 exchanges
-    const shouldTrigger = (hasIntent && userMsgs.length >= 1) || userMsgs.length >= 4;
+    const shouldTrigger = (hasIntent && userMsgs.length >= 1) || userMsgs.length >= 2;
 
     if (shouldTrigger) {
       hasTriggered.current = true;
@@ -985,6 +985,12 @@ function InkanyeziBotWidget() {
   const sendMessage = async (text?: string) => {
     const content = (text||input).trim();
     if (!content||isLoading) return;
+    // Hard stop — once form submitted, lock conversation
+    if (leadFormSubmitted) {
+      setMessages(prev => [...prev, { role:'user', content }, { role:'assistant', content:'Sharp sharp! ✦ Sanele will be in touch within 24 hours. Hamba kahle!' }]);
+      setInput('');
+      return;
+    }
     setShowChips(false);
     const userMessage  = { role:'user', content };
     const newMessages  = [...messages, userMessage];
@@ -1010,11 +1016,7 @@ function InkanyeziBotWidget() {
       setMessages([...newMessages, { role:'assistant', content: cleanMessage }]);
       if (data.context) {
         setSessionContext(data.context);
-        if (data.context.conversation_complete && !sessionContext?.conversation_complete) {
-          setTimeout(() => {
-            setMessages(prev => [...prev, { role:'assistant', content:`Your reference is ${data.context.referenceNumber}. Sanele will be in touch within 24 hours — feel free to reach out on WhatsApp (+27 65 880 4122) anytime. Sharp! ✦` }]);
-          }, 1500);
-        }
+        // conversation_complete handled by form trigger — no duplicate message
       }
     } catch {
       setMessages([...newMessages, { role:'assistant', content:'Something went wrong — please try again.' }]);
@@ -1109,7 +1111,7 @@ function InkanyeziBotWidget() {
         .ink-msgs::-webkit-scrollbar { width: 3px; }
         .ink-msgs::-webkit-scrollbar-track { background: transparent; }
         .ink-msgs::-webkit-scrollbar-thumb { background: rgba(244,185,66,0.4); border-radius: 2px; }
-        .ink-textarea::placeholder { color: rgba(100,110,130,0.5) !important; }
+        .ink-textarea::placeholder { color: rgba(160,180,220,0.4) !important; }
         @keyframes closePulse {
           0%   { box-shadow: 0 0 0 0 rgba(229,62,62,0.6), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1); }
           50%  { box-shadow: 0 0 0 10px rgba(229,62,62,0), 0 4px 20px rgba(229,62,62,0.4); transform: scale(1.06); }
@@ -1201,8 +1203,8 @@ function InkanyeziBotWidget() {
           {/* Header */}
           <div style={{
             position:'relative', zIndex:2, flexShrink:0,
-            background:'linear-gradient(135deg, #ffffff 0%, #f8f6f0 100%)',
-            borderBottom:'1px solid rgba(244,185,66,0.3)',
+            background:'linear-gradient(160deg, #0D1E35 0%, #0A1628 100%)',
+            borderBottom:'1px solid rgba(0,229,255,0.15)',
             boxShadow:'0 1px 8px rgba(0,0,0,0.06)',
             padding:'12px 16px', display:'flex', alignItems:'center', gap:12,
           }}>
@@ -1214,7 +1216,7 @@ function InkanyeziBotWidget() {
               </div>
             </div>
             <div style={{ flex:1, minWidth:0 }}>
-              <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:15, color:'#1a1a2e', letterSpacing:'-0.01em' }}>InkanyeziBot <span style={{ fontSize:11, color:C.gold, fontFamily:"'Space Mono',monospace", fontWeight:400 }}>✦</span></div>
+              <div style={{ fontFamily:"'Syne',sans-serif", fontWeight:800, fontSize:15, color:'#FFFFFF', letterSpacing:'-0.01em' }}>InkanyeziBot <span style={{ fontSize:11, color:C.gold, fontFamily:"'Space Mono',monospace", fontWeight:400 }}>✦</span></div>
               <div style={{ fontSize:11, color:'#F4B942', display:'flex', alignItems:'center', gap:5, fontFamily:"'DM Sans',sans-serif" }}>
                 <SignalDot /><span>Online · AI Automation · Durban, ZA</span>
               </div>
@@ -1223,7 +1225,7 @@ function InkanyeziBotWidget() {
               <button
                 onClick={() => setIsFullscreen(f => !f)}
                 title={isFullscreen ? 'Minimise' : 'Expand'}
-                style={{ width:28, height:28, borderRadius:6, background:'rgba(244,185,66,0.08)', border:'1px solid rgba(244,185,66,0.25)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:13, color:'#6B4F10', transition:'all 0.2s', flexShrink:0 }}
+                style={{ width:28, height:28, borderRadius:6, background:'rgba(0,229,255,0.06)', border:'1px solid rgba(0,229,255,0.2)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:13, color:'rgba(0,229,255,0.7)', transition:'all 0.2s', flexShrink:0 }}
                 onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.2)';}}
                 onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.08)';}}
               >{isFullscreen ? '⊡' : '⤢'}</button>
@@ -1231,12 +1233,12 @@ function InkanyeziBotWidget() {
               <button
                 onClick={() => { setIsOpen(false); setIsFullscreen(false); }}
                 title="Close chat"
-                style={{ width:28, height:28, borderRadius:6, background:'rgba(229,62,62,0.08)', border:'1px solid rgba(229,62,62,0.25)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:13, color:'#c53030', transition:'all 0.2s', flexShrink:0 }}
+                style={{ width:28, height:28, borderRadius:6, background:'rgba(229,62,62,0.12)', border:'1px solid rgba(229,62,62,0.35)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:13, color:'#f87171', transition:'all 0.2s', flexShrink:0 }}
                 onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(229,62,62,0.2)';}}
                 onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(229,62,62,0.08)';}}
               >✕</button>
               <div style={{ textAlign:'right' }}>
-                <div style={{ fontSize:12, letterSpacing:'0.04em' }}>🇿🇦 <span style={{ fontSize:8, color:'rgba(100,80,20,0.6)', fontFamily:"'Space Mono',monospace" }}>SA AI</span></div>
+                <div style={{ fontSize:12, letterSpacing:'0.04em' }}>🇿🇦 <span style={{ fontSize:8, color:'rgba(220,200,140,0.7)', fontFamily:"'Space Mono',monospace" }}>SA AI</span></div>
                 <HeritageStrip style={{ justifyContent:'flex-end', marginTop:3 }} />
               </div>
             </div>
@@ -1275,7 +1277,7 @@ function InkanyeziBotWidget() {
           </div>
 
           {/* Input */}
-          <div className="ink-input-bar" style={{ flexShrink:0, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#FFFFFF' }}>
+          <div className="ink-input-bar" style={{ flexShrink:0, padding:'10px 12px 12px', borderTop:'1px solid rgba(244,185,66,0.2)', background:'#0A1628' }}>
             <div style={{ display:'flex', gap:8, alignItems:'flex-end' }}>
               <textarea ref={textareaRef} value={input} className="ink-textarea"
                 onChange={e => { setInput(e.target.value); e.target.style.height='auto'; e.target.style.height=Math.min(e.target.scrollHeight,96)+'px'; }}
