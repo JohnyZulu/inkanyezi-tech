@@ -8,12 +8,12 @@ const C = {
   saGreen: '#007A4D', saGold: '#FFB612', saRed: '#DE3831', saBlue: '#002395',
 };
 
-const CARD_URL  = 'https://inkanyezi-tech.lovable.app/meet';
+const CARD_URL  = 'https://inkanyezi-tech.vercel.app/meet';
 const WA_NUMBER = '27658804122';
 const WA_MSG    = encodeURIComponent('Sawubona! I scanned your card and would like to know more about Inkanyezi Technologies.');
 const EMAIL     = 'sishangesanele@gmail.com';
 const LINKEDIN  = 'https://www.linkedin.com/in/sanele-sishange';
-const CHATBOT   = 'https://inkanyezi-tech.lovable.app/#chat';
+const CHATBOT   = 'https://inkanyezi-tech.vercel.app/#chat';
 const QR_URL    = 'https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='
   + encodeURIComponent(CARD_URL) + '&color=00E5FF&bgcolor=020A14&margin=2';
 
@@ -367,7 +367,7 @@ function HUDButton({ icon, label, sub, onClick, color, featured = false }: any) 
         background: 'radial-gradient(circle at 35% 35%, rgba(' + rgb + ',0.3), rgba(' + rgb + ',0.06))',
         border: '1px solid rgba(' + rgb + ',0.35)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 18, flexShrink: 0,
+        fontSize: 18,
         boxShadow: '0 0 8px rgba(' + rgb + ',0.2), 0 2px 0 rgba(' + rgb + ',0.1)',
         transition: 'all 0.16s',
       }}>{icon}</div>
@@ -564,7 +564,7 @@ export default function Meet() {
             <HUDButton featured icon="💾" label="Save My Contact" sub="VCARD · TAP TO ADD TO PHONE" onClick={downloadVCard} color="244,185,66" />
             <HUDButton icon="💬" label="WhatsApp" sub="+27 65 880 4122 · OPEN COMMS" onClick={() => window.open('https://wa.me/' + WA_NUMBER + '?text=' + WA_MSG, '_blank')} color="37,211,102" />
             <HUDButton icon="🤖" label="Chat with InkanyeziBot" sub="AI AUTOMATION DEMO · LIVE NOW" onClick={() => window.open(CHATBOT, '_blank')} color="255,107,53" />
-            <HUDButton icon="🌐" label="Visit Website" sub="INKANYEZI-TECH.LOVABLE.APP" onClick={() => window.open('https://inkanyezi-tech.lovable.app', '_blank')} color="0,229,255" />
+            <HUDButton icon="🌐" label="Visit Website" sub="INKANYEZITECH.CO.ZA" onClick={() => window.open('https://inkanyezi-tech.vercel.app', '_blank')} color="0,229,255" />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
               <HUDButton icon="✉️" label="Email" sub="TRANSMIT MESSAGE" onClick={() => window.open('mailto:' + EMAIL)} color="160,140,255" />
               <HUDButton icon="💼" label="LinkedIn" sub="PROFESSIONAL NODE" onClick={() => window.open(LINKEDIN, '_blank')} color="10,102,194" />
