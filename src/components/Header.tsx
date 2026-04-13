@@ -83,7 +83,6 @@ function ThemeToggle({ dark, setDark, mobile = false }: {
         transition: 'all 0.25s ease',
         flexShrink: 0,
         outline: 'none',
-        // Works on all browsers — no WebKit-specific anything needed
       }}
       onMouseEnter={e => {
         (e.currentTarget as HTMLButtonElement).style.background = 'rgba(244,185,66,0.18)';
@@ -95,7 +94,6 @@ function ThemeToggle({ dark, setDark, mobile = false }: {
         (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(244,185,66,0.35)';
         (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
       }}
-      // Touch support — ensures tap works on mobile/tablet too
       onTouchEnd={e => { e.preventDefault(); toggle(); }}
     >
       {dark ? '☀️' : '🌙'}
