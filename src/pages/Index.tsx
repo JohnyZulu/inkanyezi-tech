@@ -1108,10 +1108,7 @@ function WhatsAppWidget() {
 }
 
 // ════════════════════════════════════════════════════════════════════
-// MAIN PAGE — THREE CHANGES FROM ORIGINAL:
-// 1. Floating toggle button REMOVED
-// 2. Light theme uses Inkanyezi brand colours (warm navy, not white)
-// 3. Header receives dark + setDark props for in-nav toggle
+// MAIN PAGE
 // ════════════════════════════════════════════════════════════════════
 const Index = () => {
   const [dark, setDark] = useState(true);
@@ -1132,7 +1129,6 @@ const Index = () => {
       r.style.setProperty('--border', '217 33% 16%');
     } else {
       r.classList.remove('dark');
-      // LIGHT = warm gold-on-navy — Inkanyezi brand preserved in both themes
       r.style.setProperty('--background', '218 45% 14%');
       r.style.setProperty('--foreground', '40 85% 88%');
       r.style.setProperty('--card', '218 40% 18%');
