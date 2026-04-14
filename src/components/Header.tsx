@@ -221,17 +221,13 @@ const Header = ({ dark, setDark }: HeaderProps) => {
           box-shadow: 0 1px 0 rgba(160,100,8,0.45), 0 2px 8px rgba(244,185,66,0.18);
         }
 
-        /* Animated gold shimmer line at header bottom */
-        @keyframes inkShimmer {
-          0%   { background-position: 200% center; }
-          100% { background-position: -200% center; }
-        }
+
       `}</style>
 
       <header style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9000,
         background: hdrBg,
-        borderBottom: `1px solid ${hdrBorder}`,
+        borderBottom: 'none',
         backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
         boxShadow: scrolled
           ? dark ? '0 4px 40px rgba(0,0,0,0.55)' : '0 4px 24px rgba(0,0,0,0.08)'
@@ -239,18 +235,11 @@ const Header = ({ dark, setDark }: HeaderProps) => {
         transition: 'background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
       }}>
 
-        {/* Gold shimmer bottom line */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: 1,
-          background: 'linear-gradient(90deg, transparent, rgba(244,185,66,0.5), rgba(255,107,53,0.35), rgba(244,185,66,0.5), transparent)',
-          backgroundSize: '200% 100%',
-          animation: 'inkShimmer 4s linear infinite',
-          pointerEvents: 'none',
-        }} />
+
 
         <div style={{
           maxWidth: 1280, margin: '0 auto', padding: '0 28px',
-          height: 72,
+          height: 100,
           display: 'flex', alignItems: 'center',
           justifyContent: 'space-between', gap: 20,
           overflow: 'visible',
@@ -260,24 +249,24 @@ const Header = ({ dark, setDark }: HeaderProps) => {
           {/* In light mode, logo sits on a small dark pill so it stays visible */}
           <a href="#" onClick={closeMobile}
             style={{ textDecoration: 'none', flexShrink: 0, overflow: 'visible', display: 'block' }}>
+            {/* Logo wrapper — dark pill in light mode so white/gold mark is always visible */}
             <div style={{
-              // In light mode: subtle dark backing behind logo so white/gold mark is always readable
-              background: dark ? 'transparent' : 'rgba(10,22,40,0.06)',
-              borderRadius: dark ? 0 : 8,
-              padding: dark ? 0 : '2px 6px',
+              background: dark ? 'transparent' : 'rgba(10,22,40,0.90)',
+              borderRadius: 12,
+              padding: dark ? '0' : '4px 10px',
               transition: 'background 0.3s ease',
+              display: 'inline-block',
             }}>
               <img
                 src="/lovable-uploads/inkanyezi-logo-transparent.png"
                 alt="Inkanyezi Technologies"
                 style={{
-                  height: '128px',
+                  height: '90px',
                   width: 'auto',
                   display: 'block',
-                  // In light mode apply dark shadow behind logo mark to ensure visibility
                   filter: dark
-                    ? 'drop-shadow(0 0 6px rgba(244,185,66,0.18))'
-                    : 'drop-shadow(0 2px 8px rgba(10,22,40,0.55)) drop-shadow(0 0 12px rgba(10,22,40,0.35))',
+                    ? 'drop-shadow(0 0 6px rgba(244,185,66,0.20))'
+                    : 'none',
                   transition: 'filter 0.3s ease',
                 }}
               />
