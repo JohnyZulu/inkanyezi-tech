@@ -1129,14 +1129,15 @@ const Index = () => {
       r.style.setProperty('--border', '217 33% 16%');
     } else {
       r.classList.remove('dark');
-      r.style.setProperty('--background', '218 45% 14%');
-      r.style.setProperty('--foreground', '40 85% 88%');
-      r.style.setProperty('--card', '218 40% 18%');
-      r.style.setProperty('--muted', '218 35% 22%');
-      r.style.setProperty('--muted-foreground', '40 60% 72%');
-      r.style.setProperty('--border', '218 30% 28%');
-      r.style.setProperty('--primary', '40 89% 61%');
-      r.style.setProperty('--primary-foreground', '218 58% 10%');
+      // LIGHT = true white with Inkanyezi gold accents
+      r.style.setProperty('--background', '0 0% 100%');        // pure white
+      r.style.setProperty('--foreground', '218 58% 10%');       // midnight navy text
+      r.style.setProperty('--card', '210 40% 98%');             // near-white cards
+      r.style.setProperty('--muted', '210 30% 94%');            // light grey tint
+      r.style.setProperty('--muted-foreground', '218 25% 40%'); // muted navy
+      r.style.setProperty('--border', '218 20% 88%');           // subtle border
+      r.style.setProperty('--primary', '40 89% 61%');           // Inkanyezi gold
+      r.style.setProperty('--primary-foreground', '218 58% 10%'); // navy on gold
     }
   }, [dark]);
 
