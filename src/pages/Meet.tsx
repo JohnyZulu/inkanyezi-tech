@@ -2,7 +2,7 @@
 // Inkanyezi Technologies — Digital Business Card
 // Route: /meet
 // Design: Afrofuturist luxury — SA heritage × deep space × 3D depth
-// NO Lovable tagger, all URLs → inkanyezitech.co.za
+// NO Lovable tagger, all URLs → https://inkanyezi-tech-murex.vercel.app/
 
 import { useState, useEffect, useRef } from "react";
 
