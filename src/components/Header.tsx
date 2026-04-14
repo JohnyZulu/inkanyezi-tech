@@ -17,80 +17,7 @@ const NAV_ITEMS = [
   { label: 'Contact',      href: '#contact'      },
 ];
 
-// ── INLINE SVG LOGO ───────────────────────────────────────────────────
-// No external file dependency — renders perfectly on any background
-// Matches the original: 3 speed lines + 2 four-pointed stars + wordmark
-function InkanyeziSVGLogo() {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
-      {/* Mark */}
-      <svg viewBox="0 0 90 95" width="70" height="74" aria-hidden="true"
-        style={{ display: 'block', overflow: 'visible' }}>
-        <defs>
-          <linearGradient id="hdr_cg" x1="20%" y1="0%" x2="80%" y2="100%">
-            <stop offset="0%"   stopColor="#D4883A" />
-            <stop offset="40%"  stopColor="#E8A050" />
-            <stop offset="75%"  stopColor="#C87030" />
-            <stop offset="100%" stopColor="#A05020" />
-          </linearGradient>
-          <radialGradient id="hdr_g1" cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stopColor="#FFE8B0" stopOpacity="1" />
-            <stop offset="50%"  stopColor="#F4B040" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#C87030" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="hdr_g2" cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stopColor="#FFE8B0" stopOpacity="1" />
-            <stop offset="50%"  stopColor="#F4B040" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#C87030" stopOpacity="0" />
-          </radialGradient>
-        </defs>
 
-        {/* 3 speed lines — top-left to upper star */}
-        <line x1="19" y1="7"  x2="60" y2="44" stroke="#C07830" strokeWidth="1.6" strokeLinecap="round" opacity="0.88"/>
-        <line x1="27" y1="2"  x2="68" y2="40" stroke="#A86020" strokeWidth="1.0" strokeLinecap="round" opacity="0.65"/>
-        <line x1="34" y1="0"  x2="76" y2="36" stroke="#905015" strokeWidth="0.55" strokeLinecap="round" opacity="0.42"/>
-
-        {/* Lower star (larger) — centre (38,70), r_out=17 */}
-        <circle cx="38" cy="70" r="13" fill="url(#hdr_g2)" opacity="0.45"/>
-        <path fill="url(#hdr_cg)"
-          d="M 38,53 Q 41.5,66.5 55,70 Q 41.5,73.5 38,87 Q 34.5,73.5 21,70 Q 34.5,66.5 38,53 Z"/>
-        <circle cx="38" cy="70" r="3.8" fill="#FFE8A0" opacity="0.85"/>
-        <circle cx="38" cy="70" r="1.6" fill="white" opacity="0.95"/>
-
-        {/* Upper star (smaller) — centre (58,48), r_out=12 */}
-        <circle cx="58" cy="48" r="10" fill="url(#hdr_g1)" opacity="0.5"/>
-        <path fill="url(#hdr_cg)"
-          d="M 58,36 Q 60.5,45.5 70,48 Q 60.5,50.5 58,60 Q 55.5,50.5 46,48 Q 55.5,45.5 58,36 Z"/>
-        <circle cx="58" cy="48" r="3.0" fill="#FFE8A0" opacity="0.9"/>
-        <circle cx="58" cy="48" r="1.4" fill="white" opacity="1"/>
-        {/* Cross flare on upper star */}
-        <line x1="58" y1="43" x2="58" y2="53" stroke="white" strokeWidth="0.6" strokeLinecap="round" opacity="0.5"/>
-        <line x1="53" y1="48" x2="63" y2="48" stroke="white" strokeWidth="0.6" strokeLinecap="round" opacity="0.5"/>
-      </svg>
-
-      {/* Wordmark */}
-      <div style={{ textAlign: 'center', lineHeight: 1, marginTop: '-2px' }}>
-        <div style={{
-          fontFamily: "'Playfair Display', 'Cormorant Garamond', Georgia, serif",
-          fontSize: '0.95rem', fontWeight: 700, letterSpacing: '0.14em',
-          background: 'linear-gradient(135deg, #D08828 0%, #C07028 100%)',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text', color: '#D08828',
-        }}>
-          INKANYEZI
-        </div>
-        <div style={{
-          fontFamily: "'Syne', sans-serif",
-          fontSize: '0.34rem', fontWeight: 700, letterSpacing: '0.28em',
-          color: 'rgba(212,158,40,0.70)',
-          textTransform: 'uppercase' as const, marginTop: '2px',
-        }}>
-          TECHNOLOGIES
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ── THEME TOGGLE ─────────────────────────────────────────────────────
 function ThemeToggle({ dark, setDark, mobile = false }: {
@@ -295,10 +222,30 @@ const Header = ({ dark, setDark }: HeaderProps) => {
           overflow: 'visible',
         }}>
 
-          {/* LOGO — inline SVG, always visible regardless of theme or missing files */}
+          {/* LOGO */}
           <a href="#" onClick={closeMobile}
             style={{ textDecoration: 'none', flexShrink: 0, display: 'block', overflow: 'visible' }}>
-            <InkanyeziSVGLogo />
+            {/* Dark pill wrapper ensures logo is visible on both light and dark backgrounds */}
+            <div style={{
+              background: dark ? 'transparent' : 'rgba(10,22,40,0.88)',
+              borderRadius: dark ? 0 : 10,
+              padding: dark ? '0' : '2px 8px',
+              transition: 'background 0.3s ease',
+              display: 'inline-block',
+            }}>
+            <img
+              src="/inkanyezi-logo-transparent-BRuYXriy.png"
+              alt="Inkanyezi Technologies"
+              onError={(e) => {
+                const t = e.currentTarget;
+                // Primary path failed, no further fallback needed
+              }}
+              style={{
+                height: '110px',
+                width: 'auto',
+                display: 'block',
+              }}
+            />
           </a>
 
           {/* DESKTOP NAV */}
