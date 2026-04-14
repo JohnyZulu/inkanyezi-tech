@@ -227,11 +227,12 @@ const Header = ({ dark, setDark }: HeaderProps) => {
             style={{ textDecoration: 'none', flexShrink: 0, display: 'block', overflow: 'visible' }}>
             {/* Dark pill wrapper — logo is white/gold so needs dark bg in light mode */}
             <div style={{
-              background: dark ? 'transparent' : 'rgba(10,22,40,0.88)',
-              borderRadius: dark ? 0 : 10,
-              padding: dark ? '0' : '2px 8px',
+              background: dark ? 'transparent' : 'rgba(10,22,40,0.96)',
+              borderRadius: 12,
+              padding: dark ? '0' : '6px 10px',
               transition: 'background 0.3s ease',
               display: 'inline-block',
+              boxShadow: dark ? 'none' : '0 2px 16px rgba(10,22,40,0.25)',
             }}>
               <img
                 src="/inkanyezi-logo-transparent-BRuYXriy.png"
