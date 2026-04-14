@@ -1129,14 +1129,14 @@ const Index = () => {
       r.style.setProperty('--border', '217 33% 16%');
     } else {
       r.classList.remove('dark');
-      // LIGHT = Inkanyezi brand navy — deep, rich, brand-true
-      // Header remains dark navy so logo and stars stay visible
-      r.style.setProperty('--background',         '218 52% 10%');  // deep navy #0D1E35
-      r.style.setProperty('--foreground',         '40 80% 90%');   // warm gold-white text
-      r.style.setProperty('--card',               '218 47% 13%');  // slightly lighter navy card
-      r.style.setProperty('--muted',              '218 40% 16%');  // muted navy surface
-      r.style.setProperty('--muted-foreground',   '40 50% 65%');   // warm muted gold
-      r.style.setProperty('--border',             '218 35% 22%');  // navy border
+      // LIGHT = warm white canvas with Inkanyezi navy text + gold accents
+      // Cream-white background so stars and logo look premium
+      r.style.setProperty('--background',         '40 30% 97%');   // warm cream #FAF8F4
+      r.style.setProperty('--foreground',         '218 58% 10%');  // midnight navy #0A1628
+      r.style.setProperty('--card',               '0 0% 100%');    // pure white cards
+      r.style.setProperty('--muted',              '218 20% 94%');  // very light navy tint
+      r.style.setProperty('--muted-foreground',   '218 30% 40%');  // muted navy text
+      r.style.setProperty('--border',             '218 20% 85%');  // light navy border
       r.style.setProperty('--primary',            '40 89% 61%');   // Inkanyezi gold
       r.style.setProperty('--primary-foreground', '218 58% 8%');   // dark navy on gold
     }
