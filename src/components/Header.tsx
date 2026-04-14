@@ -225,7 +225,7 @@ const Header = ({ dark, setDark }: HeaderProps) => {
           {/* LOGO */}
           <a href="#" onClick={closeMobile}
             style={{ textDecoration: 'none', flexShrink: 0, display: 'block', overflow: 'visible' }}>
-            {/* Dark pill wrapper ensures logo is visible on both light and dark backgrounds */}
+            {/* Dark pill wrapper — logo is white/gold so needs dark bg in light mode */}
             <div style={{
               background: dark ? 'transparent' : 'rgba(10,22,40,0.88)',
               borderRadius: dark ? 0 : 10,
@@ -233,19 +233,16 @@ const Header = ({ dark, setDark }: HeaderProps) => {
               transition: 'background 0.3s ease',
               display: 'inline-block',
             }}>
-            <img
-              src="/inkanyezi-logo-transparent-BRuYXriy.png"
-              alt="Inkanyezi Technologies"
-              onError={(e) => {
-                const t = e.currentTarget;
-                // Primary path failed, no further fallback needed
-              }}
-              style={{
-                height: '110px',
-                width: 'auto',
-                display: 'block',
-              }}
-            />
+              <img
+                src="/inkanyezi-logo-transparent-BRuYXriy.png"
+                alt="Inkanyezi Technologies"
+                style={{
+                  height: '110px',
+                  width: 'auto',
+                  display: 'block',
+                }}
+              />
+            </div>
           </a>
 
           {/* DESKTOP NAV */}
