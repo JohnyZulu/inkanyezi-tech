@@ -432,7 +432,7 @@ export default function Meet() {
   const [copied, setCopied] = useState(false);
 
   const copyLink = () => {
-    navigator.clipboard.writeText("https://inkanyezitech.co.za/meet");
+    navigator.clipboard.writeText("https://inkanyezi-tech-murex.vercel.app/");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -822,7 +822,7 @@ export default function Meet() {
                 label="Chat with InkanyeziBot"
                 sub="AI Automation Demo · Live now"
                 onClick={() =>
-                  window.open("https://inkanyezitech.co.za/#chat", "_blank")
+                  window.open("https://inkanyezi-tech-murex.vercel.app/", "_blank")
                 }
                 accent="#FF6B35"
                 fullWidth
@@ -832,7 +832,7 @@ export default function Meet() {
                 label="Visit Website"
                 sub="inkanyezitech.co.za"
                 onClick={() =>
-                  window.open("https://inkanyezitech.co.za", "_blank")
+                  window.open("https://inkanyezi-tech-murex.vercel.app/", "_blank")
                 }
                 accent="#00E5FF"
                 fullWidth
@@ -1027,7 +1027,7 @@ export default function Meet() {
                 alignItems: "center",
               }}
             >
-              <QRCode url="https://inkanyezitech.co.za/meet" />
+              <QRCode url="https://inkanyezi-tech-murex.vercel.app/" />
               <div style={{ flex: 1 }}>
                 <div
                   style={{
@@ -1109,7 +1109,7 @@ export default function Meet() {
                 marginTop: 4,
               }}
             >
-              inkanyezitech.co.za
+              https://inkanyezi-tech-murex.vercel.app/
             </div>
           </div>
 
