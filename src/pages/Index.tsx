@@ -1129,15 +1129,16 @@ const Index = () => {
       r.style.setProperty('--border', '217 33% 16%');
     } else {
       r.classList.remove('dark');
-      // LIGHT = true white with Inkanyezi gold accents
-      r.style.setProperty('--background', '0 0% 100%');        // pure white
-      r.style.setProperty('--foreground', '218 58% 10%');       // midnight navy text
-      r.style.setProperty('--card', '210 40% 98%');             // near-white cards
-      r.style.setProperty('--muted', '210 30% 94%');            // light grey tint
-      r.style.setProperty('--muted-foreground', '218 25% 40%'); // muted navy
-      r.style.setProperty('--border', '218 20% 88%');           // subtle border
-      r.style.setProperty('--primary', '40 89% 61%');           // Inkanyezi gold
-      r.style.setProperty('--primary-foreground', '218 58% 10%'); // navy on gold
+      // LIGHT = Inkanyezi brand navy — deep, rich, brand-true
+      // Header remains dark navy so logo and stars stay visible
+      r.style.setProperty('--background',         '218 52% 10%');  // deep navy #0D1E35
+      r.style.setProperty('--foreground',         '40 80% 90%');   // warm gold-white text
+      r.style.setProperty('--card',               '218 47% 13%');  // slightly lighter navy card
+      r.style.setProperty('--muted',              '218 40% 16%');  // muted navy surface
+      r.style.setProperty('--muted-foreground',   '40 50% 65%');   // warm muted gold
+      r.style.setProperty('--border',             '218 35% 22%');  // navy border
+      r.style.setProperty('--primary',            '40 89% 61%');   // Inkanyezi gold
+      r.style.setProperty('--primary-foreground', '218 58% 8%');   // dark navy on gold
     }
   }, [dark]);
 
