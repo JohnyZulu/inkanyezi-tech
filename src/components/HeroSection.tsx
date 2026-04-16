@@ -144,8 +144,8 @@ function GlitchReveal({ text, delay = 0, className = "" }: { text: string; delay
 
 // ── HERO ─────────────────────────────────────────────────────────────────────
 const TYPEWRITER_WORDS = [
-  "signal in the noise", "future you can trust",
-  "answer in the chaos", "edge you've been missing", "automation you need",
+  "the signal in the noise", "the future you can trust",
+  "the answer in the chaos", "the edge you've been missing", "the automation you need",
 ];
 
 const HeroSection = () => {
