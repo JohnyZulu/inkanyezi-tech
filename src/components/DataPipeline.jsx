@@ -196,9 +196,9 @@ function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r
 function bezPts(ax,ay,bx,by,n=22){const mx=(ax+bx)/2,my=(ay+by)/2-Math.abs(bx-ax)*0.1;return Array.from({length:n+1},(_,i)=>{const t=i/n;return{x:(1-t)*(1-t)*ax+2*(1-t)*t*mx+t*t*bx,y:(1-t)*(1-t)*ay+2*(1-t)*t*my+t*t*by};});}
 
 class Particle{
-  constructor(path,delay){this.path=path;this.t=-(delay||0);this.speed=0.004+Math.random()*0.003;this.color=[C.gold,C.rust,C.teal][Math.floor(Math.random()*3)];this.r=3+Math.random()*1.5;}
-  tick(){this.t+=this.speed;if(this.t>1)this.t=-0.25-Math.random()*0.25;}
-  draw(ctx){if(this.t<0)return;const tt=Math.min(this.t,1);const seg=(this.path.length-1)*tt;const i=Math.min(Math.floor(seg),this.path.length-2);const f=seg-i;const px=this.path[i].x+(this.path[i+1].x-this.path[i].x)*f;const py=this.path[i].y+(this.path[i+1].y-this.path[i].y)*f;const op=tt<0.08?tt/0.08:tt>0.92?(1-tt)/0.08:1;ctx.save();ctx.globalAlpha=op*0.9;ctx.beginPath();ctx.arc(px,py,this.r,0,Math.PI*2);ctx.fillStyle=this.color;ctx.shadowColor=this.color;ctx.shadowBlur=9;ctx.fill();ctx.restore();}
+  constructor(path,delay){this.path=path;this.t=-(delay||0);this.speed=0.013+Math.random()*0.007;this.color=[C.gold,C.rust,C.teal][Math.floor(Math.random()*3)];this.r=3+Math.random()*1.5;}
+  tick(){this.t+=this.speed;if(this.t>1)this.t=-0.05-Math.random()*0.08;}
+  draw(ctx){if(this.t<0)return;const tt=Math.min(this.t,1);const seg=(this.path.length-1)*tt;const i=Math.min(Math.floor(seg),this.path.length-2);const f=seg-i;const px=this.path[i].x+(this.path[i+1].x-this.path[i].x)*f;const py=this.path[i].y+(this.path[i+1].y-this.path[i].y)*f;const op=tt<0.08?tt/0.08:tt>0.92?(1-tt)/0.08:1;ctx.globalAlpha=op*0.92;ctx.beginPath();ctx.arc(px,py,this.r,0,Math.PI*2);ctx.fillStyle=this.color;ctx.fill();ctx.globalAlpha=1;}
 }
 
 const INJECTED_CSS=`
@@ -274,31 +274,41 @@ const INJECTED_CSS=`
   letter-spacing:1px;color:#D4A96A;
   min-width:28px;font-weight:600;
 }
-.ink-pills{display:flex;flex-wrap:wrap;gap:6px;}
-.ink-pill{
-  font-size:11px;font-weight:500;
-  padding:7px 13px;border-radius:20px;
-  border:1.5px solid;cursor:pointer;
+.ink-ind-btn{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(58,158,126,.1);
+  border:1.5px solid rgba(58,158,126,.35);
+  border-radius:10px;
+  padding:9px 14px;
+  cursor:pointer;
+  font-size:13px;font-weight:600;
+  color:#3A9E7E;
   font-family:"DM Sans",sans-serif;
-  transition:all .2s;letter-spacing:.3px;
-  min-height:36px;display:flex;align-items:center;
+  transition:background .2s,border-color .2s;
+  width:100%;
+  min-height:44px;
 }
-.ink-pill-off{
-  border-color:rgba(58,158,126,.28);
-  background:rgba(58,158,126,.05);
-  color:rgba(58,158,126,.7);
+.ink-ind-btn:hover{background:rgba(58,158,126,.18);border-color:rgba(58,158,126,.6);}
+.ink-ind-drop{
+  position:absolute;top:calc(100% + 8px);left:0;right:0;
+  z-index:300;
+  background:#0d1e38;
+  border:1.5px solid rgba(58,158,126,.28);
+  border-radius:12px;
+  padding:6px;
+  max-height:260px;overflow-y:auto;
+  box-shadow:0 16px 48px rgba(0,0,0,.8);
 }
-.ink-pill-off:hover{
-  border-color:rgba(58,158,126,.6);
-  background:rgba(58,158,126,.12);
-  color:#3A9E7E;
+.ink-ind-drop::-webkit-scrollbar{width:4px;}
+.ink-ind-drop::-webkit-scrollbar-thumb{background:rgba(58,158,126,.2);border-radius:2px;}
+.ink-ind-item{
+  display:flex;align-items:center;gap:9px;
+  padding:9px 12px;border-radius:8px;
+  cursor:pointer;font-size:12px;
+  transition:background .15s;
 }
-.ink-pill-on{
-  border-color:#3A9E7E;
-  background:rgba(58,158,126,.18);
-  color:#3A9E7E;
-  box-shadow:0 0 10px rgba(58,158,126,.2);
-}
+.ink-ind-item:hover{background:rgba(58,158,126,.1);}
+.ink-ind-item.active{background:rgba(58,158,126,.15);color:#3A9E7E;}
 @media(max-width:600px){
   .ink-ctrl-panel{
     grid-template-columns:1fr;
@@ -308,7 +318,7 @@ const INJECTED_CSS=`
     width:auto;height:1px;
     grid-column:1;
   }
-  .ink-ctrl-col{padding:14px 16px;}
+  .ink-ctrl-col{padding:12px 14px;}
 }
 `;
 
@@ -363,20 +373,45 @@ function LangSelector({activeLang,onSelect}){
   );
 }
 
-function IndustryPills({active,onSelect}){
+function IndustrySelector({activeIndustry,onSelect}){
+  const [open,setOpen]=useState(false);
+  const ref=useRef(null);
+  const cur=INDUSTRIES.find(i=>i.id===activeIndustry)||INDUSTRIES[0];
+  useEffect(()=>{
+    const fn=e=>{if(ref.current&&!ref.current.contains(e.target))setOpen(false);};
+    document.addEventListener("mousedown",fn);
+    return()=>document.removeEventListener("mousedown",fn);
+  },[]);
   return(
-    <div className="ink-pills">
-      {INDUSTRIES.map(ind=>(
-        <button
-          key={ind.id}
-          className={`ink-pill ${ind.id===active?"ink-pill-on":"ink-pill-off"}`}
-          onClick={()=>onSelect(ind.id)}
-          aria-pressed={ind.id===active}
-        >
-          <span style={{marginRight:5,fontSize:13}}>{ind.icon}</span>
-          {ind.label}
-        </button>
-      ))}
+    <div ref={ref} style={{position:"relative",width:"100%"}}>
+      <button
+        className="ink-ind-btn"
+        onClick={()=>setOpen(o=>!o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span style={{fontSize:16}}>{cur.icon}</span>
+        <span style={{flex:1,textAlign:"left"}}>{cur.label}</span>
+        <span style={{fontSize:11,opacity:.55,transform:open?"rotate(180deg)":"rotate(0deg)",transition:"transform .2s",display:"inline-block"}}>▾</span>
+      </button>
+      {open&&(
+        <div className="ink-ind-drop" role="listbox">
+          {INDUSTRIES.map(ind=>(
+            <div
+              key={ind.id}
+              role="option"
+              aria-selected={ind.id===activeIndustry}
+              className={`ink-ind-item${ind.id===activeIndustry?" active":""}`}
+              onClick={()=>{onSelect(ind.id);setOpen(false);}}
+              style={{color:ind.id===activeIndustry?C.teal:"rgba(250,246,238,.75)"}}
+            >
+              <span style={{fontSize:15}}>{ind.icon}</span>
+              <span style={{flex:1}}>{ind.label}</span>
+              {ind.id===activeIndustry&&<span style={{color:C.teal,fontSize:12}}>✓</span>}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -437,7 +472,7 @@ export default function DataPipeline(){
     else{const pX=64,gap=(W-pX*2)/(STAGES.length-1);STAGES.forEach((_,i)=>pos.push({x:pX+gap*i,y:H/2}));}
     return pos;
   }
-  function buildParticles(np){const p=[];for(let i=0;i<STAGES.length-1;i++){const path=bezPts(np[i].x,np[i].y,np[i+1].x,np[i+1].y);for(let k=0;k<3;k++)p.push(new Particle(path,k*0.33));}return p;}
+  function buildParticles(np){const p=[];for(let i=0;i<STAGES.length-1;i++){const path=bezPts(np[i].x,np[i].y,np[i+1].x,np[i+1].y);for(let k=0;k<5;k++)p.push(new Particle(path,k*0.18));}return p;}
 
   function drawNode(ctx,node,pos,NW,NH,isActive,isHover){
     if(!pos)return;const{x,y}=pos,isDark=node.dark,R=11;
@@ -466,7 +501,7 @@ export default function DataPipeline(){
     const NW=s.W<500?60:68,NH=s.W<500?60:68;
     STAGES.forEach((node,i)=>{if(i!==s.activeNode)drawNode(ctx,node,s.nodePos[i],NW,NH,false,i===s.hoverNode);});
     if(s.activeNode>=0)drawNode(ctx,STAGES[s.activeNode],s.nodePos[s.activeNode],NW,NH,true,false);
-    s.raf=requestAnimationFrame(drawFrame);
+    if(s.raf!==null) s.raf=requestAnimationFrame(drawFrame);
   },[]);
 
   const handleResize=useCallback(()=>{
@@ -496,19 +531,37 @@ export default function DataPipeline(){
 
   useEffect(()=>{
     if(!document.getElementById("ink-dp-css")){const el=document.createElement("style");el.id="ink-dp-css";el.textContent=INJECTED_CSS;document.head.appendChild(el);}
-    handleResize();sr.current.raf=requestAnimationFrame(drawFrame);
+    handleResize();
+
+    // Only run RAF when section is visible — prevents scroll jank
+    const observer=new IntersectionObserver(entries=>{
+      const s=sr.current;
+      if(entries[0].isIntersecting){
+        if(!s.raf) s.raf=requestAnimationFrame(drawFrame);
+      } else {
+        if(s.raf){cancelAnimationFrame(s.raf);s.raf=null;}
+      }
+    },{threshold:0.01});
+    const section=canvasRef.current?.closest("section");
+    if(section) observer.observe(section);
+
     let timer;const onR=()=>{clearTimeout(timer);timer=setTimeout(handleResize,130);};window.addEventListener("resize",onR);
-    return()=>{cancelAnimationFrame(sr.current.raf);window.removeEventListener("resize",onR);};
+    return()=>{
+      const s=sr.current;
+      if(s.raf){cancelAnimationFrame(s.raf);s.raf=null;}
+      observer.disconnect();
+      window.removeEventListener("resize",onR);
+    };
   },[drawFrame,handleResize]);
 
   useEffect(()=>{if(sr.current.activeNode>=0)openTooltip(sr.current.activeNode);},[activeLang,activeIndustry]);
 
   return(
-    <section id="how-it-works" style={{width:"100%",padding:"60px 0",fontFamily:"'DM Sans',sans-serif"}}>
+    <section id="how-it-works" style={{width:"100%",padding:"40px 0",fontFamily:"'DM Sans',sans-serif"}}>
       <div style={{maxWidth:1200,margin:"0 auto",padding:"0 16px"}}>
         <div style={{borderRadius:16,overflow:"hidden"}}>
           <div style={{height:9,background:S_TOP}}/>
-          <div style={{background:C.night,padding:"22px 20px 20px",position:"relative",overflow:"hidden"}}>
+          <div style={{background:C.night,padding:"16px 20px 14px",position:"relative",overflow:"hidden"}}>
             <div style={{position:"absolute",inset:0,opacity:.04,backgroundImage:ADINKRA,pointerEvents:"none"}}/>
 
             {/* Title */}
@@ -522,7 +575,7 @@ export default function DataPipeline(){
             </h2>
 
             {/* Interaction hint */}
-            <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(244,185,66,.1)",border:"1px solid rgba(244,185,66,.25)",borderRadius:20,padding:"5px 14px",marginBottom:18}}>
+            <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(244,185,66,.1)",border:"1px solid rgba(244,185,66,.25)",borderRadius:20,padding:"4px 12px",marginBottom:12}}>
               <div className="ink-hint" style={{width:7,height:7,borderRadius:"50%",background:C.gold,flexShrink:0}}/>
               <span style={{fontSize:11,color:C.sand,letterSpacing:.4,fontWeight:500}}>
                 Tap any node to explore — available in all 11 SA official languages
@@ -550,7 +603,7 @@ export default function DataPipeline(){
                   <div className="ink-ctrl-icon ink-ctrl-icon-ind">🏢</div>
                   <span>Show pipeline for your industry</span>
                 </div>
-                <IndustryPills active={activeIndustry} onSelect={setActiveIndustry}/>
+                <IndustrySelector activeIndustry={activeIndustry} onSelect={setActiveIndustry}/>
               </div>
 
             </div>
