@@ -214,11 +214,13 @@ const INJECTED_CSS=`
   background:rgba(255,255,255,0.03);
   border:1.5px solid rgba(244,185,66,0.2);
   border-radius:14px;
-  overflow:hidden;
+  overflow:visible;
   animation:ctrlGlow 3s ease-in-out infinite;
+  position:relative;
+  z-index:10;
 }
 .ink-ctrl-divider{background:rgba(244,185,66,0.12);width:1px;align-self:stretch;}
-.ink-ctrl-col{padding:14px 18px;display:flex;flex-direction:column;gap:10px;}
+.ink-ctrl-col{padding:14px 18px;display:flex;flex-direction:column;gap:10px;position:relative;}
 .ink-ctrl-col:first-child{border-right:none;}
 .ink-ctrl-heading{
   display:flex;align-items:center;gap:7px;
