@@ -292,12 +292,6 @@ const CSS=`
 @keyframes inkHint{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.6)}}
 @keyframes detailIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes nodeGlow{0%,100%{opacity:.5}50%{opacity:1}}
-/* Mobile particle dots flowing down the zig-zag pipes */
-@keyframes flowDown{0%{top:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
-.ink-zz-ptcl{position:absolute;width:8px;height:8px;border-radius:50%;left:calc(50% - 4px);animation:flowDown 1.2s ease-in-out infinite;}
-.ink-zz-ptcl.p1{background:#F4B942;animation-delay:0s;}
-.ink-zz-ptcl.p2{background:#C0451A;animation-delay:.4s;}
-.ink-zz-ptcl.p3{background:#3A9E7E;animation-delay:.8s;}
 .ink-hint-dot{animation:inkHint 1.4s ease-in-out infinite;}
 
 /* Controls panel */
@@ -377,97 +371,57 @@ const CSS=`
 .ink-detail{animation:detailIn .28s ease forwards;}
 .ink-detail-accent{height:4px;border-radius:4px 4px 0 0;}
 
-/* Node grid — desktop: single row */
+/* ── Node grid ────────────────────────────────────────────────────────
+   Desktop: 6 equal columns, single row
+   Mobile ≤640px: 2-column grid, nodes offset to create zig-zag
+──────────────────────────────────────────────────────────────────── */
 .ink-pipe-grid{
   display:grid;
   grid-template-columns:repeat(6,1fr);
-  padding:32px 8px 28px;
-  gap:0;
+  padding:36px 12px 32px;
   width:100%;
+  position:relative;
+  z-index:2;
 }
 
-/* ── Mobile zig-zag ─────────────────────────────────────────────────── */
+/* Mobile — 2 columns, staggered */
 @media(max-width:640px){
   .ink-pipe-grid{
-    display:flex;
-    flex-direction:column;
-    padding:16px 0 16px;
-    gap:0;
+    grid-template-columns:1fr 1fr;
+    row-gap:0;
+    padding:24px 8px 24px;
   }
-  /* Each node row alternates left / right */
-  .ink-zigzag-row{
-    display:flex;
-    align-items:center;
-    padding:0 20px;
-    min-height:110px;
-    position:relative;
-    margin-bottom:8px;
-  }
-  .ink-zigzag-row.zz-left{ justify-content:flex-start; }
-  .ink-zigzag-row.zz-right{ justify-content:flex-end; }
+  /* Node 1: left col */
+  .ink-node-cell:nth-child(1){ grid-column:1; padding:12px 8px 40px; }
+  /* Node 2: right col, same row */
+  .ink-node-cell:nth-child(2){ grid-column:2; padding:12px 8px 40px; }
+  /* Node 3: left col, row 2 */
+  .ink-node-cell:nth-child(3){ grid-column:1; padding:12px 8px 40px; }
+  /* Node 4: right col, row 2 */
+  .ink-node-cell:nth-child(4){ grid-column:2; padding:12px 8px 40px; }
+  /* Node 5: left col, row 3 */
+  .ink-node-cell:nth-child(5){ grid-column:1; padding:12px 8px 16px; }
+  /* Node 6: right col, row 3 */
+  .ink-node-cell:nth-child(6){ grid-column:2; padding:12px 8px 16px; }
 
-  /* Vertical connector pipe between nodes — tall enough for particles */
-  .ink-zz-pipe{
-    position:absolute;
-    left:50%;transform:translateX(-50%);
-    width:2px;
-    background:rgba(212,169,106,0.22);
-    bottom:-30px;
-    height:34px;
-    z-index:3;
-    overflow:visible;
-  }
-  .ink-zz-pipe::after{
-    content:'';
-    position:absolute;
-    bottom:-6px;left:50%;transform:translateX(-50%);
-    width:0;height:0;
-    border-left:5px solid transparent;
-    border-right:5px solid transparent;
-    border-top:8px solid rgba(244,185,66,0.55);
-  }
-
-  /* Inline detail panel between nodes */
-  .ink-zz-detail{
-    width:100%;
-    padding:0 12px;
-    margin:-4px 0 4px;
-    animation:detailIn .28s ease forwards;
-  }
-
-  /* Node card smaller on mobile */
   .ink-node-card{width:62px;height:62px;border-radius:14px;}
   .ink-node-card:hover{transform:perspective(280px) rotateX(10deg) rotateY(-6deg);}
   .ink-node-svg{width:26px;height:26px;}
-  .ink-node-name{font-size:8px;max-width:68px;margin-top:6px;}
-  .ink-node-tool{font-size:7px;max-width:68px;}
-  .ink-node-active-badge{font-size:6px;padding:2px 6px;}
-  .ink-node-wrap{padding:8px 10px;}
+  .ink-node-name{font-size:8px;max-width:70px;margin-top:6px;}
+  .ink-node-tool{font-size:7px;max-width:70px;}
+  .ink-node-active-badge{font-size:6.5px;padding:2px 7px;}
+  .ink-node-wrap{padding:8px 6px;}
 
-  /* Hide desktop detail anchors on mobile — panels render inline */
-  .ink-desktop-detail{ display:none; }
-}
-
-/* Desktop — hide mobile zig-zag elements */
-@media(min-width:641px){
-  .ink-zigzag-row{ display:contents; }
-  .ink-zz-pipe{ display:none; }
-  .ink-zz-detail{ display:none; }
-  .ink-mobile-detail{ display:none; }
-}
-
-@media(max-width:400px){
-  .ink-node-card{width:56px;height:56px;border-radius:12px;}
-  .ink-node-svg{width:22px;height:22px;}
-  .ink-node-name{font-size:7.5px;max-width:62px;}
-  .ink-node-wrap{padding:6px 8px;}
-}
-
-/* Mobile */
-@media(max-width:600px){
   .ink-ctrl{grid-template-columns:1fr;grid-template-rows:auto 1px auto;}
   .ink-ctrl-div{width:auto;height:1px;grid-column:1;}
   .ink-ctrl-col{padding:10px 12px;}
+}
+
+@media(max-width:400px){
+  .ink-node-card{width:54px;height:54px;border-radius:12px;}
+  .ink-node-svg{width:22px;height:22px;}
+  .ink-node-name{font-size:7.5px;max-width:60px;}
+  .ink-node-wrap{padding:6px 4px;}
 }
 `;
 
@@ -698,9 +652,8 @@ export default function DataPipeline(){
   const [activeNode,     setActiveNode]     = useState(-1);
   const [nodePositions,  setNodePositions]  = useState([]);
 
-  // Measure node DOM positions after render and feed to canvas
+  // Measure node DOM positions and feed to canvas (works on all screen sizes)
   const measureNodes = useCallback(()=>{
-    if(window.innerWidth<=640) return; // mobile uses zig-zag, no canvas pipes
     if(!pipeRef.current||!wrapRef.current)return;
     const wrapRect = wrapRef.current.getBoundingClientRect();
     const nodeEls  = pipeRef.current.querySelectorAll(".ink-node-card");
@@ -713,25 +666,24 @@ export default function DataPipeline(){
         y: r.top  - wrapRect.top  + r.height/2,
       });
     });
-    // display:contents renders NodeCard twice (desktop + mobile spans) — dedupe
-    const finalPos = positions.length === NODES_DEF.length*2
-      ? positions.filter((_,idx)=>idx%2===0)
-      : positions;
     const s = sr.current;
-    s.pipes = finalPos;
+    s.pipes = positions;
     // Sync canvas height to actual wrapper height
     const cvs = canvasRef.current;
     if(cvs){
       const DPR = s.DPR||1;
-      const H   = wrapRef.current.getBoundingClientRect().height||200;
+      const H = wrapRef.current.getBoundingClientRect().height||200;
       s.H = H;
-      cvs.height = H * DPR;
-      cvs.style.height = H + "px";
+      cvs.height = H*DPR;
+      cvs.style.height = H+"px";
       cvs.getContext("2d").setTransform(DPR,0,0,DPR,0,0);
     }
+    // Particles travel right→left going down (from node i+1 back toward node i direction)
+    // On desktop all nodes are same Y so this is purely right→left
+    // On mobile 2-col grid nodes alternate L/R, creating diagonal right→left-down flow
     const ptcls = [];
-    for(let i=0;i<finalPos.length-1;i++){
-      const path=bezPts(finalPos[i].x,finalPos[i].y,finalPos[i+1].x,finalPos[i+1].y);
+    for(let i=0;i<positions.length-1;i++){
+      const path=bezPts(positions[i].x,positions[i].y,positions[i+1].x,positions[i+1].y);
       for(let k=0;k<5;k++) ptcls.push(new Particle(path,k*0.18));
     }
     s.particles = ptcls;
@@ -827,15 +779,7 @@ export default function DataPipeline(){
     setActiveNode(next);
     sr.current.activeNode=next;
     setTimeout(()=>{
-      // On mobile, the inline detail panel renders after the node — scroll to it
-      const isMobile = window.innerWidth<=640;
-      if(isMobile){
-        // Find the zig-zag detail that just appeared
-        const details = document.querySelectorAll(".ink-zz-detail");
-        if(details.length>0) details[0].scrollIntoView({behavior:"smooth",block:"nearest"});
-      } else {
-        document.getElementById("ink-detail-anchor")?.scrollIntoView({behavior:"smooth",block:"nearest"});
-      }
+      document.getElementById("ink-detail-anchor")?.scrollIntoView({behavior:"smooth",block:"nearest"});
     },80);
   }
 
@@ -886,68 +830,30 @@ export default function DataPipeline(){
 
           <div style={{height:6,background:S_KEN}}/>
 
-          {/* ── Pipeline area ────────────────────────────────────────────
-              Desktop: canvas behind + 6-col grid
-              Mobile:  zig-zag column, canvas hidden, inline detail panels
-          ─────────────────────────────────────────────────────────────── */}
+          {/* Pipeline area — canvas behind HTML nodes */}
           <div ref={wrapRef} style={{background:C.night,position:"relative"}}>
-
-            {/* Canvas — pipes + particles. Visible desktop only. */}
             <canvas
               ref={canvasRef}
-              style={{
-                position:"absolute",inset:0,
-                width:"100%",height:"100%",
-                pointerEvents:"none",zIndex:1,
-              }}
+              style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:1}}
             />
-
-            {/* Node container */}
+            {/* Single render of each node — no duplication */}
             <div ref={pipeRef} className="ink-pipe-grid">
-
-              {NODES_DEF.map((node,i)=>{
-                const isActive = activeNode===i;
-                const isLast   = i===NODES_DEF.length-1;
-                const zigDir   = i%2===0 ? "zz-left" : "zz-right";
-
-                return (
-                  <span key={node.id} style={{display:"contents"}}>
-
-                    {/* ── Desktop node (sits in grid cell) ── */}
-                    <span className="ink-desktop-node" style={{display:"contents"}}>
-                      <NodeCard node={node} isActive={isActive} onClick={()=>toggleNode(i)}/>
-                    </span>
-
-                    {/* ── Mobile zig-zag row ── */}
-                    <div className={`ink-zigzag-row ${zigDir}`}>
-                      <NodeCard node={node} isActive={isActive} onClick={()=>toggleNode(i)}/>
-                      {!isLast&&(
-                        <div className="ink-zz-pipe">
-                          <div className="ink-zz-ptcl p1"/>
-                          <div className="ink-zz-ptcl p2"/>
-                          <div className="ink-zz-ptcl p3"/>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Inline detail panel — mobile only — appears after tapped node */}
-                    {isActive&&(
-                      <div className="ink-zz-detail">
-                        <DetailPanel stageIdx={i} industry={activeIndustry} lang={activeLang}/>
-                      </div>
-                    )}
-
-                  </span>
-                );
-              })}
-
+              {NODES_DEF.map((node,i)=>(
+                <div key={node.id} className="ink-node-cell" style={{display:"flex",justifyContent:"center"}}>
+                  <NodeCard
+                    node={node}
+                    isActive={activeNode===i}
+                    onClick={()=>toggleNode(i)}
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
           <div style={{height:6,background:S_KEN}}/>
 
-          {/* ── Desktop detail panel — always in DOM below pipeline ── */}
-          <div className="ink-desktop-detail" id="ink-detail-anchor" style={{background:C.night,padding:"12px 16px 16px"}}>
+          {/* Detail panel — below pipeline on all screen sizes */}
+          <div id="ink-detail-anchor" style={{background:C.night,padding:"12px 16px 16px"}}>
             <DetailPanel stageIdx={activeNode} industry={activeIndustry} lang={activeLang}/>
           </div>
 
