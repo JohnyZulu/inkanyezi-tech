@@ -251,7 +251,7 @@ const INJECTED_CSS=`
 .ink-lang-btn:hover{background:rgba(244,185,66,.18);border-color:rgba(244,185,66,.6);}
 .ink-lang-drop{
   position:absolute;top:calc(100% + 8px);left:0;right:0;
-  z-index:300;
+  z-index:9999;
   background:#0d1e38;
   border:1.5px solid rgba(244,185,66,.28);
   border-radius:12px;
@@ -291,7 +291,7 @@ const INJECTED_CSS=`
 .ink-ind-btn:hover{background:rgba(58,158,126,.18);border-color:rgba(58,158,126,.6);}
 .ink-ind-drop{
   position:absolute;top:calc(100% + 8px);left:0;right:0;
-  z-index:300;
+  z-index:9999;
   background:#0d1e38;
   border:1.5px solid rgba(58,158,126,.28);
   border-radius:12px;
@@ -495,7 +495,6 @@ export default function DataPipeline(){
     const ctx=cvs.getContext("2d");const{W,H}=s;ctx.clearRect(0,0,W,H);
     if(W>=800){ctx.fillStyle=C.night;ctx.fillRect(0,0,W/2,H);ctx.fillStyle=C.cream;ctx.fillRect(W/2,0,W/2,H);const fade=ctx.createLinearGradient(W/2-48,0,W/2+48,0);fade.addColorStop(0,"rgba(10,22,40,0.55)");fade.addColorStop(1,"rgba(240,232,213,0.55)");ctx.fillStyle=fade;ctx.fillRect(W/2-48,0,96,H);}
     else{ctx.fillStyle=C.night;ctx.fillRect(0,0,W,H);}
-    ctx.save();ctx.globalAlpha=0.025;for(let gx=0;gx<W;gx+=28)for(let gy=0;gy<H;gy+=28){ctx.beginPath();ctx.arc(gx,gy,0.7,0,Math.PI*2);ctx.fillStyle=gx<W/2?"#F4B942":"#C0451A";ctx.fill();}ctx.restore();
     for(let i=0;i<STAGES.length-1;i++){const a=s.nodePos[i],b=s.nodePos[i+1];if(!a||!b)continue;const mx=(a.x+b.x)/2,my=(a.y+b.y)/2-Math.abs(b.x-a.x)*0.1;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(mx,my,b.x,b.y);ctx.strokeStyle="rgba(212,169,106,0.18)";ctx.lineWidth=2.5;ctx.setLineDash([7,6]);ctx.stroke();ctx.setLineDash([]);const t2=0.91;const px2=(1-t2)*(1-t2)*a.x+2*(1-t2)*t2*mx+t2*t2*b.x;const py2=(1-t2)*(1-t2)*a.y+2*(1-t2)*t2*my+t2*t2*b.y;const ang=Math.atan2(b.y-py2,b.x-px2);ctx.save();ctx.translate(b.x,b.y);ctx.rotate(ang);ctx.beginPath();ctx.moveTo(-11,-5);ctx.lineTo(0,0);ctx.lineTo(-11,5);ctx.strokeStyle="rgba(244,185,66,0.55)";ctx.lineWidth=2;ctx.lineJoin="round";ctx.stroke();ctx.restore();}
     s.particles.forEach(p=>{p.tick();p.draw(ctx);});
     const NW=s.W<500?60:68,NH=s.W<500?60:68;
@@ -527,7 +526,7 @@ export default function DataPipeline(){
   function onClick(e){const idx=getNodeAt(e.clientX,e.clientY);openTooltip(idx===sr.current.activeNode?-1:idx);}
   function onMove(e){const idx=getNodeAt(e.clientX,e.clientY);sr.current.hoverNode=idx;canvasRef.current.style.cursor=idx>=0?"pointer":"default";}
   function onLeave(){sr.current.hoverNode=-1;}
-  function onTouch(e){e.preventDefault();const t=e.changedTouches[0];const idx=getNodeAt(t.clientX,t.clientY);openTooltip(idx===sr.current.activeNode?-1:idx);}
+  function onTouch(e){const t=e.changedTouches[0];const idx=getNodeAt(t.clientX,t.clientY);if(idx>=0){openTooltip(idx===sr.current.activeNode?-1:idx);}}
 
   useEffect(()=>{
     if(!document.getElementById("ink-dp-css")){const el=document.createElement("style");el.id="ink-dp-css";el.textContent=INJECTED_CSS;document.head.appendChild(el);}
@@ -559,20 +558,22 @@ export default function DataPipeline(){
   return(
     <section id="how-it-works" style={{width:"100%",padding:"40px 0",fontFamily:"'DM Sans',sans-serif"}}>
       <div style={{maxWidth:1200,margin:"0 auto",padding:"0 16px"}}>
-        <div style={{borderRadius:16,overflow:"hidden"}}>
+        <div style={{borderRadius:16,overflow:"visible"}}>
           <div style={{height:9,background:S_TOP}}/>
-          <div style={{background:C.night,padding:"16px 20px 14px",position:"relative",overflow:"hidden"}}>
+          <div style={{background:C.night,padding:"16px 20px 14px",position:"relative",zIndex:10}}>
             <div style={{position:"absolute",inset:0,opacity:.04,backgroundImage:ADINKRA,pointerEvents:"none"}}/>
 
-            {/* Title */}
-            <p style={{fontFamily:"'Cinzel',serif",fontSize:9,letterSpacing:4,color:C.sand,textTransform:"uppercase",marginBottom:5,opacity:.8}}>
-              Inkanyezi Technologies — Signal Architecture
+            {/* Header text */}
+            <p style={{fontFamily:"'Cinzel',serif",fontSize:9,letterSpacing:4,color:C.sand,textTransform:"uppercase",marginBottom:6,opacity:.8}}>
+              How Inkanyezi Works
             </p>
-            <h2 style={{fontFamily:"'Cinzel',serif",fontSize:"clamp(16px,3.5vw,22px)",fontWeight:700,color:C.ivory,lineHeight:1.2,margin:"0 0 10px"}}>
-              We are the{" "}
-              <em style={{fontStyle:"italic",fontFamily:"'Cormorant Garamond',serif",color:C.gold,fontSize:"clamp(18px,4vw,26px)",fontWeight:300}}>signal</em>
-              {" "}in the noise
+            <h2 style={{fontFamily:"'Cinzel',serif",fontSize:"clamp(15px,3vw,20px)",fontWeight:700,color:C.ivory,lineHeight:1.25,margin:"0 0 6px"}}>
+              Your business runs on{" "}
+              <em style={{fontStyle:"italic",fontFamily:"'Cormorant Garamond',serif",color:C.gold,fontSize:"clamp(17px,3.5vw,23px)",fontWeight:300}}>autopilot</em>
             </h2>
+            <p style={{fontFamily:"'DM Sans',sans-serif",fontSize:"clamp(11px,1.8vw,13px)",color:"rgba(250,246,238,0.55)",lineHeight:1.65,margin:"0 0 12px",maxWidth:560}}>
+              Every enquiry — WhatsApp, website, phone or walk-in — is automatically captured, sorted, responded to and tracked. No missed leads. No manual admin. Select your industry below to see exactly how it works for your business.
+            </p>
 
             {/* Interaction hint */}
             <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(244,185,66,.1)",border:"1px solid rgba(244,185,66,.25)",borderRadius:20,padding:"4px 12px",marginBottom:12}}>
@@ -610,7 +611,7 @@ export default function DataPipeline(){
           </div>
           <div style={{height:6,background:S_KEN}}/>
           <div ref={wrapRef} style={{position:"relative",width:"100%",background:C.night}}>
-            <canvas ref={canvasRef} style={{display:"block",width:"100%",height:"auto",touchAction:"none"}} onClick={onClick} onMouseMove={onMove} onMouseLeave={onLeave} onTouchEnd={onTouch}/>
+            <canvas ref={canvasRef} style={{display:"block",width:"100%",height:"auto",touchAction:"manipulation"}} onClick={onClick} onMouseMove={onMove} onMouseLeave={onLeave} onTouchEnd={onTouch}/>
             {ttState&&<Tooltip node={ttState.node} industry={activeIndustry} lang={activeLang} pos={ttState.pos} arrowLeft={ttState.arrowLeft}/>}
           </div>
           <div style={{height:6,background:S_KEN}}/>
