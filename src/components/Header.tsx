@@ -226,7 +226,7 @@ const Header = ({ dark, setDark }: HeaderProps) => {
         <div style={{
           maxWidth: 1280, margin: '0 auto',
           padding: '0 clamp(14px, 4vw, 28px)',
-          height: 'clamp(68px, 10vw, 100px)',
+          height: 'clamp(82px, 11vw, 100px)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
           overflow: 'visible',
         }}>
@@ -236,12 +236,12 @@ const Header = ({ dark, setDark }: HeaderProps) => {
             style={{ textDecoration: 'none', flexShrink: 0, display: 'block', overflow: 'visible' }}>
             <div style={{
               background: dark ? 'transparent' : 'rgba(10,22,40,0.96)', borderRadius: 10,
-              padding: dark ? '0' : 'clamp(4px,1vw,6px) clamp(6px,1.5vw,10px)',
+              padding: dark ? '0' : 'clamp(5px,1vw,6px) clamp(8px,1.5vw,10px)',
               transition: 'background 0.3s ease', display: 'inline-block',
               boxShadow: dark ? 'none' : '0 2px 16px rgba(10,22,40,0.25)',
             }}>
               <img src="/inkanyezi-logo-transparent-BRuYXriy.png" alt="Inkanyezi Technologies"
-                style={{ height: 'clamp(54px, 9vw, 110px)', width: 'auto', display: 'block' }} />
+                style={{ height: 'clamp(80px, 10vw, 110px)', width: 'auto', display: 'block' }} />
             </div>
           </a>
 
@@ -270,7 +270,7 @@ const Header = ({ dark, setDark }: HeaderProps) => {
             borderTop: dark ? '1px solid rgba(244,185,66,0.10)' : '1px solid rgba(10,22,40,0.08)',
             padding: `8px clamp(16px,5vw,28px) 0`,
             paddingBottom: 'max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px))',
-            maxHeight: 'calc(100dvh - clamp(68px,10vw,100px))',
+            maxHeight: 'calc(100dvh - clamp(82px,11vw,100px))',
             overflowY: 'auto',
           }}>
 
