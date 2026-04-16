@@ -1111,39 +1111,102 @@ function WhatsAppWidget() {
 // MAIN PAGE
 // ════════════════════════════════════════════════════════════════════
 const Index = () => {
-  const [dark, setDark] = useState(true);
-
-  useEffect(() => {
-    if (localStorage.getItem('ink_site_theme') === 'light') setDark(false);
-  }, []);
+  // ── Default is ALWAYS dark unless the user explicitly toggled to light ──
+  // We deliberately ignore the OS prefers-color-scheme so the brand
+  // Afrofuturist dark aesthetic is always the first impression.
+  const [dark, setDark] = useState(() => {
+    // On first load: dark unless user previously chose light
+    const saved = typeof window !== 'undefined'
+      ? localStorage.getItem('ink_site_theme')
+      : null;
+    return saved !== 'light'; // 'dark', null, or anything else → dark
+  });
 
   useEffect(() => {
     const r = document.documentElement;
+
+    // Lock color-scheme so the browser never applies its own dark/light
+    // overrides on form controls, scrollbars, etc.
+    r.style.colorScheme = 'dark';
+
     if (dark) {
       r.classList.add('dark');
       r.style.setProperty('--background', '222 47% 6%');
       r.style.setProperty('--foreground', '210 40% 98%');
-      r.style.setProperty('--card', '222 47% 8%');
-      r.style.setProperty('--muted', '217 33% 12%');
+      r.style.setProperty('--card',       '222 47% 8%');
+      r.style.setProperty('--muted',      '217 33% 12%');
       r.style.setProperty('--muted-foreground', '215 20% 60%');
-      r.style.setProperty('--border', '217 33% 16%');
+      r.style.setProperty('--border',     '217 33% 16%');
+      // Restore primary to gold in dark mode (may have been overwritten)
+      r.style.setProperty('--primary',            '40 89% 61%');
+      r.style.setProperty('--primary-foreground', '218 58% 8%');
+      r.style.setProperty('--accent',             '17 100% 60%');
     } else {
       r.classList.remove('dark');
-      // LIGHT = warm white canvas with Inkanyezi navy text + gold accents
-      // Cream-white background so stars and logo look premium
-      r.style.setProperty('--background',         '40 30% 97%');   // warm cream #FAF8F4
-      r.style.setProperty('--foreground',         '218 58% 10%');  // midnight navy #0A1628
-      r.style.setProperty('--card',               '0 0% 100%');    // pure white cards
-      r.style.setProperty('--muted',              '218 20% 94%');  // very light navy tint
-      r.style.setProperty('--muted-foreground',   '218 30% 40%');  // muted navy text
-      r.style.setProperty('--border',             '218 20% 85%');  // light navy border
-      r.style.setProperty('--primary',            '40 89% 61%');   // Inkanyezi gold
-      r.style.setProperty('--primary-foreground', '218 58% 8%');   // dark navy on gold
+      r.style.colorScheme = 'light';
+      // LIGHT = warm cream canvas, Inkanyezi navy text, gold accents
+      r.style.setProperty('--background',         '40 30% 97%');
+      r.style.setProperty('--foreground',         '218 58% 10%');
+      r.style.setProperty('--card',               '0 0% 100%');
+      r.style.setProperty('--muted',              '218 20% 94%');
+      r.style.setProperty('--muted-foreground',   '218 30% 40%');
+      r.style.setProperty('--border',             '218 20% 85%');
+      r.style.setProperty('--primary',            '40 89% 61%');
+      r.style.setProperty('--primary-foreground', '218 58% 8%');
+      r.style.setProperty('--accent',             '17 100% 60%');
     }
   }, [dark]);
 
   return (
     <div className="min-h-screen bg-background text-foreground relative">
+      {/* ── BRAND COLOUR LOCK ─────────────────────────────────────────────
+          Prevent iOS/Android/Windows from overriding Inkanyezi gold, orange,
+          navy with their own dark/light/forced-colour themes.
+          forced-colors: active = Windows High Contrast mode — we keep our colours.
+          prefers-color-scheme: we explicitly set everything via JS above so
+          Tailwind/CSS variables always win over browser UA defaults.
+      ──────────────────────────────────────────────────────────────────── */}
+      <style>{`
+        /* Never let the browser invert or override brand colours */
+        @media (forced-colors: active) {
+          :root {
+            forced-color-adjust: none;
+          }
+          .gradient-gold, .gradient-gold-text,
+          [class*="glow-gold"], [class*="border-gold"],
+          .ink-btn-primary, .ink-book, .ink-mobile-cta {
+            forced-color-adjust: none !important;
+          }
+        }
+
+        /* Lock the scrollbar and form controls to dark regardless of OS */
+        :root {
+          color-scheme: dark;
+        }
+        .dark :root, .dark {
+          color-scheme: dark;
+        }
+        /* When user picks light, allow light controls but keep brand colours */
+        html:not(.dark) {
+          color-scheme: light;
+        }
+
+        /* Prevent iOS text-size-adjust on orientation change */
+        html {
+          -webkit-text-size-adjust: 100%;
+          text-size-adjust: 100%;
+        }
+
+        /* Prevent iOS from turning phone numbers / addresses blue */
+        a[href^="tel"], a[href^="mailto"] {
+          color: inherit;
+          text-decoration: inherit;
+        }
+        /* Override iOS tap callout on non-links */
+        [style*="cursor: pointer"], button, a {
+          -webkit-touch-callout: none;
+        }
+      `}</style>
       <CustomCursor />
       <GlobalStarfield />
       <ShootingStars />
