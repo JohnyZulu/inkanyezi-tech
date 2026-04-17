@@ -486,7 +486,7 @@ export default function SolutionSection() {
   }, []);
 
   return (
-    <section style={{
+    <section id="services" style={{
       width: "100%",
       background: "var(--sol-bg)",
       padding: "80px 0 90px",
