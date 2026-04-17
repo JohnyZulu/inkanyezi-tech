@@ -4,6 +4,7 @@
 // Architecture: Automate (Workflow + AI Agents + Voice Agents) · Learn · Grow
 
 import { useEffect, useRef, useState } from "react";
+id="services"
 
 // ── Brand colours — constant across both modes ────────────────────────────────
 const B = {
