@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import ProblemSection from "@/components/ProblemSection";
 import SolutionSection from "@/components/SolutionSection";
-import HowItWorks from "@/components/HowItWorks";
+import DataPipeline from "@/components/DataPipeline";
 import ROICalculator from "@/components/ROICalculator";
 import ChatDemoFixed from "@/components/ChatDemoFixed";
 import PhilosophySection from "@/components/PhilosophySection";
@@ -1217,7 +1217,7 @@ const Index = () => {
           <HeroSection />
           <ProblemSection />
           <SolutionSection />
-          <HowItWorks />
+          <DataPipeline />
           <ROICalculator />
           <ChatDemoFixed />
           <PhilosophySection />
