@@ -1015,7 +1015,7 @@ export default function DataPipeline(){
         </div>
       </div>
     </section>
-  );
+
 }import { useEffect, useRef, useState, useCallback } from "react";
 
 // ─── Palette ──────────────────────────────────────────────────────────────────
