@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import ProblemSection from "@/components/ProblemSection";
 import SolutionSection from "@/components/SolutionSection";
-import DataPipeline from "@/components/DataPipeline";
+import HowItWorks from "@/components/HowItWorks";
 import ROICalculator from "@/components/ROICalculator";
 import ChatDemoFixed from "@/components/ChatDemoFixed";
 import PhilosophySection from "@/components/PhilosophySection";
@@ -1144,16 +1144,17 @@ const Index = () => {
     } else {
       r.classList.remove('dark');
       r.style.colorScheme = 'light';
-      // LIGHT = warm cream canvas, Inkanyezi navy text, gold accents
-      r.style.setProperty('--background',         '40 30% 97%');
-      r.style.setProperty('--foreground',         '218 58% 10%');
-      r.style.setProperty('--card',               '0 0% 100%');
-      r.style.setProperty('--muted',              '218 20% 94%');
-      r.style.setProperty('--muted-foreground',   '218 30% 40%');
-      r.style.setProperty('--border',             '218 20% 85%');
-      r.style.setProperty('--primary',            '40 89% 61%');
+      // LIGHT = steel-grey canvas — makes gold, orange & teal brand colours
+      // vibrate against the neutral background instead of disappearing into cream
+      r.style.setProperty('--background',         '216 18% 88%');  // #D8DFE8 — cool light grey
+      r.style.setProperty('--foreground',         '218 58% 10%');  // Midnight navy text
+      r.style.setProperty('--card',               '216 20% 94%');  // #EBEEf3 — slightly lighter grey for cards
+      r.style.setProperty('--muted',              '216 18% 82%');  // one shade darker for muted areas
+      r.style.setProperty('--muted-foreground',   '218 30% 38%');
+      r.style.setProperty('--border',             '216 18% 74%');  // visible border without harshness
+      r.style.setProperty('--primary',            '40 89% 61%');   // gold — unchanged
       r.style.setProperty('--primary-foreground', '218 58% 8%');
-      r.style.setProperty('--accent',             '17 100% 60%');
+      r.style.setProperty('--accent',             '17 100% 60%');  // orange — unchanged
     }
   }, [dark]);
 
@@ -1214,9 +1215,9 @@ const Index = () => {
         <Header dark={dark} setDark={setDark} />
         <main>
           <HeroSection />
-          <DataPipeline />
           <ProblemSection />
           <SolutionSection />
+          <HowItWorks />
           <ROICalculator />
           <ChatDemoFixed />
           <PhilosophySection />
