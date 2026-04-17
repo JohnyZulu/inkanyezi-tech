@@ -266,8 +266,8 @@ class Particle{
   constructor(path,delay){
     this.path=path;this.t=-(delay||0);
     this.speed=0.013+Math.random()*0.007;
-    this.color=[C.gold,C.rust,C.teal][Math.floor(Math.random()*3)];
-    this.r=3+Math.random()*1.5;
+    this.color=["#F4B942","#C0451A","#3A9E7E"][Math.floor(Math.random()*3)];
+    this.r=4+Math.random()*1.5;
   }
   tick(){this.t+=this.speed;if(this.t>1)this.t=-0.05-Math.random()*0.08;}
   draw(ctx){
@@ -498,8 +498,8 @@ function NodeCard({node,isActive,onClick}){
   const edgeBg = node.dark ? "#0a1628" : "#d8cfc0";
   const edgeRBg = node.dark ? "#0d1e38" : "#e0d6c0";
   const numColor = isActive ? C.gold : node.dark ? "rgba(212,169,106,.65)" : node.color;
-  const nameColor = isActive ? C.gold : node.dark ? "rgba(212,169,106,.55)" : "rgba(10,22,40,.5)";
-  const toolColor = isActive ? "rgba(244,185,66,.6)" : node.dark ? "rgba(212,169,106,.3)" : "rgba(10,22,40,.3)";
+  const nameColor = isActive ? node.color : node.dark ? "rgba(212,169,106,.85)" : "#1a2e50";
+  const toolColor = isActive ? `${node.color}aa` : node.dark ? "rgba(212,169,106,.5)" : "rgba(26,46,80,.45)";
   const boxShadow = isActive
     ? `0 0 0 2.5px ${node.color}, 0 14px 36px rgba(0,0,0,.55), 0 4px 0 ${node.color}77`
     : `0 8px 22px rgba(0,0,0,.45), 0 3px 0 ${node.color}55, inset 0 1px 0 rgba(255,255,255,.1)`;
@@ -533,24 +533,40 @@ function NodeCard({node,isActive,onClick}){
   );
 }
 
-// ─── Detail panel — always in DOM, prominent at top ──────────────────────────
-function DetailPanel({stageIdx,industry,lang}){
+// ─── Detail panel — node number indicator + prev/next navigation ─────────────
+function DetailPanel({stageIdx,industry,lang,onNavigate}){
   if(stageIdx<0){
     return(
-      <div style={{background:"rgba(255,255,255,.025)",border:"1px dashed rgba(244,185,66,.18)",borderRadius:12,padding:"16px 20px",textAlign:"center"}}>
-        <p style={{fontFamily:"'Cinzel',serif",fontSize:10,letterSpacing:2,color:"rgba(212,169,106,.4)",textTransform:"uppercase",marginBottom:4}}>
+      <div style={{background:"rgba(255,255,255,.025)",border:"1px dashed rgba(244,185,66,.18)",borderRadius:12,padding:"20px",textAlign:"center"}}>
+        <p style={{fontFamily:"'Cinzel',serif",fontSize:10,letterSpacing:2,color:"rgba(212,169,106,.4)",textTransform:"uppercase",marginBottom:6}}>
           ↑ Tap any node above
         </p>
         <p style={{fontSize:11.5,color:"rgba(250,246,238,.3)",fontFamily:"'DM Sans',sans-serif"}}>
-          Select a stage to see the real business scenario for your industry
+          Select a stage to see the real SA business scenario for your industry
         </p>
+        {/* Node number step indicators */}
+        <div style={{display:"flex",justifyContent:"center",gap:8,marginTop:14}}>
+          {NODES_DEF.map((_,i)=>(
+            <button key={i} onClick={()=>onNavigate(i)} style={{
+              width:28,height:28,borderRadius:"50%",
+              background:"rgba(244,185,66,.08)",border:"1px solid rgba(244,185,66,.2)",
+              color:"rgba(244,185,66,.45)",fontFamily:"'Cinzel',serif",fontSize:9,fontWeight:700,
+              cursor:"pointer",transition:"all .2s",
+            }}>
+              {String(i+1).padStart(2,"0")}
+            </button>
+          ))}
+        </div>
       </div>
     );
   }
-  const node   = NODES_DEF[stageIdx];
+
+  const node        = NODES_DEF[stageIdx];
   const indScenario = (IND[industry]||IND.General)[`s${stageIdx}`];
   const langText    = (LANG_TEXTS[stageIdx]||{})[lang]||(LANG_TEXTS[stageIdx]||{}).EN||"";
   const langName    = LANGS.find(l=>l.code===lang)?.name||"English";
+  const hasPrev     = stageIdx > 0;
+  const hasNext     = stageIdx < NODES_DEF.length-1;
 
   return(
     <div className="ink-detail" style={{borderRadius:12,overflow:"hidden",border:`1.5px solid ${node.color}40`}}>
@@ -558,6 +574,28 @@ function DetailPanel({stageIdx,industry,lang}){
       <div className="ink-detail-accent" style={{background:`linear-gradient(90deg,${node.color},${node.color}44)`}}/>
 
       <div style={{background:"linear-gradient(135deg,#0d1e38,#0A1628)",padding:"16px 18px"}}>
+
+        {/* ── Node number indicator row ── */}
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:14,flexWrap:"wrap"}}>
+          {NODES_DEF.map((n,i)=>(
+            <button key={i} onClick={()=>onNavigate(i)} style={{
+              width:i===stageIdx?32:26,height:i===stageIdx?32:26,
+              borderRadius:"50%",
+              background:i===stageIdx?n.color:"rgba(255,255,255,.06)",
+              border:i===stageIdx?`2px solid ${n.color}`:"1px solid rgba(255,255,255,.12)",
+              color:i===stageIdx?(n.dark?"#FAF6EE":"#0A1628"):"rgba(255,255,255,.4)",
+              fontFamily:"'Cinzel',serif",fontSize:i===stageIdx?10:8,fontWeight:700,
+              cursor:"pointer",transition:"all .22s ease",flexShrink:0,
+              boxShadow:i===stageIdx?`0 0 12px ${n.color}55`:"none",
+            }}>
+              {String(i+1).padStart(2,"0")}
+            </button>
+          ))}
+          <span style={{marginLeft:4,fontFamily:"'Cinzel',serif",fontSize:8,letterSpacing:2,color:"rgba(255,255,255,.25)",textTransform:"uppercase"}}>
+            Stage {stageIdx+1} of {NODES_DEF.length}
+          </span>
+        </div>
+
         {/* Stage header row */}
         <div style={{display:"flex",alignItems:"flex-start",gap:14,marginBottom:14}}>
           {/* Mini 3D node icon */}
@@ -587,7 +625,7 @@ function DetailPanel({stageIdx,industry,lang}){
           </div>
         </div>
 
-        {/* SA Business scenario — the main story */}
+        {/* SA Business scenario */}
         <div style={{background:"rgba(255,255,255,.04)",borderRadius:9,padding:"12px 14px",marginBottom:12,borderLeft:`3px solid ${node.color}`}}>
           <p style={{fontFamily:"'Cinzel',serif",fontSize:8.5,letterSpacing:2,color:node.color,textTransform:"uppercase",marginBottom:6,opacity:.85}}>
             Real SA Business Scenario
@@ -615,7 +653,7 @@ function DetailPanel({stageIdx,industry,lang}){
             </span>
           ))}
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:3}}>
+        <div style={{display:"flex",alignItems:"center",gap:3,marginBottom:14}}>
           <span style={{fontSize:8,letterSpacing:1,textTransform:"uppercase",color:"rgba(212,169,106,.45)",marginRight:4}}>Signal</span>
           {[1,2,3,4,5].map(b=>(
             <div key={b} style={{width:5,borderRadius:1,height:5+b*3,background:b<=node.signal?C.teal:"rgba(58,158,126,.15)",transition:"background .3s"}}/>
@@ -623,10 +661,39 @@ function DetailPanel({stageIdx,industry,lang}){
           <span style={{fontSize:9,color:"rgba(58,158,126,.7)",marginLeft:4}}>{node.signal===5?"Excellent":"Good"}</span>
         </div>
 
+        {/* ── Prev / Next navigation ── */}
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom: node.isFinal?0:0}}>
+          <button onClick={()=>hasPrev&&onNavigate(stageIdx-1)} style={{
+            display:"flex",alignItems:"center",gap:6,
+            padding:"8px 14px",borderRadius:8,border:"1px solid",
+            borderColor:hasPrev?"rgba(244,185,66,.35)":"rgba(255,255,255,.08)",
+            background:hasPrev?"rgba(244,185,66,.08)":"transparent",
+            color:hasPrev?C.gold:"rgba(255,255,255,.2)",
+            cursor:hasPrev?"pointer":"default",
+            fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:600,
+            transition:"all .2s",
+          }}>
+            ← {hasPrev?`Stage ${stageIdx} — ${NODES_DEF[stageIdx-1].label}`:"First stage"}
+          </button>
+          <div style={{flex:1}}/>
+          <button onClick={()=>hasNext&&onNavigate(stageIdx+1)} style={{
+            display:"flex",alignItems:"center",gap:6,
+            padding:"8px 14px",borderRadius:8,border:"1px solid",
+            borderColor:hasNext?"rgba(244,185,66,.55)":"rgba(255,255,255,.08)",
+            background:hasNext?"rgba(244,185,66,.12)":"transparent",
+            color:hasNext?C.gold:"rgba(255,255,255,.2)",
+            cursor:hasNext?"pointer":"default",
+            fontFamily:"'DM Sans',sans-serif",fontSize:11,fontWeight:600,
+            transition:"all .2s",
+          }}>
+            {hasNext?`Stage ${stageIdx+2} — ${NODES_DEF[stageIdx+1].label}`:"Last stage"} →
+          </button>
+        </div>
+
         {/* Book a call CTA on final node */}
         {node.isFinal&&(
           <a href="https://cal.com/sanele-inkanyezi" target="_blank" rel="noopener noreferrer"
-            style={{display:"flex",alignItems:"center",gap:10,background:"rgba(244,185,66,.1)",border:"1px solid rgba(244,185,66,.3)",borderRadius:10,padding:"11px 14px",marginTop:14,textDecoration:"none"}}>
+            style={{display:"flex",alignItems:"center",gap:10,background:"rgba(244,185,66,.1)",border:"1px solid rgba(244,185,66,.3)",borderRadius:10,padding:"11px 14px",marginTop:12,textDecoration:"none"}}>
             <div style={{width:36,height:36,borderRadius:"50%",background:"linear-gradient(135deg,#1a2e50,#0f1e36)",border:"1.5px solid rgba(244,185,66,.4)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:17,flexShrink:0}}>🚀</div>
             <div>
               <div style={{fontFamily:"'Cinzel',serif",fontSize:11,fontWeight:600,color:C.gold}}>Book a free call with Sanele</div>
@@ -678,12 +745,12 @@ export default function DataPipeline(){
       cvs.style.height = H+"px";
       cvs.getContext("2d").setTransform(DPR,0,0,DPR,0,0);
     }
-    // Particles travel right→left going down (from node i+1 back toward node i direction)
-    // On desktop all nodes are same Y so this is purely right→left
-    // On mobile 2-col grid nodes alternate L/R, creating diagonal right→left-down flow
+    // Build straight-line particle paths matching the straight pipes
     const ptcls = [];
     for(let i=0;i<positions.length-1;i++){
-      const path=bezPts(positions[i].x,positions[i].y,positions[i+1].x,positions[i+1].y);
+      const a=positions[i], b=positions[i+1];
+      // Simple linear path: just start and end point
+      const path=[a,b];
       for(let k=0;k<5;k++) ptcls.push(new Particle(path,k*0.18));
     }
     s.particles = ptcls;
@@ -711,23 +778,21 @@ export default function DataPipeline(){
     const{W,H}=s;
     ctx.clearRect(0,0,W,H);
     // Transparent bg — the HTML nodes sit on top
-    // Draw pipes between node positions
+    // Draw straight pipes between node positions
     if(s.pipes.length>1){
       for(let i=0;i<s.pipes.length-1;i++){
         const a=s.pipes[i],b=s.pipes[i+1];
-        const mx=(a.x+b.x)/2,my=(a.y+b.y)/2-Math.abs(b.x-a.x)*0.08;
-        ctx.beginPath();ctx.moveTo(a.x,a.y);
-        ctx.quadraticCurveTo(mx,my,b.x,b.y);
-        ctx.strokeStyle="rgba(212,169,106,0.22)";
-        ctx.lineWidth=2;ctx.setLineDash([6,5]);ctx.stroke();ctx.setLineDash([]);
-        // Arrowhead
-        const t2=0.9;
-        const px2=(1-t2)*(1-t2)*a.x+2*(1-t2)*t2*mx+t2*t2*b.x;
-        const py2=(1-t2)*(1-t2)*a.y+2*(1-t2)*t2*my+t2*t2*b.y;
-        const ang=Math.atan2(b.y-py2,b.x-px2);
-        ctx.save();ctx.translate(b.x,b.y);ctx.rotate(ang);
-        ctx.beginPath();ctx.moveTo(-9,-4);ctx.lineTo(0,0);ctx.lineTo(-9,4);
-        ctx.strokeStyle="rgba(244,185,66,.6)";ctx.lineWidth=2;ctx.lineJoin="round";ctx.stroke();
+        // Straight line
+        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+        ctx.strokeStyle="rgba(10,22,64,0.18)";
+        ctx.lineWidth=2;ctx.setLineDash([8,5]);ctx.stroke();ctx.setLineDash([]);
+        // Arrowhead pointing straight to b
+        const ang=Math.atan2(b.y-a.y,b.x-a.x);
+        const arrowX=b.x-Math.cos(ang)*38;
+        const arrowY=b.y-Math.sin(ang)*38;
+        ctx.save();ctx.translate(arrowX,arrowY);ctx.rotate(ang);
+        ctx.beginPath();ctx.moveTo(-10,-4);ctx.lineTo(0,0);ctx.lineTo(-10,4);
+        ctx.strokeStyle="rgba(10,22,64,.45)";ctx.lineWidth=2;ctx.lineJoin="round";ctx.stroke();
         ctx.restore();
       }
     }
@@ -788,8 +853,31 @@ export default function DataPipeline(){
       <div style={{maxWidth:1200,margin:"0 auto",padding:"0 16px"}}>
         <div style={{borderRadius:16,overflow:"visible"}}>
 
-          {/* Top Ndebele strip */}
-          <div style={{height:9,background:S_TOP,borderRadius:"16px 16px 0 0"}}/>
+          {/* Tech interface top bar — replaces Ndebele strip */}
+          <div style={{
+            height:36,borderRadius:"16px 16px 0 0",
+            background:"linear-gradient(90deg,#0d1e38 0%,#112240 50%,#0d1e38 100%)",
+            borderBottom:"1px solid rgba(244,185,66,.15)",
+            display:"flex",alignItems:"center",
+            padding:"0 16px",gap:10,
+          }}>
+            {/* Traffic-light dots */}
+            <div style={{display:"flex",gap:6}}>
+              <div style={{width:10,height:10,borderRadius:"50%",background:"#FF5F56"}}/>
+              <div style={{width:10,height:10,borderRadius:"50%",background:"#FFBD2E"}}/>
+              <div style={{width:10,height:10,borderRadius:"50%",background:"#27C93F"}}/>
+            </div>
+            <div style={{flex:1,display:"flex",justifyContent:"center"}}>
+              <span style={{fontFamily:"'DM Sans',monospace",fontSize:10,color:"rgba(212,169,106,.55)",letterSpacing:2}}>
+                INKANYEZI · AUTOMATION PIPELINE · LIVE
+              </span>
+            </div>
+            {/* Live pulse indicator */}
+            <div style={{display:"flex",alignItems:"center",gap:5}}>
+              <div className="ink-hint-dot" style={{width:6,height:6,borderRadius:"50%",background:"#27C93F",flexShrink:0}}/>
+              <span style={{fontSize:9,color:"rgba(39,201,63,.7)",letterSpacing:1,fontFamily:"'DM Sans',sans-serif"}}>LIVE</span>
+            </div>
+          </div>
 
           {/* Header */}
           <div style={{background:C.night,padding:"16px 20px 14px",position:"relative",zIndex:10}}>
@@ -830,8 +918,23 @@ export default function DataPipeline(){
 
           <div style={{height:6,background:S_KEN}}/>
 
-          {/* Pipeline area — canvas behind HTML nodes */}
-          <div ref={wrapRef} style={{background:C.night,position:"relative"}}>
+          {/* Pipeline area — light interface background */}
+          <div ref={wrapRef} style={{
+            position:"relative",
+            background:"linear-gradient(180deg,#E8EEF7 0%,#EDF2FA 100%)",
+            borderTop:"1px solid rgba(10,22,40,.08)",
+            borderBottom:"1px solid rgba(10,22,40,.08)",
+          }}>
+            {/* Subtle grid lines — computer interface feel */}
+            <div style={{
+              position:"absolute",inset:0,
+              backgroundImage:`
+                linear-gradient(rgba(10,22,40,.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(10,22,40,.04) 1px, transparent 1px)
+              `,
+              backgroundSize:"32px 32px",
+              pointerEvents:"none",zIndex:0,
+            }}/>
             <canvas
               ref={canvasRef}
               style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none",zIndex:1}}
@@ -854,7 +957,12 @@ export default function DataPipeline(){
 
           {/* Detail panel — below pipeline on all screen sizes */}
           <div id="ink-detail-anchor" style={{background:C.night,padding:"12px 16px 16px"}}>
-            <DetailPanel stageIdx={activeNode} industry={activeIndustry} lang={activeLang}/>
+            <DetailPanel
+              stageIdx={activeNode}
+              industry={activeIndustry}
+              lang={activeLang}
+              onNavigate={toggleNode}
+            />
           </div>
 
           {/* Progress dots */}
