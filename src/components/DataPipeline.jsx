@@ -325,12 +325,12 @@ const CSS=`
 .ink-node-num{font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:1.5px;margin-bottom:4px;transition:color .2s;}
 .ink-node-card{
   width:76px;height:76px;border-radius:18px;position:relative;
-  transform-style:preserve-3d;
-  transform:perspective(280px) rotateX(10deg) rotateY(-6deg);
+  transform-style:flat;
+  transform:translateY(0px) scale(1);
   transition:transform .25s ease,box-shadow .25s ease;
 }
-.ink-node-card:hover{transform:perspective(280px) rotateX(3deg) rotateY(-1deg) translateY(-5px) scale(1.05);}
-.ink-node-card.active{transform:perspective(280px) rotateX(1deg) rotateY(0deg) translateY(-9px) scale(1.07);}
+.ink-node-card:hover{transform:translateY(-5px) scale(1.05);}
+.ink-node-card.active{transform:translateY(-9px) scale(1.07);}
 .ink-node-face{
   position:absolute;inset:0;border-radius:18px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
@@ -405,7 +405,7 @@ const CSS=`
   .ink-node-cell:nth-child(6){ grid-column:2; padding:12px 8px 16px; }
 
   .ink-node-card{width:62px;height:62px;border-radius:14px;}
-  .ink-node-card:hover{transform:perspective(280px) rotateX(10deg) rotateY(-6deg);}
+  .ink-node-card:hover{transform:translateY(-3px) scale(1.04);}
   .ink-node-svg{width:26px;height:26px;}
   .ink-node-name{font-size:8px;max-width:70px;margin-top:6px;}
   .ink-node-tool{font-size:7px;max-width:70px;}
@@ -625,23 +625,13 @@ function DetailPanel({stageIdx,industry,lang,onNavigate}){
           </div>
         </div>
 
-        {/* SA Business scenario */}
+        {/* SA Business scenario — EN shows industry-specific desc; other langs show translated explanation */}
         <div style={{background:"rgba(255,255,255,.04)",borderRadius:9,padding:"12px 14px",marginBottom:12,borderLeft:`3px solid ${node.color}`}}>
           <p style={{fontFamily:"'Cinzel',serif",fontSize:8.5,letterSpacing:2,color:node.color,textTransform:"uppercase",marginBottom:6,opacity:.85}}>
-            Real SA Business Scenario
+            {lang==="EN" ? "Real SA Business Scenario" : `${langName} — SA Business Scenario`}
           </p>
           <p style={{fontSize:"clamp(12px,1.8vw,13px)",color:"rgba(250,246,238,.8)",lineHeight:1.82,margin:0}}>
-            {indScenario.desc}
-          </p>
-        </div>
-
-        {/* Language explanation */}
-        <div style={{background:"rgba(58,158,126,.06)",borderRadius:9,padding:"10px 14px",marginBottom:12,borderLeft:`3px solid ${C.teal}`}}>
-          <p style={{fontSize:8.5,letterSpacing:2,textTransform:"uppercase",color:C.teal,marginBottom:5,fontWeight:600}}>
-            {langName} explanation:
-          </p>
-          <p style={{fontSize:"clamp(11px,1.6vw,12px)",color:"rgba(250,246,238,.6)",lineHeight:1.75,margin:0}}>
-            {langText}
+            {lang==="EN" ? indScenario.desc : langText}
           </p>
         </div>
 
