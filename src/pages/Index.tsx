@@ -221,12 +221,32 @@ function scoreConversation(ctx: any, userCount: number, lastMsg: string) {
   return { score, shouldShow: score >= THRESHOLD && userCount >= MIN_MSGS };
 }
 
-const CHIPS = [
-  { label:'📊 Calculate my ROI',         msg:'Calculate my ROI' },
-  { label:"🚀 Show me what you've built", msg:"Show me what you've built" },
-  { label:'📅 Book a free demo',          msg:'Book a free demo' },
-  { label:'💬 Automate my WhatsApp',      msg:'Automate my WhatsApp' },
-];
+const CHIPS: Record<string, {label:string;msg:string}[]> = {
+  greeting: [
+    { label:'💼 I run a trade/service business', msg:'I run a trade/service business' },
+    { label:'🏥 Healthcare or admin',            msg:'I work in healthcare or admin' },
+    { label:'🏡 Real estate / property',         msg:'I work in real estate or property' },
+    { label:'📦 Retail or logistics',            msg:'I work in retail or logistics' },
+  ],
+  discovery: [
+    { label:'⏰ Too much manual admin',    msg:'We spend too much time on manual admin' },
+    { label:'📲 WhatsApp automation',      msg:'I need to automate my WhatsApp' },
+    { label:'📅 Booking/appointment chaos',msg:'We struggle with appointment booking' },
+    { label:'💸 Chasing invoices',         msg:'We spend too much time chasing payments' },
+  ],
+  qualification: [
+    { label:'📊 Show me pricing',    msg:'What does it cost?' },
+    { label:'🔁 How does it work?',  msg:'How does the process work?' },
+    { label:'⚡ Load shedding safe?', msg:'Does it work during load shedding?' },
+    { label:'📅 Book a free demo',   msg:'I want to book a free discovery call' },
+  ],
+};
+const getChips = (userCount: number) => {
+  if (userCount === 0) return CHIPS.greeting;
+  if (userCount <= 2)  return CHIPS.discovery;
+  if (userCount <= 4)  return CHIPS.qualification;
+  return [];
+};
 
 const INDUSTRIES = [
   { value:'plumbing',      label:'🔧 Plumbing & Trade' },
@@ -699,22 +719,31 @@ function InkanyeziBotWidget() {
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = true;
-      recognition.maxAlternatives = 1;
+      recognition.maxAlternatives = 3;
       recognition.lang = 'en-ZA';
       recognition.onresult = (e: any) => {
-        const transcript = Array.from(e.results).map((r: any) => r[0].transcript).join('');
-        setInput(transcript);
-        if (e.results[e.results.length - 1].isFinal) setIsListening(false);
+        let interim = ''; let final = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          if (e.results[i].isFinal) { final += e.results[i][0].transcript; }
+          else { interim += e.results[i][0].transcript; }
+        }
+        if (interim) setInput(interim);
+        if (final) {
+          const cleaned = final
+            .replace(/\bi\b/g, 'I').replace(/\bim\b/gi, "I'm")
+            .replace(/\bdont\b/gi, "don't").replace(/\bcant\b/gi, "can't")
+            .replace(/\bwont\b/gi, "won't").replace(/\bwhatsapp\b/gi, 'WhatsApp')
+            .replace(/\bai\b/gi, 'AI').replace(/\bsa\b/gi, 'SA').replace(/\s+/g, ' ').trim();
+          setInput(cleaned);
+          setIsListening(false);
+        }
       };
       recognition.onerror = (e: any) => {
-        if (e.error === 'no-speech') {
-          try { recognition.stop(); } catch {}
-          setTimeout(() => { try { recognition.start(); } catch {} }, 200);
-        } else { setIsListening(false); }
+        if (e.error !== 'no-speech' && e.error !== 'aborted') setIsListening(false);
       };
       recognition.onend = () => {
         setIsListening(prev => {
-          if (prev) { setTimeout(() => { try { recognition.start(); } catch {} }, 100); return true; }
+          if (prev) { setTimeout(() => { try { recognition.start(); } catch {} }, 150); return true; }
           return false;
         });
       };
@@ -730,6 +759,13 @@ function InkanyeziBotWidget() {
     if (isListening) { recognitionRef.current.stop(); setIsListening(false); }
     else { setInput(''); recognitionRef.current.start(); setIsListening(true); }
   };
+
+  const newSession = useCallback(() => {
+    try { sessionStorage.removeItem('inkanyezi_chat_session'); } catch {}
+    setMessages([{ role:'assistant', content:"Sawubona! 👋 I'm InkanyeziBot — your AI guide to automation for South African businesses.\n\nBy chatting, you agree to our POPIA-compliant data policy.\n\nWhat does your business do, and what's the biggest challenge slowing you down right now?" }]);
+    setInput(''); setShowLeadForm(false); setLeadFormSubmitted(false);
+    setShowChips(true); setSessionContext(null); hasTriggered.current = false;
+  }, []);
 
   useEffect(() => {
     const STORAGE_KEY = 'inkanyezi_chat_session';
@@ -813,7 +849,7 @@ function InkanyeziBotWidget() {
     const allText = messages.map(m => m.content).join(' ').toLowerCase();
     const intentKeywords = ['contact','details','reach out','get in touch','sign up','sign me up','interested','ready','book','schedule','call me','whatsapp me','my number','my email','send me','how do i start','how much','pricing','quote','get started','i want','sounds good','yes please'];
     const hasIntent = intentKeywords.some(kw => allText.includes(kw));
-    const shouldTrigger = (hasIntent && userMsgs.length >= 1) || userMsgs.length >= 2;
+    const shouldTrigger = (hasIntent && userMsgs.length >= 3) || userMsgs.length >= 5;
     if (shouldTrigger) {
       hasTriggered.current = true;
       const bridgeMsg = sessionContext?.name
@@ -980,6 +1016,12 @@ function InkanyeziBotWidget() {
                 </div>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
+                <button onClick={newSession} title="Start a new conversation"
+                  style={{ width:28, height:28, borderRadius:6, background:'rgba(244,185,66,0.06)', border:'1px solid rgba(244,185,66,0.2)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:11, color:'rgba(244,185,66,0.7)', transition:'all 0.2s', flexShrink:0, fontFamily:"'Space Mono',monospace", letterSpacing:'0.02em' }}
+                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.18)';(e.currentTarget as HTMLButtonElement).style.color='#F4B942';}}
+                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.06)';(e.currentTarget as HTMLButtonElement).style.color='rgba(244,185,66,0.7)';}}>
+                  ↺
+                </button>
                 <button onClick={() => setIsFullscreen(f => !f)} title={isFullscreen?'Minimise':'Expand'}
                   style={{ width:28, height:28, borderRadius:6, background:'rgba(0,229,255,0.06)', border:'1px solid rgba(0,229,255,0.2)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:13, color:'rgba(0,229,255,0.7)', transition:'all 0.2s', flexShrink:0 }}
                   onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.2)';}}
@@ -1011,7 +1053,7 @@ function InkanyeziBotWidget() {
                 </div>
               ))}
               {showLeadForm && !leadFormSubmitted && (
-                <ChatLeadForm onSubmit={handleLeadSubmit} onDismiss={()=>setShowLeadForm(false)} sessionContext={sessionContext} submitting={leadSubmitting} onVoiceField={micSupported ? startVoiceForField : undefined} />
+                <ChatLeadForm onSubmit={handleLeadSubmit} onDismiss={()=>setShowLeadForm(false)} sessionContext={sessionContext} submitting={leadSubmitting} />
               )}
               {isLoading && (
                 <div style={{ display:'flex', alignItems:'flex-end', gap:6 }}>
