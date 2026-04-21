@@ -221,32 +221,12 @@ function scoreConversation(ctx: any, userCount: number, lastMsg: string) {
   return { score, shouldShow: score >= THRESHOLD && userCount >= MIN_MSGS };
 }
 
-const CHIPS: Record<string, {label:string;msg:string}[]> = {
-  greeting: [
-    { label:'💼 I run a trade/service business', msg:'I run a trade/service business' },
-    { label:'🏥 Healthcare or admin',            msg:'I work in healthcare or admin' },
-    { label:'🏡 Real estate / property',         msg:'I work in real estate or property' },
-    { label:'📦 Retail or logistics',            msg:'I work in retail or logistics' },
-  ],
-  discovery: [
-    { label:'⏰ Too much manual admin',    msg:'We spend too much time on manual admin' },
-    { label:'📲 WhatsApp automation',      msg:'I need to automate my WhatsApp' },
-    { label:'📅 Booking/appointment chaos',msg:'We struggle with appointment booking' },
-    { label:'💸 Chasing invoices',         msg:'We spend too much time chasing payments' },
-  ],
-  qualification: [
-    { label:'📊 Show me pricing',    msg:'What does it cost?' },
-    { label:'🔁 How does it work?',  msg:'How does the process work?' },
-    { label:'⚡ Load shedding safe?', msg:'Does it work during load shedding?' },
-    { label:'📅 Book a free demo',   msg:'I want to book a free discovery call' },
-  ],
-};
-const getChips = (userCount: number) => {
-  if (userCount === 0) return CHIPS.greeting;
-  if (userCount <= 2)  return CHIPS.discovery;
-  if (userCount <= 4)  return CHIPS.qualification;
-  return [];
-};
+const CHIPS = [
+  { label:'📊 Calculate my ROI',         msg:'Calculate my ROI' },
+  { label:"🚀 Show me what you've built", msg:"Show me what you've built" },
+  { label:'📅 Book a free demo',          msg:'Book a free demo' },
+  { label:'💬 Automate my WhatsApp',      msg:'Automate my WhatsApp' },
+];
 
 const INDUSTRIES = [
   { value:'plumbing',      label:'🔧 Plumbing & Trade' },
@@ -342,7 +322,7 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting, onVo
                 Let's make this{' '}
                 <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>official</span>
               </h3>
-              <p style={{ margin:'0.2rem 0 0', fontSize:'0.65rem', color:'rgba(255,255,255,0.45)', lineHeight:1.4, fontFamily:"'DM Sans',sans-serif" }}>Sanele follows up personally within 24 hours.</p>
+              <p style={{ margin:'0.2rem 0 0', fontSize:'0.65rem', color:'rgba(255,255,255,0.45)', lineHeight:1.4, fontFamily:"'DM Sans',sans-serif" }}>Booking confirmation sent immediately.</p>
             </div>
             {onDismiss && !submitted && (
               <button onClick={onDismiss} style={{ background:'rgba(255,255,255,0.07)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:'4px', padding:'3px 8px', color:'rgba(255,255,255,0.45)', fontSize:'0.6rem', cursor:'pointer', fontFamily:"'Space Mono',monospace", flexShrink:0, marginLeft:8 }}>✕</button>
@@ -359,7 +339,7 @@ function ChatLeadForm({ onSubmit, onDismiss, sessionContext={}, submitting, onVo
                 <span style={{ background:`linear-gradient(90deg, ${C.gold}, ${C.orange})`, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>{form.name?.split(' ')[0]||'friend'}</span>!
               </p>
               <p style={{ fontSize:'0.72rem', color:'#6B7280', margin:'0 0 0.6rem', lineHeight:1.5, fontFamily:"'DM Sans',sans-serif" }}>
-                {form.company ? `Sanele will reach out to ${form.company} within 24 hours.` : 'Sanele will be in touch within 24 hours.'}
+                {form.company ? `Booking confirmation sent. Sanele will connect with ${form.company} at your chosen time.` : 'Booking confirmation sent. Sanele will connect with you at your chosen time.'}
               </p>
               <p style={{ fontSize:'0.56rem', color:'#9CA3AF', margin:0, fontFamily:"'Space Mono',monospace" }}>Durban, KZN [ZA] · We are the signal in the noise.</p>
             </div>
@@ -730,10 +710,11 @@ function InkanyeziBotWidget() {
         if (interim) setInput(interim);
         if (final) {
           const cleaned = final
-            .replace(/\bi\b/g, 'I').replace(/\bim\b/gi, "I'm")
-            .replace(/\bdont\b/gi, "don't").replace(/\bcant\b/gi, "can't")
-            .replace(/\bwont\b/gi, "won't").replace(/\bwhatsapp\b/gi, 'WhatsApp')
-            .replace(/\bai\b/gi, 'AI').replace(/\bsa\b/gi, 'SA').replace(/\s+/g, ' ').trim();
+            .replace(/i/g, 'I').replace(/im/gi, "I'm")
+            .replace(/dont/gi, "don't").replace(/cant/gi, "can't")
+            .replace(/wont/gi, "won't").replace(/whatsapp/gi, 'WhatsApp')
+            .replace(/ai/gi, 'AI').replace(/sa/gi, 'SA')
+            .replace(/\s+/g, ' ').trim();
           setInput(cleaned);
           setIsListening(false);
         }
@@ -759,13 +740,6 @@ function InkanyeziBotWidget() {
     if (isListening) { recognitionRef.current.stop(); setIsListening(false); }
     else { setInput(''); recognitionRef.current.start(); setIsListening(true); }
   };
-
-  const newSession = useCallback(() => {
-    try { sessionStorage.removeItem('inkanyezi_chat_session'); } catch {}
-    setMessages([{ role:'assistant', content:"Sawubona! 👋 I'm InkanyeziBot — your AI guide to automation for South African businesses.\n\nBy chatting, you agree to our POPIA-compliant data policy.\n\nWhat does your business do, and what's the biggest challenge slowing you down right now?" }]);
-    setInput(''); setShowLeadForm(false); setLeadFormSubmitted(false);
-    setShowChips(true); setSessionContext(null); hasTriggered.current = false;
-  }, []);
 
   useEffect(() => {
     const STORAGE_KEY = 'inkanyezi_chat_session';
@@ -849,12 +823,12 @@ function InkanyeziBotWidget() {
     const allText = messages.map(m => m.content).join(' ').toLowerCase();
     const intentKeywords = ['contact','details','reach out','get in touch','sign up','sign me up','interested','ready','book','schedule','call me','whatsapp me','my number','my email','send me','how do i start','how much','pricing','quote','get started','i want','sounds good','yes please'];
     const hasIntent = intentKeywords.some(kw => allText.includes(kw));
-    const shouldTrigger = (hasIntent && userMsgs.length >= 3) || userMsgs.length >= 5;
+    const shouldTrigger = (hasIntent && userMsgs.length >= 1) || userMsgs.length >= 2;
     if (shouldTrigger) {
       hasTriggered.current = true;
       const bridgeMsg = sessionContext?.name
-        ? `Perfect${sessionContext.name ? `, ${sessionContext.name.split(' ')[0]}` : ''}. Let me get your details so Sanele can follow up personally — takes 30 seconds. 👇`
-        : `Great — let me grab a few details so Sanele can follow up with you directly. Takes about 30 seconds. 👇`;
+        ? `Perfect${sessionContext.name ? `, ${sessionContext.name.split(' ')[0]}` : ''}. Let me get your details — you'll receive a booking confirmation immediately and Sanele will connect with you at your chosen time. Takes 30 seconds. 👇`
+        : `Great — let me grab a few details. You'll get an email confirmation straight away and Sanele will connect with you at your chosen time. 👇`;
       const alreadyInvited = lastBotMsg.toLowerCase().includes('detail') || lastBotMsg.toLowerCase().includes('follow up') || lastBotMsg.toLowerCase().includes('reach');
       if (!alreadyInvited) setTimeout(() => { setMessages(prev => [...prev, { role:'assistant', content: bridgeMsg }]); }, 400);
       setTimeout(() => setShowLeadForm(true), alreadyInvited ? 800 : 2000);
@@ -865,8 +839,13 @@ function InkanyeziBotWidget() {
     const content = (text||input).trim();
     if (!content||isLoading) return;
     if (leadFormSubmitted) {
-      setMessages(prev => [...prev, { role:'user', content }, { role:'assistant', content:'Sharp sharp! ✦ Sanele will be in touch within 24 hours. Hamba kahle!' }]);
-      setInput(''); return;
+      const lowerContent = content.toLowerCase();
+      const isBye = ['bye','goodbye','thanks','thank you','hamba','no thanks','no more','nothing else','all good','perfect','great','sorted'].some(w => lowerContent.includes(w));
+      if (isBye) {
+        setMessages(prev => [...prev, { role:'user', content }, { role:'assistant', content:"It was great chatting with you! We look forward to speaking soon. Hamba kahle! 🌟" }]);
+        setInput(''); return;
+      }
+      // Has a real question — fall through to API for knowledge Q&A
     }
     setShowChips(false);
     const userMessage  = { role:'user', content };
@@ -914,7 +893,7 @@ function InkanyeziBotWidget() {
         const biz = formData.company || sessionContext?.business || 'your business';
         const industry = formData.industry || sessionContext?.industry || '';
         const industryLine = industry ? ` in the ${industry} space` : '';
-        setMessages(prev => [...prev, { role:'assistant', content:`✦ All locked in${firstName ? `, ${firstName}` : ''}! Sanele will personally reach out to you about ${biz}${industryLine} within 24 hours.\n\nIn the meantime — is there anything specific about how we automate ${biz} that you'd like me to explain?` }]);
+        setMessages(prev => [...prev, { role:'assistant', content:`✦ All locked in${firstName ? `, ${firstName}` : ''}! A booking confirmation is heading to your inbox now. Sanele will connect with you at your chosen time to discuss ${biz}${industryLine}.\n\nAnything else you'd like to know about how we can help ${biz}?` }]);
       }, 700);
       return { success:true };
     } catch { return { success:false }; }
@@ -1016,12 +995,6 @@ function InkanyeziBotWidget() {
                 </div>
               </div>
               <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0 }}>
-                <button onClick={newSession} title="Start a new conversation"
-                  style={{ width:28, height:28, borderRadius:6, background:'rgba(244,185,66,0.06)', border:'1px solid rgba(244,185,66,0.2)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:11, color:'rgba(244,185,66,0.7)', transition:'all 0.2s', flexShrink:0, fontFamily:"'Space Mono',monospace", letterSpacing:'0.02em' }}
-                  onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.18)';(e.currentTarget as HTMLButtonElement).style.color='#F4B942';}}
-                  onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.06)';(e.currentTarget as HTMLButtonElement).style.color='rgba(244,185,66,0.7)';}}>
-                  ↺
-                </button>
                 <button onClick={() => setIsFullscreen(f => !f)} title={isFullscreen?'Minimise':'Expand'}
                   style={{ width:28, height:28, borderRadius:6, background:'rgba(0,229,255,0.06)', border:'1px solid rgba(0,229,255,0.2)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', fontSize:13, color:'rgba(0,229,255,0.7)', transition:'all 0.2s', flexShrink:0 }}
                   onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(244,185,66,0.2)';}}
@@ -1059,7 +1032,7 @@ function InkanyeziBotWidget() {
                 <div style={{ display:'flex', alignItems:'flex-end', gap:6 }}>
                   <div style={{ width:24, height:24, borderRadius:'50%', background:'linear-gradient(135deg, #FF6B35, #c2410c)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, flexShrink:0 }}>⭐</div>
                   <div style={{ background:'rgba(255,255,255,0.95)', padding:'12px 16px', borderRadius:14, borderBottomLeftRadius:3, border:'1px solid rgba(244,185,66,0.2)', boxShadow:'0 1px 4px rgba(0,0,0,0.06)', display:'flex', alignItems:'center', gap:5 }}>
-                    {[0,1,2].map(i => <div key={i} style={{ width:6, height:6, borderRadius:'50%', background:'#F4B942', opacity:0.4, animation:'thinkPulse 1.2s ease-in-out infinite', animationDelay:`${i*0.2}s` }} />)}
+                    <span style={{ fontSize:13, color:'rgba(244,185,66,0.8)', fontFamily:"'DM Sans',sans-serif", fontStyle:'italic', letterSpacing:'0.02em' }}>Thinking…</span>
                   </div>
                 </div>
               )}
