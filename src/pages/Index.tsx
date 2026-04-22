@@ -794,7 +794,9 @@ function InkanyeziBotWidget() {
     } catch (err: any) {
       const msg = err?.message || '';
       if (msg.includes('Permission') || msg.includes('denied') || msg.includes('NotAllowed')) {
-        setMicError('Mic access denied — allow microphone in browser settings');
+        setMicError('Tap the 🔒 icon in your browser address bar → allow microphone → retry');
+      } else if (msg.includes('NotFound') || msg.includes('Requested device')) {
+        setMicError('No microphone found on this device');
       } else {
         setMicError('Could not start mic — please try again');
       }
@@ -806,8 +808,15 @@ function InkanyeziBotWidget() {
     localStorage.setItem('ink_mic_seen', '1');
     setShowMicHint(false);
     setMicError('');
-    if (isListening) { stopDeepgram(); }
-    else { setInput(''); startDeepgram(); }
+    if (isListening) {
+      stopDeepgram();
+    } else {
+      setInput('');
+      // Show a brief instruction before requesting permission
+      // This primes the user so the browser prompt doesn't surprise them
+      setMicError('');
+      startDeepgram();
+    }
   }, [isListening, stopDeepgram, startDeepgram]);
 
 
@@ -1136,8 +1145,11 @@ function InkanyeziBotWidget() {
                 {micSupported && (
                   <div style={{ position:'relative', flexShrink:0 }}>
                     {micError && (
-                      <div style={{ position:'absolute', bottom:50, left:'50%', transform:'translateX(-50%)', background:'#1a0808', color:'#f87171', fontSize:10, padding:'6px 10px', borderRadius:8, border:'1px solid rgba(248,113,113,0.4)', fontFamily:"'DM Sans',sans-serif", pointerEvents:'none', zIndex:10, maxWidth:200, textAlign:'center', lineHeight:1.4 }}>
+                      <div
+                        onClick={() => setMicError('')}
+                        style={{ position:'absolute', bottom:50, left:'50%', transform:'translateX(-50%)', background:'#1a0808', color:'#f87171', fontSize:10, padding:'8px 12px', borderRadius:8, border:'1px solid rgba(248,113,113,0.4)', fontFamily:"'DM Sans',sans-serif", cursor:'pointer', zIndex:10, width:220, textAlign:'center', lineHeight:1.5, boxShadow:'0 4px 12px rgba(0,0,0,0.4)' }}>
                         {micError}
+                        <div style={{ fontSize:9, color:'rgba(248,113,113,0.6)', marginTop:3 }}>Tap to dismiss</div>
                       </div>
                     )}
                     {showMicHint && !isListening && !micError && (
