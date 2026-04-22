@@ -715,7 +715,7 @@ function InkanyeziBotWidget() {
   const messagesEnd  = useRef<HTMLDivElement>(null);
   const textareaRef  = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior:'smooth' }); }, [messages, showLeadForm, isLoading]);
+  useEffect(() => { setTimeout(() => messagesEnd.current?.scrollIntoView({ behavior:'smooth' }), 50); }, [messages, showLeadForm, isLoading]);
 
 
   // ── MIC: Deepgram real-time transcription ────────────────────────
@@ -925,13 +925,8 @@ function InkanyeziBotWidget() {
     const content = (text||input).trim();
     if (!content||isLoading) return;
     if (leadFormSubmitted) {
-      const lowerContent = content.toLowerCase();
-      const isBye = ['bye','goodbye','thanks','thank you','hamba','no thanks','no more','nothing else','all good','perfect','great','sorted'].some(w => lowerContent.includes(w));
-      if (isBye) {
-        setMessages(prev => [...prev, { role:'user', content }, { role:'assistant', content:"It was great chatting with you! We look forward to speaking soon. Hamba kahle! 🌟" }]);
-        setInput(''); return;
-      }
-      // Has a real question — fall through to API for knowledge Q&A
+      // Post-form: send ALL messages to the API for intelligent Q&A
+      // The route.js brain handles goodbye detection and "anything else?" prompts
     }
     setShowChips(false);
     const userMessage  = { role:'user', content };
@@ -979,7 +974,7 @@ function InkanyeziBotWidget() {
         const biz = formData.company || sessionContext?.business || 'your business';
         const industry = formData.industry || sessionContext?.industry || '';
         const industryLine = industry ? ` in the ${industry} space` : '';
-        setMessages(prev => [...prev, { role:'assistant', content:`✦ All locked in${firstName ? `, ${firstName}` : ''}! A booking confirmation is heading to your inbox now. Sanele will connect with you at your chosen time to discuss ${biz}${industryLine}.\n\nAnything else you'd like to know about how we can help ${biz}?` }]);
+        setMessages(prev => [...prev, { role:'assistant', content:`✦ All locked in${firstName ? `, ${firstName}` : ''}! Check your inbox — your booking confirmation is on its way.\n\nIs there anything else I can help you with?` }]);
       }, 700);
       return { success:true };
     } catch { return { success:false }; }
