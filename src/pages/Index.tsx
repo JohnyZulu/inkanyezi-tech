@@ -748,9 +748,9 @@ function InkanyeziBotWidget() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
 
+      // Deepgram WebSocket — token passed as query param (works in all browsers)
       const ws = new WebSocket(
-        'wss://api.deepgram.com/v1/listen?model=nova-2&language=en-ZA&smart_format=true&punctuate=true&interim_results=true&encoding=linear16&sample_rate=16000',
-        ['token', key]
+        `wss://api.deepgram.com/v1/listen?model=nova-2&language=en-ZA&smart_format=true&punctuate=true&interim_results=true&encoding=linear16&sample_rate=16000&token=${key}`
       );
       deepgramWsRef.current = ws;
 
