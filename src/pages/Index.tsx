@@ -689,7 +689,12 @@ function InkanyeziBotWidget() {
   const [isListening, setIsListening]   = useState(false);
   const [micSupported, setMicSupported] = useState(false);
   const [showMicHint, setShowMicHint]   = useState(false);
-  const recognitionRef = useRef<any>(null);
+  const [micError, setMicError]         = useState('');
+  const recognitionRef   = useRef<any>(null);
+  const deepgramWsRef    = useRef<WebSocket|null>(null);
+  const mediaStreamRef   = useRef<MediaStream|null>(null);
+  const processorRef     = useRef<ScriptProcessorNode|null>(null);
+  const audioCtxRef      = useRef<AudioContext|null>(null);
 
   const startVoiceForField = (fieldSetter: (v: string) => void) => {
     if (!recognitionRef.current) return;
@@ -712,54 +717,99 @@ function InkanyeziBotWidget() {
 
   useEffect(() => { messagesEnd.current?.scrollIntoView({ behavior:'smooth' }); }, [messages, showLeadForm, isLoading]);
 
+
+  // ── MIC: Deepgram real-time transcription ────────────────────────
   useEffect(() => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (SpeechRecognition) {
+    if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
       setMicSupported(true);
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = true;
-      recognition.maxAlternatives = 3;
-      recognition.lang = 'en-ZA';
-      recognition.onresult = (e: any) => {
-        let interim = ''; let final = '';
-        for (let i = e.resultIndex; i < e.results.length; i++) {
-          if (e.results[i].isFinal) { final += e.results[i][0].transcript; }
-          else { interim += e.results[i][0].transcript; }
-        }
-        if (interim) setInput(interim);
-        if (final) {
-          const cleaned = final
-            .replace(/i/g, 'I').replace(/im/gi, "I'm")
-            .replace(/dont/gi, "don't").replace(/cant/gi, "can't")
-            .replace(/wont/gi, "won't").replace(/whatsapp/gi, 'WhatsApp')
-            .replace(/ai/gi, 'AI').replace(/sa/gi, 'SA')
-            .replace(/\s+/g, ' ').trim();
-          setInput(cleaned);
-          setIsListening(false);
-        }
-      };
-      recognition.onerror = (e: any) => {
-        if (e.error !== 'no-speech' && e.error !== 'aborted') setIsListening(false);
-      };
-      recognition.onend = () => {
-        setIsListening(prev => {
-          if (prev) { setTimeout(() => { try { recognition.start(); } catch {} }, 150); return true; }
-          return false;
-        });
-      };
-      recognitionRef.current = recognition;
       if (!localStorage.getItem('ink_mic_seen')) setTimeout(() => setShowMicHint(true), 3000);
     }
   }, []);
 
-  const toggleListening = () => {
-    if (!recognitionRef.current) return;
+  const stopDeepgram = useCallback(() => {
+    try { deepgramWsRef.current?.close(); } catch {}
+    try { processorRef.current?.disconnect(); } catch {}
+    try { (audioCtxRef.current as any)?.close(); } catch {}
+    mediaStreamRef.current?.getTracks().forEach((t: any) => t.stop());
+    deepgramWsRef.current  = null;
+    processorRef.current   = null;
+    audioCtxRef.current    = null;
+    mediaStreamRef.current = null;
+    setIsListening(false);
+  }, []);
+
+  const startDeepgram = useCallback(async () => {
+    setMicError('');
+    try {
+      const tokenRes = await fetch('https://inkanyezibot-v2.vercel.app/api/transcribe');
+      const { key } = await tokenRes.json();
+      if (!key) throw new Error('No key');
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+
+      const ws = new WebSocket(
+        'wss://api.deepgram.com/v1/listen?model=nova-2&language=en-ZA&smart_format=true&punctuate=true&interim_results=true&encoding=linear16&sample_rate=16000',
+        ['token', key]
+      );
+      deepgramWsRef.current = ws;
+
+      ws.onopen = () => {
+        setIsListening(true);
+        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+        const ctx = new AudioCtx({ sampleRate: 16000 });
+        audioCtxRef.current = ctx;
+        const source = ctx.createMediaStreamSource(stream);
+        const processor = ctx.createScriptProcessor(4096, 1, 1);
+        processorRef.current = processor;
+        processor.onaudioprocess = (e: any) => {
+          if (ws.readyState !== WebSocket.OPEN) return;
+          const float32 = e.inputBuffer.getChannelData(0);
+          const int16 = new Int16Array(float32.length);
+          for (let i = 0; i < float32.length; i++) {
+            int16[i] = Math.max(-32768, Math.min(32767, float32[i] * 32768));
+          }
+          ws.send(int16.buffer);
+        };
+        source.connect(processor);
+        processor.connect(ctx.destination);
+      };
+
+      ws.onmessage = (evt: any) => {
+        try {
+          const msg = JSON.parse(evt.data);
+          const transcript = msg?.channel?.alternatives?.[0]?.transcript || '';
+          if (!transcript) return;
+          if (msg.is_final) {
+            setInput((prev: string) => (prev.replace(/\s*\[…\].*$/, '').trim() + ' ' + transcript).trim());
+          } else {
+            setInput((prev: string) => prev.replace(/\s*\[…\].*$/, '').trim() + ' […]' + transcript);
+          }
+        } catch {}
+      };
+
+      ws.onerror = () => { setMicError('Mic connection error — please try again'); stopDeepgram(); };
+      ws.onclose = () => { if (isListening) stopDeepgram(); };
+
+    } catch (err: any) {
+      const msg = err?.message || '';
+      if (msg.includes('Permission') || msg.includes('denied') || msg.includes('NotAllowed')) {
+        setMicError('Mic access denied — allow microphone in browser settings');
+      } else {
+        setMicError('Could not start mic — please try again');
+      }
+      stopDeepgram();
+    }
+  }, [stopDeepgram, isListening]);
+
+  const toggleListening = useCallback(() => {
     localStorage.setItem('ink_mic_seen', '1');
     setShowMicHint(false);
-    if (isListening) { recognitionRef.current.stop(); setIsListening(false); }
-    else { setInput(''); recognitionRef.current.start(); setIsListening(true); }
-  };
+    setMicError('');
+    if (isListening) { stopDeepgram(); }
+    else { setInput(''); startDeepgram(); }
+  }, [isListening, stopDeepgram, startDeepgram]);
+
 
   const newSession = useCallback(() => {
     try { sessionStorage.removeItem('inkanyezi_chat_session'); } catch {}
@@ -1085,7 +1135,12 @@ function InkanyeziBotWidget() {
                 />
                 {micSupported && (
                   <div style={{ position:'relative', flexShrink:0 }}>
-                    {showMicHint && !isListening && (
+                    {micError && (
+                      <div style={{ position:'absolute', bottom:50, left:'50%', transform:'translateX(-50%)', background:'#1a0808', color:'#f87171', fontSize:10, padding:'6px 10px', borderRadius:8, border:'1px solid rgba(248,113,113,0.4)', fontFamily:"'DM Sans',sans-serif", pointerEvents:'none', zIndex:10, maxWidth:200, textAlign:'center', lineHeight:1.4 }}>
+                        {micError}
+                      </div>
+                    )}
+                    {showMicHint && !isListening && !micError && (
                       <div style={{ position:'absolute', bottom:50, left:'50%', transform:'translateX(-50%)', background:'#0A1628', color:'#F4B942', fontSize:11, whiteSpace:'nowrap', padding:'6px 12px', borderRadius:8, border:'1px solid rgba(244,185,66,0.4)', fontFamily:"'Space Mono',monospace", pointerEvents:'none', zIndex:10, animation:'micHintPop 0.3s ease' }}>
                         🎙 Tap to speak
                         <div style={{ position:'absolute', bottom:-5, left:'50%', transform:'translateX(-50%)', width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'5px solid #0A1628' }} />
