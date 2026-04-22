@@ -690,26 +690,7 @@ function InkanyeziBotWidget() {
   const [micSupported, setMicSupported] = useState(false);
   const [showMicHint, setShowMicHint]   = useState(false);
   const [micError, setMicError]         = useState('');
-  const recognitionRef   = useRef<any>(null);
-  const deepgramWsRef    = useRef<WebSocket|null>(null);
-  const mediaStreamRef   = useRef<MediaStream|null>(null);
-  const processorRef     = useRef<ScriptProcessorNode|null>(null);
-  const audioCtxRef      = useRef<AudioContext|null>(null);
-
-  const startVoiceForField = (fieldSetter: (v: string) => void) => {
-    if (!recognitionRef.current) return;
-    const r = recognitionRef.current;
-    r.onresult = (e: any) => {
-      const t = Array.from(e.results).map((r: any) => r[0].transcript).join('');
-      fieldSetter(t);
-      if (e.results[e.results.length - 1].isFinal) setIsListening(false);
-    };
-    r.onerror = () => setIsListening(false);
-    r.onend   = () => setIsListening(false);
-    setInput('');
-    setIsListening(true);
-    r.start();
-  };
+  const recognitionRef = useRef<any>(null);
 
   const hasTriggered = useRef(false);
   const messagesEnd  = useRef<HTMLDivElement>(null);
@@ -717,107 +698,105 @@ function InkanyeziBotWidget() {
 
   useEffect(() => { setTimeout(() => messagesEnd.current?.scrollIntoView({ behavior:'smooth' }), 50); }, [messages, showLeadForm, isLoading]);
 
-
-  // ── MIC: Deepgram real-time transcription ────────────────────────
+  // ── MIC: Browser Speech Recognition (SA English) ─────────────────
   useEffect(() => {
-    if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
-      setMicSupported(true);
-      if (!localStorage.getItem('ink_mic_seen')) setTimeout(() => setShowMicHint(true), 3000);
-    }
-  }, []);
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) return;
+    setMicSupported(true);
+    const rec = new SR();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.maxAlternatives = 3;
+    rec.lang = 'en-ZA';
 
-  const stopDeepgram = useCallback(() => {
-    try { deepgramWsRef.current?.close(); } catch {}
-    try { processorRef.current?.disconnect(); } catch {}
-    try { (audioCtxRef.current as any)?.close(); } catch {}
-    mediaStreamRef.current?.getTracks().forEach((t: any) => t.stop());
-    deepgramWsRef.current  = null;
-    processorRef.current   = null;
-    audioCtxRef.current    = null;
-    mediaStreamRef.current = null;
-    setIsListening(false);
-  }, []);
-
-  const startDeepgram = useCallback(async () => {
-    setMicError('');
-    try {
-      const tokenRes = await fetch('https://inkanyezibot-v2.vercel.app/api/transcribe');
-      const { key } = await tokenRes.json();
-      if (!key) throw new Error('No key');
-
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaStreamRef.current = stream;
-
-      // Deepgram WebSocket — token passed as query param (works in all browsers)
-      const ws = new WebSocket(
-        `wss://api.deepgram.com/v1/listen?model=nova-2&language=en-ZA&smart_format=true&punctuate=true&interim_results=true&encoding=linear16&sample_rate=16000&token=${key}`
-      );
-      deepgramWsRef.current = ws;
-
-      ws.onopen = () => {
-        setIsListening(true);
-        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-        const ctx = new AudioCtx({ sampleRate: 16000 });
-        audioCtxRef.current = ctx;
-        const source = ctx.createMediaStreamSource(stream);
-        const processor = ctx.createScriptProcessor(4096, 1, 1);
-        processorRef.current = processor;
-        processor.onaudioprocess = (e: any) => {
-          if (ws.readyState !== WebSocket.OPEN) return;
-          const float32 = e.inputBuffer.getChannelData(0);
-          const int16 = new Int16Array(float32.length);
-          for (let i = 0; i < float32.length; i++) {
-            int16[i] = Math.max(-32768, Math.min(32767, float32[i] * 32768));
-          }
-          ws.send(int16.buffer);
-        };
-        source.connect(processor);
-        processor.connect(ctx.destination);
-      };
-
-      ws.onmessage = (evt: any) => {
-        try {
-          const msg = JSON.parse(evt.data);
-          const transcript = msg?.channel?.alternatives?.[0]?.transcript || '';
-          if (!transcript) return;
-          if (msg.is_final) {
-            setInput((prev: string) => (prev.replace(/\s*\[…\].*$/, '').trim() + ' ' + transcript).trim());
-          } else {
-            setInput((prev: string) => prev.replace(/\s*\[…\].*$/, '').trim() + ' […]' + transcript);
-          }
-        } catch {}
-      };
-
-      ws.onerror = () => { setMicError('Mic connection error — please try again'); stopDeepgram(); };
-      ws.onclose = () => { if (isListening) stopDeepgram(); };
-
-    } catch (err: any) {
-      const msg = err?.message || '';
-      if (msg.includes('Permission') || msg.includes('denied') || msg.includes('NotAllowed')) {
-        setMicError('Tap the 🔒 icon in your browser address bar → allow microphone → retry');
-      } else if (msg.includes('NotFound') || msg.includes('Requested device')) {
-        setMicError('No microphone found on this device');
-      } else {
-        setMicError('Could not start mic — please try again');
+    rec.onresult = (e: any) => {
+      let interim = '';
+      let final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const transcript = e.results[i][0].transcript;
+        if (e.results[i].isFinal) {
+          final += transcript;
+        } else {
+          interim += transcript;
+        }
       }
-      stopDeepgram();
-    }
-  }, [stopDeepgram, isListening]);
+      if (final) {
+        // Clean up common SA speech-to-text errors
+        const cleaned = final
+          .replace(/\bi\b/g, 'I')
+          .replace(/\bim\b/gi, "I'm")
+          .replace(/\bdont\b/gi, "don't")
+          .replace(/\bcant\b/gi, "can't")
+          .replace(/\bwont\b/gi, "won't")
+          .replace(/\bwhatsapp\b/gi, 'WhatsApp')
+          .replace(/\bai\b/gi, 'AI')
+          .replace(/\bsa\b/gi, 'SA')
+          .replace(/\s+/g, ' ')
+          .trim();
+        setInput((prev: string) => (prev + ' ' + cleaned).trim());
+      } else if (interim) {
+        // Show interim text so user sees live transcription
+        setInput((prev: string) => {
+          const base = prev.replace(/\s*\.\.\..*$/, '').trim();
+          return base ? base + ' ...' + interim : interim;
+        });
+      }
+    };
+
+    rec.onerror = (e: any) => {
+      if (e.error === 'not-allowed' || e.error === 'permission-denied') {
+        setMicError('Tap the 🔒 icon in your address bar → allow microphone → retry');
+      } else if (e.error === 'no-speech') {
+        // Silence — don't show error, just keep listening
+        return;
+      } else if (e.error === 'network') {
+        setMicError('Network error — check your connection');
+      } else {
+        setMicError('Mic error — please try again');
+      }
+      setIsListening(false);
+    };
+
+    rec.onend = () => {
+      // If still supposed to be listening, restart (handles browser auto-stop)
+      setIsListening((prev: boolean) => {
+        if (prev) {
+          setTimeout(() => { try { rec.start(); } catch {} }, 100);
+          return true;
+        }
+        return false;
+      });
+    };
+
+    recognitionRef.current = rec;
+    if (!localStorage.getItem('ink_mic_seen')) setTimeout(() => setShowMicHint(true), 3000);
+  }, []);
 
   const toggleListening = useCallback(() => {
+    const rec = recognitionRef.current;
+    if (!rec) {
+      setMicError('Speech recognition not available in this browser');
+      return;
+    }
     localStorage.setItem('ink_mic_seen', '1');
     setShowMicHint(false);
     setMicError('');
     if (isListening) {
-      stopDeepgram();
+      try { rec.stop(); } catch {}
+      setIsListening(false);
+      // Clean up any trailing interim text
+      setInput((prev: string) => prev.replace(/\s*\.\.\..*$/, '').trim());
     } else {
       setInput('');
-      // Show a brief instruction before requesting permission
-      // This primes the user so the browser prompt doesn't surprise them
-      setMicError('');
-      startDeepgram();
+      try {
+        rec.start();
+        setIsListening(true);
+      } catch (err: any) {
+        setMicError('Could not start mic — please try again');
+        setIsListening(false);
+      }
     }
-  }, [isListening, stopDeepgram, startDeepgram]);
+  }, [isListening]);
 
 
   const newSession = useCallback(() => {
