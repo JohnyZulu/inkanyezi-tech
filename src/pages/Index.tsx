@@ -738,19 +738,22 @@ function InkanyeziBotWidget() {
         // Skip if too short (likely just a click)
         if (audioBlob.size < 1000) { resolve(); return; }
 
-        // Send to Deepgram via backend
+        // Send to Deepgram via backend — use base MIME type only (strip codecs)
+        const baseMime = mimeType.split(';')[0] || 'audio/webm';
         setIsTranscribing(true);
         try {
           const res = await fetch('https://inkanyezibot-v2.vercel.app/api/transcribe', {
             method: 'POST',
-            headers: { 'Content-Type': mimeType },
+            headers: { 'Content-Type': baseMime },
             body: audioBlob,
           });
           const data = await res.json();
-          if (data.text) {
-            setInput((prev: string) => prev ? prev + ' ' + data.text : data.text);
+          if (data.text && data.text.trim()) {
+            setInput((prev: string) => prev ? prev + ' ' + data.text.trim() : data.text.trim());
           } else if (data.error) {
-            setMicError('Could not transcribe — please try again');
+            setMicError(data.error);
+          } else {
+            setMicError('No speech detected — try speaking louder');
           }
         } catch {
           setMicError('Transcription failed — check your connection');
