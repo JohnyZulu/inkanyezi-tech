@@ -690,7 +690,10 @@ function InkanyeziBotWidget() {
   const [micSupported, setMicSupported] = useState(false);
   const [showMicHint, setShowMicHint]   = useState(false);
   const [micError, setMicError]         = useState('');
-  const recognitionRef = useRef<any>(null);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder|null>(null);
+  const audioChunksRef   = useRef<Blob[]>([]);
+  const mediaStreamRef   = useRef<MediaStream|null>(null);
 
   const hasTriggered = useRef(false);
   const messagesEnd  = useRef<HTMLDivElement>(null);
@@ -698,105 +701,124 @@ function InkanyeziBotWidget() {
 
   useEffect(() => { setTimeout(() => messagesEnd.current?.scrollIntoView({ behavior:'smooth' }), 50); }, [messages, showLeadForm, isLoading]);
 
-  // ── MIC: Browser Speech Recognition (SA English) ─────────────────
+  // ── MIC: Deepgram Nova-2 AI Transcription ────────────────────────
   useEffect(() => {
-    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SR) return;
-    setMicSupported(true);
-    const rec = new SR();
-    rec.continuous = true;
-    rec.interimResults = true;
-    rec.maxAlternatives = 3;
-    rec.lang = 'en-ZA';
+    // MediaRecorder works on all modern browsers and devices
+    if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia) {
+      setMicSupported(true);
+      if (!localStorage.getItem('ink_mic_seen')) setTimeout(() => setShowMicHint(true), 3000);
+    }
+  }, []);
 
-    rec.onresult = (e: any) => {
-      let interim = '';
-      let final = '';
-      for (let i = e.resultIndex; i < e.results.length; i++) {
-        const transcript = e.results[i][0].transcript;
-        if (e.results[i].isFinal) {
-          final += transcript;
-        } else {
-          interim += transcript;
+  const stopRecording = useCallback(async () => {
+    const recorder = mediaRecorderRef.current;
+    if (!recorder || recorder.state === 'inactive') {
+      setIsListening(false);
+      return;
+    }
+
+    // Return a promise that resolves when recording stops and transcription completes
+    return new Promise<void>((resolve) => {
+      recorder.onstop = async () => {
+        setIsListening(false);
+        const chunks = audioChunksRef.current;
+
+        // Stop the mic stream
+        mediaStreamRef.current?.getTracks().forEach(t => t.stop());
+        mediaStreamRef.current = null;
+        mediaRecorderRef.current = null;
+
+        if (chunks.length === 0) { resolve(); return; }
+
+        // Create audio blob
+        const mimeType = recorder.mimeType || 'audio/webm';
+        const audioBlob = new Blob(chunks, { type: mimeType });
+        audioChunksRef.current = [];
+
+        // Skip if too short (likely just a click)
+        if (audioBlob.size < 1000) { resolve(); return; }
+
+        // Send to Deepgram via backend
+        setIsTranscribing(true);
+        try {
+          const res = await fetch('https://inkanyezibot-v2.vercel.app/api/transcribe', {
+            method: 'POST',
+            headers: { 'Content-Type': mimeType },
+            body: audioBlob,
+          });
+          const data = await res.json();
+          if (data.text) {
+            setInput((prev: string) => prev ? prev + ' ' + data.text : data.text);
+          } else if (data.error) {
+            setMicError('Could not transcribe — please try again');
+          }
+        } catch {
+          setMicError('Transcription failed — check your connection');
+        } finally {
+          setIsTranscribing(false);
         }
-      }
-      if (final) {
-        // Clean up common SA speech-to-text errors
-        const cleaned = final
-          .replace(/\bi\b/g, 'I')
-          .replace(/\bim\b/gi, "I'm")
-          .replace(/\bdont\b/gi, "don't")
-          .replace(/\bcant\b/gi, "can't")
-          .replace(/\bwont\b/gi, "won't")
-          .replace(/\bwhatsapp\b/gi, 'WhatsApp')
-          .replace(/\bai\b/gi, 'AI')
-          .replace(/\bsa\b/gi, 'SA')
-          .replace(/\s+/g, ' ')
-          .trim();
-        setInput((prev: string) => (prev + ' ' + cleaned).trim());
-      } else if (interim) {
-        // Show interim text so user sees live transcription
-        setInput((prev: string) => {
-          const base = prev.replace(/\s*\.\.\..*$/, '').trim();
-          return base ? base + ' ...' + interim : interim;
-        });
-      }
-    };
+        resolve();
+      };
 
-    rec.onerror = (e: any) => {
-      if (e.error === 'not-allowed' || e.error === 'permission-denied') {
-        setMicError('Tap the 🔒 icon in your address bar → allow microphone → retry');
-      } else if (e.error === 'no-speech') {
-        // Silence — don't show error, just keep listening
-        return;
-      } else if (e.error === 'network') {
-        setMicError('Network error — check your connection');
+      recorder.stop();
+    });
+  }, []);
+
+  const startRecording = useCallback(async () => {
+    setMicError('');
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 16000,
+        }
+      });
+      mediaStreamRef.current = stream;
+
+      // Pick best supported format
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus'
+                     : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm'
+                     : MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4'
+                     : 'audio/wav';
+
+      const recorder = new MediaRecorder(stream, { mimeType });
+      mediaRecorderRef.current = recorder;
+      audioChunksRef.current = [];
+
+      recorder.ondataavailable = (e: any) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
+      // Collect data every 250ms for responsiveness
+      recorder.start(250);
+      setIsListening(true);
+
+    } catch (err: any) {
+      const msg = err?.message || '';
+      if (msg.includes('Permission') || msg.includes('denied') || msg.includes('NotAllowed')) {
+        setMicError('Tap 🔒 in your address bar → allow microphone → retry');
+      } else if (msg.includes('NotFound') || msg.includes('device')) {
+        setMicError('No microphone found on this device');
       } else {
-        setMicError('Mic error — please try again');
+        setMicError('Could not access microphone');
       }
       setIsListening(false);
-    };
-
-    rec.onend = () => {
-      // If still supposed to be listening, restart (handles browser auto-stop)
-      setIsListening((prev: boolean) => {
-        if (prev) {
-          setTimeout(() => { try { rec.start(); } catch {} }, 100);
-          return true;
-        }
-        return false;
-      });
-    };
-
-    recognitionRef.current = rec;
-    if (!localStorage.getItem('ink_mic_seen')) setTimeout(() => setShowMicHint(true), 3000);
+    }
   }, []);
 
   const toggleListening = useCallback(() => {
-    const rec = recognitionRef.current;
-    if (!rec) {
-      setMicError('Speech recognition not available in this browser');
-      return;
-    }
     localStorage.setItem('ink_mic_seen', '1');
     setShowMicHint(false);
     setMicError('');
     if (isListening) {
-      try { rec.stop(); } catch {}
-      setIsListening(false);
-      // Clean up any trailing interim text
-      setInput((prev: string) => prev.replace(/\s*\.\.\..*$/, '').trim());
+      stopRecording();
     } else {
       setInput('');
-      try {
-        rec.start();
-        setIsListening(true);
-      } catch (err: any) {
-        setMicError('Could not start mic — please try again');
-        setIsListening(false);
-      }
+      startRecording();
     }
-  }, [isListening]);
+  }, [isListening, stopRecording, startRecording]);
 
 
   const newSession = useCallback(() => {
@@ -1110,7 +1132,7 @@ function InkanyeziBotWidget() {
                 <textarea ref={textareaRef} value={input} className="ink-textarea"
                   onChange={e => { setInput(e.target.value); e.target.style.height='auto'; e.target.style.height=Math.min(e.target.scrollHeight,96)+'px'; }}
                   onKeyDown={e => { if (e.key==='Enter'&&!e.shiftKey&&!('ontouchstart' in window)) { e.preventDefault(); sendMessage(); } }}
-                  placeholder={isListening ? '🎙 Listening… speak now' : 'Type or tap 🎙 to speak...'} rows={1}
+                  placeholder={isTranscribing ? '✨ Transcribing with AI...' : isListening ? '🎙 Recording… tap stop when done' : 'Type or tap 🎙 to speak...'} rows={1}
                   autoComplete="on" autoCorrect="on" autoCapitalize="sentences" spellCheck={true}
                   style={{ flex:1, padding:'9px 13px', borderRadius:14, background:'#F5F7FA', border:`1px solid ${isListening ? '#F4B942' : 'rgba(244,185,66,0.3)'}`, color:'#1a1a2e', outline:'none', fontSize:16, resize:'none', lineHeight:1.5, wordBreak:'break-word', overflowWrap:'break-word', whiteSpace:'pre-wrap', overflowX:'hidden', overflowY:'auto', maxHeight:120, width:'100%', boxSizing:'border-box', fontFamily:"'DM Sans',sans-serif", transition:'border-color 0.2s', WebkitAppearance:'none' }}
                   onFocus={e=>e.target.style.borderColor='#F4B942'}
@@ -1133,8 +1155,8 @@ function InkanyeziBotWidget() {
                       </div>
                     )}
                     <button onPointerUp={toggleListening} aria-label={isListening?'Stop recording':'Speak your message'}
-                      style={{ width:42, height:42, borderRadius:'50%', flexShrink:0, background:isListening?'linear-gradient(135deg,#F4B942,#FF6B35)':'rgba(244,185,66,0.15)', border:isListening?'2px solid #F4B942':'1.5px solid rgba(244,185,66,0.5)', color:isListening?'#0A1628':'#F4B942', fontSize:18, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', animation:isListening?'micPulse 1.2s ease-in-out infinite':'none', WebkitTapHighlightColor:'transparent', touchAction:'manipulation' }}>
-                      {isListening?'⏹':'🎙'}
+                      style={{ width:42, height:42, borderRadius:'50%', flexShrink:0, background:isTranscribing?'linear-gradient(135deg,#3A9E7E,#2d8a6e)':isListening?'linear-gradient(135deg,#F4B942,#FF6B35)':'rgba(244,185,66,0.15)', border:isTranscribing?'2px solid #3A9E7E':isListening?'2px solid #F4B942':'1.5px solid rgba(244,185,66,0.5)', color:isTranscribing?'#fff':isListening?'#0A1628':'#F4B942', fontSize:18, cursor:isTranscribing?'wait':'pointer', display:'flex', alignItems:'center', justifyContent:'center', transition:'all 0.2s', animation:isListening?'micPulse 1.2s ease-in-out infinite':'none', WebkitTapHighlightColor:'transparent', touchAction:'manipulation', pointerEvents:isTranscribing?'none':'auto' }}>
+                      {isTranscribing?'✨':isListening?'⏹':'🎙'}
                     </button>
                   </div>
                 )}
