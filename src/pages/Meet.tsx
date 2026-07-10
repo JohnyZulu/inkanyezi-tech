@@ -12,7 +12,7 @@ ORG:Inkanyezi Technologies
 TITLE:Founder & AI Automation Consultant
 TEL;TYPE=CELL,WHATSAPP:+27658804122
 EMAIL:inkanyeziaisolutions3@gmail.com
-URL:https://inkanyezi-tech-murex.vercel.app/meet
+URL:https://inkanyezitech.co.za
 ADR;TYPE=WORK:;;Durban;KwaZulu-Natal;;South Africa
 NOTE:AI Automation for South African SMEs. We are the signal in the noise.
 END:VCARD`;
@@ -409,7 +409,7 @@ export default function Meet() {
   const [copied, setCopied] = useState(false);
 
   const copyLink = () => {
-    navigator.clipboard.writeText("https://inkanyezi-tech-murex.vercel.app/meet");
+    navigator.clipboard.writeText("https://");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -647,7 +647,7 @@ export default function Meet() {
             <SectionLabel text="✦ Signal Beacon" />
             <div style={{ padding: "16px 18px" }}>
               <div style={{ display: "flex", gap: 18, alignItems: "center" }}>
-                <QRCode url="https://inkanyezi-tech-murex.vercel.app/meet" />
+                <QRCode url="https://" />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily:"'Cormorant Garamond',serif", fontWeight:600, fontSize:'0.82rem', color:"#FFFFFF", marginBottom:5, lineHeight:1.3 }}>
                     Scan to open this card
