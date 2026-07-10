@@ -584,11 +584,11 @@ export default function Meet() {
                 accent="#22C55E" fullWidth />
               <GameBtn icon="🤖" label="Chat with InkanyeziBot"
                 sub="AI Automation Demo · Live now"
-                onClick={() => window.open("https://inkanyezi-tech-murex.vercel.app/#chat","_blank")}
+                onClick={() => window.open("https://inkanyezitech.co.za/#chat","_blank")}
                 accent="#FF6B35" fullWidth />
               <GameBtn icon="🌐" label="Visit Website"
-                sub="inkanyezi-tech-murex.vercel.app"
-                onClick={() => window.open("https://inkanyezi-tech-murex.vercel.app","_blank")}
+                sub="inkanyezitech.co.za"
+                onClick={() => window.open("https://inkanyezitech.co.za","_blank")}
                 accent="#00C8FF" fullWidth />
             </div>
           </Card>
@@ -681,7 +681,7 @@ export default function Meet() {
               Inkanyezi Technologies · Durban, KZN · POPIA Compliant
             </div>
             <div style={{ fontFamily:"'Outfit',sans-serif", fontSize:"0.58rem", letterSpacing:"0.1em", color:"rgba(212,158,40,0.5)", marginTop:3 }}>
-              inkanyezi-tech-murex.vercel.app
+              inkanyezitech.co.za
             </div>
           </div>
 
