@@ -10,25 +10,8 @@ const DemoSection = () => {
   return (
     <section
       id="demo"
-      className="relative py-24 bg-[#0A1628] overflow-hidden"
+      className="relative pt-4 pb-20 bg-transparent overflow-hidden"
     >
-      {/* Subtle constellation background */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(40)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute rounded-full bg-white"
-            style={{
-              width: Math.random() * 2 + 1 + "px",
-              height: Math.random() * 2 + 1 + "px",
-              top: Math.random() * 100 + "%",
-              left: Math.random() * 100 + "%",
-              opacity: Math.random() * 0.4 + 0.1,
-            }}
-          />
-        ))}
-      </div>
-
       <div className="relative z-10 max-w-6xl mx-auto px-6">
 
         {/* Section label */}
@@ -42,13 +25,13 @@ const DemoSection = () => {
         </h2>
 
         {/* Subheading */}
-        <p className="text-center text-white/60 text-lg max-w-2xl mx-auto mb-12 leading-relaxed">
+        <p className="text-center text-white/60 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
           This is not a demo recording. This is a real system, running live,
           capturing leads and booking clients — while the founder sleeps.
         </p>
 
         {/* Gold divider */}
-        <div className="flex items-center justify-center gap-4 mb-12">
+        <div className="flex items-center justify-center gap-4 mb-10">
           <div className="h-px w-24 bg-gradient-to-r from-transparent to-[#F4B942] opacity-50" />
           <span className="text-[#F4B942] text-lg">✦</span>
           <div className="h-px w-24 bg-gradient-to-l from-transparent to-[#F4B942] opacity-50" />
@@ -64,7 +47,6 @@ const DemoSection = () => {
           <div className="relative rounded-2xl overflow-hidden border border-[#F4B942]/20 shadow-2xl shadow-black/60">
 
             {!playing ? (
-              /* Custom thumbnail + play button */
               <div
                 className="relative cursor-pointer group"
                 onClick={() => setPlaying(true)}
@@ -83,14 +65,11 @@ const DemoSection = () => {
                 {/* Play button */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">
-                    {/* Outer glow ring */}
                     <div className="absolute -inset-4 rounded-full bg-[#F4B942]/20 animate-ping" />
-                    {/* Button */}
                     <button
                       className="relative w-20 h-20 rounded-full bg-[#F4B942] flex items-center justify-center shadow-lg shadow-[#F4B942]/40 transition-transform duration-200 group-hover:scale-110"
                       aria-label="Play video"
                     >
-                      {/* Play triangle */}
                       <svg
                         className="w-8 h-8 text-[#0A1628] ml-1"
                         fill="currentColor"
@@ -113,7 +92,6 @@ const DemoSection = () => {
                 </div>
               </div>
             ) : (
-              /* YouTube iframe */
               <div style={{ paddingBottom: "56.25%", position: "relative", height: 0 }}>
                 <iframe
                   src={EMBED_URL}
@@ -134,12 +112,12 @@ const DemoSection = () => {
           </div>
         </div>
 
-        {/* Below video — stats strip */}
-        <div className="mt-12 grid grid-cols-3 gap-6 max-w-2xl mx-auto text-center">
+        {/* Stats strip */}
+        <div className="mt-10 grid grid-cols-3 gap-6 max-w-2xl mx-auto text-center">
           {[
             { value: "< 5 MIN", label: "Lead response time" },
-            { value: "24/7", label: "Always working" },
-            { value: "100%", label: "Automated pipeline" },
+            { value: "24/7",    label: "Always working" },
+            { value: "100%",    label: "Automated pipeline" },
           ].map(({ value, label }) => (
             <div key={label}>
               <p className="text-[#F4B942] font-serif text-2xl font-bold mb-1">
@@ -153,7 +131,7 @@ const DemoSection = () => {
         </div>
 
         {/* CTA */}
-        <div className="mt-12 text-center">
+        <div className="mt-10 text-center">
           <a
             href="/meet"
             className="inline-flex items-center gap-3 px-8 py-4 bg-[#FF6B35] text-white font-bold text-sm tracking-wider uppercase rounded-lg hover:bg-[#FF6B35]/90 transition-all duration-200 shadow-lg shadow-[#FF6B35]/30 hover:shadow-[#FF6B35]/50 hover:-translate-y-0.5"
