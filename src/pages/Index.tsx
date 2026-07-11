@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 import CustomCursor from "@/components/CustomCursor";
 import GlobalStarfield from "@/components/GlobalStarfield";
 import ShootingStars from "@/components/ShootingStars";
+import DemoSection from "@/components/DemoSection";
 
 // ════════════════════════════════════════════════════════════════════
 // DESIGN TOKENS — Afrofuturist Cosmos × SA Heritage × Dark Matter
@@ -1333,6 +1334,7 @@ const Index = () => {
           <SolutionSection />
           <DataPipeline />
           <ROICalculator />
+          <DemoSection />
           <ChatDemoFixed />
           <PhilosophySection />
           <ContactSection />
