@@ -1330,11 +1330,11 @@ const Index = () => {
         <Header dark={dark} setDark={setDark} />
         <main>
           <HeroSection />
+          <DemoSection />
           <ProblemSection />
           <SolutionSection />
           <DataPipeline />
           <ROICalculator />
-          <DemoSection />
           <ChatDemoFixed />
           <PhilosophySection />
           <ContactSection />
