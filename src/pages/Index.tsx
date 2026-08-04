@@ -965,7 +965,7 @@ function InkanyeziBotWidget() {
         message: formData.message||sessionContext?.pain_point||'',
         has_email: (formData.email||sessionContext?.email)?'true':'false',
         has_whatsapp: (formData.phone||sessionContext?.whatsapp)?'true':'false',
-        source: 'lovable-site-lead-form', session_id: sessionId, message_count: userMsgs.length,
+        source: 'inkanyezibot-chat', session_id: sessionId, message_count: userMsgs.length,
         conversation_summary: messages.slice(-6).map(m=>`${m.role==='user'?'Customer':'Bot'}: ${m.content}`).join('\n'),
         qualification_stage: sessionContext?.qualification_stage||'new', pain_point: sessionContext?.pain_point||'',
         budget_signal: sessionContext?.budget_signal||'', demo_booked: sessionContext?.demo_booked||false,
